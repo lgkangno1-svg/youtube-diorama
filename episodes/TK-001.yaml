@@ -1,0 +1,67 @@
+episode_id: TK-001
+status: ready-for-flow
+target_market: JP
+audience: [teens, twenties]
+format: experiment
+food: omurice
+constraint: 3cm
+length_target_seconds: 45
+hook: "猫の手に卵を渡した結果…"
+title: "猫の手で3cmオムライスは作れる？"
+open_loops:
+  - at_second: 0
+    question: can_the_cat_make_it
+  - at_second: 12
+    question: will_the_egg_tear
+  - at_second: 30
+    question: who_is_it_for
+payoff: parsley_twist
+loop_end: return_egg_cup_to_opening_position
+flow_strategy:
+  primary_model: veo-3.1-lite
+  upgrade_model: veo-3.1-quality
+  output_count: 1
+  use_quality_only_for: [hero_food_reveal]
+  use_consistent_references: true
+references:
+  - CAT_MASTER_PAWS
+  - KITCHEN_MASTER_COUNTER
+  - PAN_MASTER
+  - PLATE_MASTER
+scenes:
+  - id: S1
+    purpose: hook
+    generation_seconds: 8
+    keep_seconds: 7
+    action: paw_pushes_tiny_egg_cup_toward_pan
+  - id: S2
+    purpose: constraint_reveal
+    generation_seconds: 8
+    keep_seconds: 7
+    action: ten_rice_grains_and_one_ketchup_drop_are_stirred
+  - id: S3
+    purpose: cliffhanger
+    generation_seconds: 8
+    keep_seconds: 7.5
+    action: omelet_edge_almost_tears
+  - id: S4
+    purpose: second_risk
+    generation_seconds: 8
+    keep_seconds: 9
+    action: omelet_is_slid_onto_rice_and_almost_slips
+  - id: S5
+    purpose: visual_payoff
+    generation_seconds: 8
+    keep_seconds: 8
+    action: ketchup_line_and_hero_reveal
+    quality_candidate: true
+  - id: S6
+    purpose: twist_and_loop
+    generation_seconds: 8
+    keep_seconds: 6.5
+    action: paw_ignores_omurice_takes_parsley_then_resets_egg_cup
+success_metrics:
+  viewed_vs_swiped_target: ">=75%"
+  avg_percentage_viewed_target: ">=95%"
+  loop_rewatch_signal: true
+  comments_goal: menu_choice
