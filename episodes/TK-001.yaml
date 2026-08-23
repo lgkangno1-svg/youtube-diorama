@@ -5,29 +5,31 @@ audience: [teens, twenties]
 format: experiment
 food: omurice
 constraint: 3cm
-length_target_seconds: 39
+length_target_seconds: 36
 hook: "猫の手に卵を渡した結果…"
 title: "猫の手で3cmオムライスは作れる？"
 open_loops:
   - at_second: 0
     question: can_the_cat_make_it
-  - at_second: 11
+  - at_second: 9
     question: will_the_egg_tear
-  - at_second: 27
+  - at_second: 25
     question: what_will_the_cat_choose
 payoff: parsley_twist
 loop_end: reuse_opening_keyframe_after_parsley_twist
 flow_strategy:
+  mode: exploration_4gen
   primary_model: veo-3.1-lite
   upgrade_model: veo-3.1-quality
   output_count: 1
-  max_lite_generations_first_pass: 5
-  non_ultra_credit_budget_first_pass: 50
-  ultra_credit_budget_first_pass: 25
-  free_daily_credit_compatible: true
-  use_quality_only_for: [hero_food_reveal_if_lite_is_unusable]
+  max_lite_generations_first_pass: 4
+  non_ultra_credit_budget_first_pass: 40
+  ultra_credit_budget_first_pass: 20
+  fifth_generation_requires_winner_gate: true
+  image_preflight_model: nano-banana-2-lite
+  explicitly_select_image_model: true
+  use_quality_only_for: [hero_food_reveal_after_format_wins]
   use_consistent_references: true
-  build_keyframes_with_free_image_model_first: true
   do_not_generate_separate_cta_clip: true
 references:
   - CAT_MASTER_PAWS
@@ -35,35 +37,28 @@ references:
   - PAN_MASTER
   - PLATE_MASTER
 scenes:
-  - id: S1
-    purpose: hook
+  - id: G1
+    purpose: hook_plus_constraint
     generation_seconds: 8
-    keep_seconds: 7
-    action: paw_pushes_tiny_egg_cup_toward_pan
-  - id: S2
-    purpose: constraint_reveal
+    action: paw_pushes_tiny_egg_cup_toward_pan_then_reveals_tiny_rice_amount
+  - id: G2
+    purpose: progress_plus_danger
     generation_seconds: 8
-    keep_seconds: 7
-    action: ten_rice_grains_and_one_ketchup_drop_are_stirred
-  - id: S3
-    purpose: cliffhanger
+    action: ketchup_rice_cooks_then_omelet_edge_almost_tears
+  - id: G3
+    purpose: recovery_plus_final_risk
     generation_seconds: 8
-    keep_seconds: 7.5
-    action: omelet_edge_almost_tears
-  - id: S4
-    purpose: second_risk
+    action: omelet_survives_then_almost_slips_while_being_placed_on_rice
+  - id: G4
+    purpose: payoff_plus_twist
     generation_seconds: 8
-    keep_seconds: 8
-    action: omelet_is_slid_onto_rice_and_almost_slips
-  - id: S5
-    purpose: payoff_twist
-    generation_seconds: 8
-    keep_seconds: 8
     action: finished_omurice_reveal_then_paw_ignores_it_and_takes_parsley
 editorial_seconds:
-  cliffhanger_freeze: 0.5
-  hero_hold: 0.5
-  opening_keyframe_reuse_for_cta_and_loop: 1.0
+  opening_keyframe_hold: 0.8
+  cliffhanger_freeze: 0.4
+  hero_keyframe_punch_in: 0.6
+  reaction_hold: 0.5
+  opening_keyframe_reuse_for_loop: 0.8
 success_metrics:
   viewed_vs_swiped_target: ">=75%"
   avg_percentage_viewed_target: ">=95%"
@@ -74,3 +69,7 @@ originality_guard:
   unique_conflict: omelet_almost_tears
   unique_ending: parsley_twist
   do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
+ip_story_guard:
+  character_motivation: prove_the_tiny_shop_can_serve_a_real_signature_dish
+  world_state_change: first_signature_menu_item_is_completed
+  callback_or_new_lore: cat_prefers_garnish_over_the_dish_it_worked_hard_to_make
