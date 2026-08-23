@@ -5,6 +5,26 @@
 > 타깃: 일본 10대·20대 중심, 글로벌 확장 가능
 > 핵심 포맷: 고양이 앞발 × 디오라마 × 초미니 실제 음식 × ASMR × 짧은 스토리
 
+## 현재 제작 표준 — 먼저 이것부터 적용
+
+2026-08-24 최신 Loop 결과로 초기 파일럿 제작 표준을 아래처럼 갱신했다.
+
+> **무료 keyframe preflight → Veo 3.1 Lite 최대 5 generations → 38~40초 편집 → 실패 컷만 재생성**
+
+이유:
+- 비구독 사용자는 하루 50개의 무료 Flow credits를 받음
+- Veo 3.1 Lite는 비-Ultra 기준 generation당 10 credits
+- 5 generations = 50 credits이므로 무료 일일 한도 안에서 파일럿 1편 전체 모션 테스트 가능
+- 기존 6 generations 기본안 대비 약 17% 절감
+- CTA/루프용 별도 영상은 만들지 않고 오프닝 keyframe을 재사용
+- Flow 요청이 복수 generation을 만들 수 있으므로 output count는 항상 1로 확인
+- keyframe/ingredient는 Flow의 무료 기본 이미지 모델 Nano Banana 2 Lite에서 먼저 검수
+
+세부 운영 규칙은 `docs/06_zero_waste_flow_factory.md`를 현재 기준 문서로 사용한다.
+기존 `docs/02_google_flow_scene_prompts.md`의 6장면 예시는 대본/연출 참고용이며, 실제 최초 생성 예산은 episode manifest의 5-generation 제한을 우선한다.
+
+---
+
 ## 1. 프로젝트 목적
 
 YouTube Shorts에서 조회수만 높은 채널이 아니라, 장기적으로 광고·YouTube Shopping·제휴·브랜드 협찬·캐릭터 IP 확장까지 가능한 쇼츠 채널을 만든다.
@@ -87,9 +107,9 @@ YouTube Shorts에서 조회수만 높은 채널이 아니라, 장기적으로 �
 - 첫 3초에 완성품을 모두 노출하지 않음
 - 5~10초마다 새로운 미해결 질문 생성
 - 15초에 계란이 찢어질 듯한 클리프행어
-- 30초에 `사실 이건 고양이가 먹으려고 만든 게 아니다`라는 두 번째 오픈루프
+- 30초에 새로운 오픈루프
 - 마지막에 고양이가 오므라이스가 아닌 파슬리를 선택
-- 마지막 프레임을 첫 프레임의 `앞발 + 달걀` 구도로 되돌려 무한 루프
+- 마지막 프레임을 첫 프레임과 연결해 루프
 
 ### STEP 5 — 30일 콘텐츠 캘린더 제작
 
@@ -104,15 +124,15 @@ YouTube Shorts에서 조회수만 높은 채널이 아니라, 장기적으로 �
 
 ### STEP 6 — Google Flow 제작 파이프라인
 
-45초 전체를 한 번에 생성하지 않고 6~8초 단위 장면으로 분할한다.
+초기에는 45초 전체를 한 번에 만들거나 모든 장면을 Quality로 생성하지 않는다.
 
-Google Flow의 Ingredients/References를 이용해 아래를 고정한다.
-- 같은 고양이 앞발
-- 같은 미니 주방
-- 같은 조리도구
-- 같은 조명과 렌즈 룩
-
-각 클립을 Flow Scenebuilder에서 이어 붙이고 45초로 트리밍한다.
+현재 표준:
+- 무료 이미지 keyframe으로 캐릭터/주방/도구/스케일 사전 검수
+- 동일 Reference Pack 고정
+- Lite 최대 5 generations
+- 약 38~40초 파일럿
+- 실패 컷만 재생성
+- Quality는 장기 재사용할 Hero asset에만 선택적으로 사용
 
 ### STEP 7 — 경쟁 채널 벤치마킹
 
@@ -154,7 +174,7 @@ Google Flow의 Ingredients/References를 이용해 아래를 고정한다.
 - 도자기·금속 조리도구의 작은 충돌음
 - 고양이 발의 부드러운 탭
 - 필요 시 아주 작은 고양이 울음
-- 영상 생성 단계에서는 일본어 텍스트·대사를 최소화하고 후편집 내레이션/자막 사용
+- 생성 단계에서는 일본어 화면 텍스트를 최소화하고 후편집 내레이션/자막 사용
 
 ### 금지 요소
 - 인간 손 등장
@@ -165,6 +185,14 @@ Google Flow의 Ingredients/References를 이용해 아래를 고정한다.
 - 워터마크
 - 화면 안의 깨진 일본어 AI 텍스트
 - 불필요한 카메라 흔들림
+
+### 원본성 가드
+각 episode는 최소한 아래 3가지가 고유해야 한다.
+- unique_goal
+- unique_conflict
+- unique_ending
+
+동일 conflict + ending 조합은 다음 5편 안에 재사용하지 않는다.
 
 ---
 
@@ -187,17 +215,41 @@ Google Flow의 Ingredients/References를 이용해 아래를 고정한다.
 
 ---
 
-## 5. 문서 구조
+## 5. 수익화 기준
 
-- `README.md` — 프로젝트 전체 개요와 대화/의사결정 기록
-- `docs/01_scripts_hooks_retention.md` — 45초 대본, 훅, 리텐션 구조
-- `docs/02_google_flow_scene_prompts.md` — Google Flow용 장면별 생성 프롬프트
-- `docs/03_benchmark_analysis.md` — 경쟁 채널 및 바이럴 구조 분석
-- `docs/04_30_day_calendar.md` — 30일 Shorts 아이디어
+2026년 확대 YPP 조기 진입 목표:
+- 구독자 500명
+- 최근 90일 공개 업로드 3회
+- 최근 90일 qualified Shorts views 300만 또는 장문 qualified watch hours 3,000
+
+현재 광고/Premium 목표:
+- 구독자 1,000명
+- 최근 90일 qualified public Shorts views 1,000만 또는 qualified watch hours 4,000
+
+2027-02-01부터 신규 광고/Premium 진입은 1,000명 + 2,000만 qualified Shorts views/90일 또는 8,000 watch hours로 강화 예정.
+
+500명 단계에서 타 브랜드 YouTube Shopping Affiliate가 자동 활성화된다고 가정하지 않는다. 실제 Studio 자격을 확인한 뒤 사용한다.
+
+포토리얼한 AI Tiny Cat Kitchen 영상은 실제로 일어나지 않은 사실적 장면이므로 YouTube Studio의 AI use disclosure를 기본적으로 `Yes`로 처리한다. 공개 자체는 추천 또는 수익화 자격을 제한하지 않는다.
 
 ---
 
-## 6. 첫 제작물
+## 6. 문서 구조
+
+- `README.md` — 프로젝트 전체 개요와 현재 제작 기준
+- `docs/01_scripts_hooks_retention.md` — 대본, 훅, 리텐션 구조
+- `docs/02_google_flow_scene_prompts.md` — Flow 장면별 프롬프트 예시
+- `docs/03_benchmark_analysis.md` — 경쟁 채널 및 바이럴 구조 분석
+- `docs/04_30_day_calendar.md` — 30일 Shorts 아이디어
+- `docs/05_72h_growth_and_low_credit_loop.md` — 성장·수익화·저크레딧 Loop 계획
+- `docs/06_zero_waste_flow_factory.md` — **현재 적용할 5-generation 저비용 제작 표준**
+- `episodes/TK-001.yaml` — 3cm 오므라이스
+- `episodes/TK-002.yaml` — 쌀 10알 볶음밥
+- `episodes/TK-003.yaml` — 비 오는 날 우동집
+
+---
+
+## 7. 첫 제작물
 
 파일럿:
 
@@ -207,9 +259,13 @@ Google Flow의 Ingredients/References를 이용해 아래를 고정한다.
 
 > **猫の手に卵を渡した結果…**
 
+현재 TK-001 생성 예산:
+- Lite 최대 5 generations
+- 비-Ultra 50 credits / Ultra 25 credits
+- 목표 편집 길이 약 39초
+
 결말:
 - 고양이가 힘들게 3cm 오므라이스를 완성
 - 먹으려는 듯 다가감
-- 오므라이스를 지나쳐 옆의 파슬리를 가져감
-- 다시 작은 달걀을 화면 중앙에 놓음
-- 첫 장면으로 자연스럽게 루프
+- 오므라이스를 지나쳐 파슬리를 가져감
+- 오프닝 keyframe을 재사용해 첫 장면으로 루프
