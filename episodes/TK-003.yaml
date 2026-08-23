@@ -5,20 +5,25 @@ audience: [teens, twenties]
 format: story
 food: udon
 setting: rainy_night_tiny_shop
-length_target_seconds: 50
+length_target_seconds: 40
 hook: "お客さんは、まだ0人。"
 title: "雨の日、猫が小さなうどん屋を開きました。"
 core_question: will_any_customer_arrive
-midpoint_risk: rain_gets_heavier_and_broth_is_almost_overcooked
+midpoint_risk: rain_gets_heavier_and_noodles_almost_overcook
 payoff: first_customer_arrives
-character_twist: cat_prepares_two_bowls_but_keeps_the_smaller_one_for_itself
-loop_end: shop_lantern_returns_to_empty_opening_frame
+character_twist: cat_keeps_the_smaller_bowl
+loop_end: reuse_empty_shop_opening_frame
 flow_strategy:
   primary_model: veo-3.1-lite
   output_count: 1
-  use_quality_only_for: [rainy_shop_hero_shot]
+  max_lite_generations_first_pass: 5
+  non_ultra_credit_budget_first_pass: 50
+  ultra_credit_budget_first_pass: 25
+  free_daily_credit_compatible: true
+  use_quality_only_for: [rainy_shop_hero_shot_if_lite_is_unusable]
+  build_keyframes_with_free_image_model_first: true
   prioritize_atmosphere: true
-  one_motion_per_clip: true
+  do_not_generate_separate_cta_clip: true
 scenes:
   - id: S1
     action: empty_rainy_udon_shop_with_cat_waiting
@@ -29,7 +34,14 @@ scenes:
   - id: S4
     action: tiny_door_bell_moves_and_customer_shadow_appears
   - id: S5
-    action: steaming_udon_is_completed
-  - id: S6
-    action: first_customer_gets_bowl_and_cat_keeps_tiny_bowl
+    action: steaming_udon_is_served_and_cat_keeps_smaller_bowl
+editorial_seconds:
+  rain_atmosphere_hold: 1.0
+  door_bell_pause: 0.5
+  opening_frame_reuse_for_loop: 1.0
 experiment_variable: worldbuilding_story_retention
+originality_guard:
+  unique_goal: attract_first_customer
+  unique_conflict: food_may_overcook_while_waiting
+  unique_ending: cat_keeps_smaller_bowl
+  do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
