@@ -1,0 +1,94 @@
+episode_id: TK-004
+status: priority_trend_window
+target_market: JP
+audience: [teens, twenties]
+format: trend_experiment
+food: original_mini_gummy
+setting: tiny_japanese_candy_lab
+trend_window:
+  cultural_moment: "9月3日 グミの日"
+  publish_target: "2026-08-28_to_2026-09-03"
+  evidence_theme: "Japanese convenience stores are launching texture-led gummy products ahead of Gummy Day"
+  brand_copying: false
+  use_generic_texture_language_only: true
+length_target_seconds: 36
+hook: "3ミリのグミ、食感まで作れる？"
+title: "猫が3ミリのグミを3種類作ったら、最後だけ変でした。"
+core_question: can_the_cat_create_three_visibly_different_gummy_textures_at_3mm_scale
+midpoint_risk: the_crunchy_shell_cracks_before_the_soft_center_sets
+payoff: three_distinct_mini_gummies_are_completed
+resolution: cat_does_not_pick_a_flavor_and_instead_taps_the_one_with_the_strangest_texture_then_labels_it_as_the_winner_via_voiceover
+loop_end: return_to_three_empty_molds_from_opening
+trend_translation:
+  source_structure_only:
+    - chilled_crunchy_texture
+    - crispy_plus_bouncy_two_layer_texture
+    - mochi_like_soft_chew
+  do_not_recreate:
+    - retailer_packaging
+    - brand_names
+    - logos
+    - exact_product_shapes
+    - exact_flavor_combinations
+flow_strategy:
+  mode: exploration_4gen_frame_locked
+  primary_model: veo-3.1-lite
+  output_count: 1
+  max_lite_generations_first_pass: 4
+  non_ultra_credit_budget_first_pass: 40
+  ultra_credit_budget_first_pass: 20
+  frame_mode: first_plus_last
+  keyframe_count: 5
+  fifth_generation_requires_winner_gate: true
+  image_preflight_model: nano-banana-2-lite
+  explicitly_select_image_model: true
+  use_quality_only_for: [three_texture_hero_macro_after_format_wins]
+  do_not_generate_separate_cta_clip: true
+keyframes:
+  KF0_OPEN: three_empty_3mm_gummy_molds_beside_white_socked_orange_cat_paw_in_tiny_candy_lab
+  KF1_CONSTRAINT: three_tiny_clear_mixtures_with_visibly_different_surface_preparations_ready_for_molding
+  KF2_DANGER: one_crunchy_shell_is_cracking_while_soft_center_is_still_unset
+  KF3_PAYOFF: three_completed_micro_gummies_show_glassy_crunchy_layered_bouncy_and_soft_mochi_like_visual_textures
+  KF4_RESOLUTION: cat_paw_ignores_flavor_order_and_taps_the_visually_strangest_texture_as_winner_beside_three_empty_molds
+scenes:
+  - id: G1
+    start_frame: KF0_OPEN
+    end_frame: KF1_CONSTRAINT
+    action: cat_prepares_three_micro_batches_with_three_different_texture_methods
+  - id: G2
+    start_frame: KF1_CONSTRAINT
+    end_frame: KF2_DANGER
+    action: molding_begins_and_the_crunchy_shell_nearly_fails_before_center_sets
+  - id: G3
+    start_frame: KF2_DANGER
+    end_frame: KF3_PAYOFF
+    action: cat_recovers_the_batch_and_reveals_three_visually_distinct_micro_gummies
+  - id: G4
+    start_frame: KF3_PAYOFF
+    end_frame: KF4_RESOLUTION
+    action: macro_texture_comparison_then_cat_selects_texture_not_flavor
+editorial_seconds:
+  opening_three_mold_hold: 0.7
+  shell_crack_freeze: 0.35
+  three_texture_macro_punch_ins: 1.4
+  selection_pause: 0.55
+  opening_mold_reuse_for_loop: 0.7
+experiment_variable: topical_texture_transformation_retention
+creator_signature:
+  narrator_angle: tiny_food_scientist_observing_texture_not_flavor
+  signature_line: "味じゃなくて、食感で選びました。"
+originality_guard:
+  unique_goal: create_three_micro_textures
+  unique_conflict: shell_sets_before_center_and_nearly_cracks
+  unique_ending: texture_based_selection_resolution
+  do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
+ip_story_guard:
+  character_motivation: prove_the_tiny_kitchen_can_control_texture_not_just_size
+  world_state_change: cat_unlocks_a_tiny_candy_lab_corner_in_the_world
+  callback_or_new_lore: three_molds_remain_on_shelf_for_future_seasonal_sweets
+episode_fingerprint:
+  hook_mechanic: scale_plus_texture_question
+  dominant_visual: three_micro_translucent_textures
+  conflict_mechanic: shell_vs_center_setting_time
+  emotional_turn: near_failure_to_sensory_curiosity
+  ending_mechanic: preference_resolution_not_comedy_food_theft
