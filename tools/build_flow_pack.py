@@ -42,17 +42,32 @@ def get_scene_action(data: dict[str, Any], scene_id: str) -> str:
     return ""
 
 
+def resolution_value(data: dict[str, Any]) -> str:
+    return humanize(
+        data.get("resolution")
+        or data.get("character_twist")
+        or data.get("originality_guard", {}).get("unique_ending")
+        or data.get("payoff")
+    )
+
+
 def frame_text(data: dict[str, Any], name: str) -> str:
     explicit = data.get("keyframes", {}).get(name)
     if explicit:
         return humanize(explicit)
+
+    # Backward compatibility with pre-resolution manifests.
+    if name == "KF4_RESOLUTION":
+        legacy = data.get("keyframes", {}).get("KF4_TWIST")
+        if legacy:
+            return humanize(legacy)
 
     fallback = {
         "KF0_OPEN": f"opening visual for hook: {data.get('hook', '')}; show the constraint immediately",
         "KF1_CONSTRAINT": f"constraint clearly visible: {humanize(data.get('constraint') or data.get('core_question'))}",
         "KF2_DANGER": f"danger moment: {humanize(data.get('midpoint_risk') or data.get('originality_guard', {}).get('unique_conflict'))}",
         "KF3_PAYOFF": f"payoff visual: {humanize(data.get('payoff'))}",
-        "KF4_TWIST": f"ending visual: {humanize(data.get('character_twist') or data.get('originality_guard', {}).get('unique_ending'))}",
+        "KF4_RESOLUTION": f"ending resolution visual: {resolution_value(data)}",
     }
     return fallback[name]
 
@@ -61,12 +76,12 @@ def build(data: dict[str, Any]) -> str:
     episode_id = data["episode_id"]
     refs = ", ".join(data.get("references", [])) or "master cat, kitchen, cookware references"
 
-    kfs = ["KF0_OPEN", "KF1_CONSTRAINT", "KF2_DANGER", "KF3_PAYOFF", "KF4_TWIST"]
+    kfs = ["KF0_OPEN", "KF1_CONSTRAINT", "KF2_DANGER", "KF3_PAYOFF", "KF4_RESOLUTION"]
     transitions = [
         ("G1", "KF0_OPEN", "KF1_CONSTRAINT"),
         ("G2", "KF1_CONSTRAINT", "KF2_DANGER"),
         ("G3", "KF2_DANGER", "KF3_PAYOFF"),
-        ("G4", "KF3_PAYOFF", "KF4_TWIST"),
+        ("G4", "KF3_PAYOFF", "KF4_RESOLUTION"),
     ]
 
     lines: list[str] = []
@@ -83,6 +98,7 @@ def build(data: dict[str, Any]) -> str:
         "- Frame mode: First + Last",
         "- References: " + refs,
         "- Use Nano Banana 2 Lite for keyframes",
+        "- Reserve the upper overlay-safe area; do not place the only critical visual cue at the very top edge",
         "",
         "## 5 keyframes",
         "",
@@ -119,7 +135,15 @@ def build(data: dict[str, Any]) -> str:
             lines.append(f"- {key}: {humanize(value)}")
         lines.append("")
 
+    narration = data.get("creator_signature", {})
     lines += [
+        "## Creator signature layer",
+        "",
+        "Add narration/captions in post; do not spend Flow credits generating dialogue unless the episode specifically requires it.",
+        f"- narrator_angle: {humanize(narration.get('narrator_angle') or 'one concise observation or joke unique to this episode')}",
+        f"- signature_line: {narration.get('signature_line') or 'write one short Japanese line that could not be pasted unchanged onto another episode'}",
+        "- Keep this layer brief; its purpose is authorship, character voice, and retention, not explaining every visible action.",
+        "",
         "## Human approval only",
         "",
         f"1. Title: {data.get('title', '')}",
@@ -128,6 +152,7 @@ def build(data: dict[str, Any]) -> str:
         "4. Approve final export",
         "",
         "If one generation fails, regenerate only that generation. Never regenerate the full episode by default.",
+        "Use Gemini Omni Flash video edit only when one 40-credit edit is expected to replace at least four Lite rerolls or provides a capability Lite cannot supply.",
     ]
 
     return "\n".join(lines) + "\n"
