@@ -5,31 +5,43 @@ audience: [teens, twenties]
 format: experiment
 food: fried_rice
 constraint: exactly_10_rice_grains
-length_target_seconds: 40
+length_target_seconds: 38
 hook: "今日使う米は、10粒だけ。"
 title: "米10粒でチャーハンは作れる？"
 core_question: can_ten_grains_become_real_fried_rice
 midpoint_risk: one_grain_falls_out
 payoff: complete_tiny_fried_rice
 character_twist: cat_takes_only_one_green_onion_piece
-loop_end: missing_grain_returns_to_start
+loop_end: reuse_opening_counting_frame
 flow_strategy:
   primary_model: veo-3.1-lite
   output_count: 1
-  use_quality_only_for: [final_food_macro_if_needed]
+  max_lite_generations_first_pass: 5
+  non_ultra_credit_budget_first_pass: 50
+  ultra_credit_budget_first_pass: 25
+  free_daily_credit_compatible: true
+  use_quality_only_for: [final_food_macro_if_lite_is_unusable]
+  build_keyframes_with_free_image_model_first: true
   prefer_start_end_frames: true
-  one_motion_per_clip: true
+  do_not_generate_separate_cta_clip: true
 scenes:
   - id: S1
     action: ten_grains_are_counted_beside_pan
   - id: S2
-    action: grains_enter_pan
+    action: grains_enter_pan_and_begin_sizzling
   - id: S3
     action: one_grain_nearly_falls_out
   - id: S4
-    action: tiny_egg_and_scallion_are_added
+    action: tiny_egg_and_scallion_complete_the_fried_rice
   - id: S5
-    action: final_fried_rice_reveal
-  - id: S6
-    action: cat_takes_scallion_and_resets_missing_grain
+    action: final_fried_rice_reveal_then_cat_takes_only_scallion
+editorial_seconds:
+  count_hold: 0.5
+  danger_freeze: 0.5
+  opening_frame_reuse_for_loop: 1.0
 experiment_variable: numeric_constraint_hook
+originality_guard:
+  unique_goal: cook_exactly_10_grains
+  unique_conflict: losing_one_grain_breaks_the_rule
+  unique_ending: scallion_only_twist
+  do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
