@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""Build a zero-LLM YouTube Shorts publish pack from an episode YAML manifest.
+
+Usage:
+  python tools/build_publish_pack.py episodes/TK-001.yaml
+  python tools/build_publish_pack.py episodes/TK-001.yaml --out generated/TK-001_publish_pack.md
+
+Requires: PyYAML
+"""
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+from typing import Any
+import yaml
+
+
+def h(v: Any) -> str:
+    return "" if v is None else str(v).replace("_", " ").strip()
+
+
+def build(data: dict[str, Any]) -> str:
+    eid = data["episode_id"]
+    title = data.get("title", "")
+    food = h(data.get("food"))
+    hook = data.get("hook", "")
+    sig = data.get("creator_signature", {}).get("signature_line", "")
+    resolution = h(data.get("resolution") or data.get("payoff"))
+    target = data.get("target_market", "JP")
+
+    publishing = data.get("publishing", {})
+    audience_prompt = publishing.get("audience_prompt") or f"次はどんな小さな料理を見たい？"
+    description_line = publishing.get("description_line") or f"{hook} {food}を小さな世界で作ります。"
+    hashtags = publishing.get("hashtags") or ["#Shorts", "#ミニチュア料理", "#猫", "#AI猫"]
+
+    lines = [
+        f"# {eid} — YouTube Publish Pack",
+        "",
+        "> Deterministic metadata pack. No LLM rewrite is needed unless the content premise changes.",
+        "",
+        "## Copy/paste metadata",
+        "",
+        f"**Title**  \n{title}",
+        "",
+        "**Description**",
+        "",
+        "```text",
+        description_line,
+    ]
+    if sig:
+        lines.append(sig)
+    lines += [
+        "",
+        " ".join(hashtags),
+        "```",
+        "",
+        "**Pinned comment**",
+        "",
+        "```text",
+        audience_prompt,
+        "```",
+        "",
+        "## Studio checklist",
+        "",
+        f"- Target market: {target}",
+        "- Format: Short / 9:16",
+        "- AI use disclosure: YES for photorealistic synthetic Tiny Cat Kitchen footage",
+        "- Paid promotion: NO unless money/free product/other value was received from a brand",
+        "- Do not add a generic like/subscribe CTA if the episode already has an audience prompt",
+        "- Keep sponsor/product tags empty unless actual Studio eligibility and a real commercial relationship/product are present",
+        "- Check that the visible title/description do not claim the food or tools are physically real if the footage is synthetic",
+        "",
+        "## Originality note for channel records",
+        "",
+        f"- Hook: {hook}",
+        f"- Resolution: {resolution}",
+        f"- Creator signature: {sig or 'none'}",
+        "- Keep this record with the episode so sponsorship/YPP reviews can quickly see the creative premise and authorship layer.",
+        "",
+        "## Post-publish data entry",
+        "",
+        "At 24h and 72h, record Studio metrics in analytics/shorts_metrics_v2.csv. Do not judge a winner from raw public views alone.",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def main() -> None:
+    p = argparse.ArgumentParser()
+    p.add_argument("manifest", type=Path)
+    p.add_argument("--out", type=Path)
+    args = p.parse_args()
+    data = yaml.safe_load(args.manifest.read_text(encoding="utf-8")) or {}
+    out = args.out or Path("generated") / f"{data['episode_id']}_publish_pack.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(build(data), encoding="utf-8")
+    print(out)
+
+
+if __name__ == "__main__":
+    main()
