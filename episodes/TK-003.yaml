@@ -11,7 +11,7 @@ title: "雨の日、猫が小さなうどん屋を開きました。"
 core_question: will_any_customer_arrive
 midpoint_risk: rain_gets_heavier_and_noodles_almost_overcook
 payoff: first_customer_arrives
-character_twist: cat_keeps_the_smaller_bowl
+resolution: first_customer_receives_the_full_bowl_and_cat_warms_its_paws_beside_a_small_bowl_in_the_shared_steam
 loop_end: reuse_empty_shop_opening_frame
 flow_strategy:
   mode: exploration_4gen_frame_locked
@@ -33,7 +33,7 @@ keyframes:
   KF1_CONSTRAINT: cat_begins_broth_and_noodle_prep_while_empty_seat_is_visible
   KF2_DANGER: rain_is_heavy_and_noodles_are_about_to_overcook_in_steaming_pot
   KF3_PAYOFF: saved_noodles_are_ready_as_shop_door_bell_moves_and_customer_shadow_appears
-  KF4_TWIST: first_customer_has_full_bowl_while_cat_keeps_the_smallest_bowl_for_itself
+  KF4_RESOLUTION: first_customer_has_full_bowl_while_cat_warms_its_paws_beside_a_small_bowl_in_the_same_soft_steam
 scenes:
   - id: G1
     start_frame: KF0_OPEN
@@ -49,8 +49,8 @@ scenes:
     action: noodles_are_saved_then_door_bell_moves_and_customer_shadow_appears
   - id: G4
     start_frame: KF3_PAYOFF
-    end_frame: KF4_TWIST
-    action: steaming_udon_is_served_and_cat_keeps_smaller_bowl
+    end_frame: KF4_RESOLUTION
+    action: steaming_udon_is_served_to_the_first_customer_then_cat_settles_beside_the_small_bowl_and_warms_its_paws_in_the_shared_steam
 editorial_seconds:
   opening_rain_keyframe_hold: 1.0
   overcook_freeze: 0.4
@@ -58,18 +58,21 @@ editorial_seconds:
   payoff_keyframe_punch_in: 0.6
   opening_frame_reuse_for_loop: 0.8
 experiment_variable: worldbuilding_story_retention
+creator_signature:
+  narrator_angle: quiet_observer_of_the_shops_first_connection
+  signature_line: "0人だった夜に、最初の一杯が出ました。"
 originality_guard:
   unique_goal: attract_first_customer
   unique_conflict: food_may_overcook_while_waiting
-  unique_ending: cat_keeps_smaller_bowl
+  unique_ending: shared_steam_emotional_resolution
   do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
 ip_story_guard:
   character_motivation: earn_the_shop_first_customer_on_a_bad_weather_night
   world_state_change: the_tiny_shop_gets_its_first_customer
-  callback_or_new_lore: cat_always_keeps_the_smallest_bowl_for_itself
+  callback_or_new_lore: cat_keeps_a_small_bowl_near_the_stove_on_rainy_nights
 episode_fingerprint:
   hook_mechanic: social_problem_zero_customers
   dominant_visual: rainy_steam_lit_shop
   conflict_mechanic: waiting_vs_food_overcook
   emotional_turn: loneliness_to_first_connection
-  ending_mechanic: character_keeps_smallest_portion
+  ending_mechanic: warm_emotional_resolution
