@@ -1,0 +1,35 @@
+episode_id: TK-002
+status: planned
+target_market: JP
+audience: [teens, twenties]
+format: experiment
+food: fried_rice
+constraint: exactly_10_rice_grains
+length_target_seconds: 40
+hook: "今日使う米は、10粒だけ。"
+title: "米10粒でチャーハンは作れる？"
+core_question: can_ten_grains_become_real_fried_rice
+midpoint_risk: one_grain_falls_out
+payoff: complete_tiny_fried_rice
+character_twist: cat_takes_only_one_green_onion_piece
+loop_end: missing_grain_returns_to_start
+flow_strategy:
+  primary_model: veo-3.1-lite
+  output_count: 1
+  use_quality_only_for: [final_food_macro_if_needed]
+  prefer_start_end_frames: true
+  one_motion_per_clip: true
+scenes:
+  - id: S1
+    action: ten_grains_are_counted_beside_pan
+  - id: S2
+    action: grains_enter_pan
+  - id: S3
+    action: one_grain_nearly_falls_out
+  - id: S4
+    action: tiny_egg_and_scallion_are_added
+  - id: S5
+    action: final_fried_rice_reveal
+  - id: S6
+    action: cat_takes_scallion_and_resets_missing_grain
+experiment_variable: numeric_constraint_hook
