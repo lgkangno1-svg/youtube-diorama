@@ -11,7 +11,7 @@ title: "米10粒でチャーハンは作れる？"
 core_question: can_ten_grains_become_real_fried_rice
 midpoint_risk: one_grain_falls_out
 payoff: complete_tiny_fried_rice
-character_twist: cat_takes_only_one_green_onion_piece
+resolution: all_ten_grains_are_visibly_accounted_for_and_cat_gives_one_satisfied_paw_tap
 loop_end: reuse_opening_counting_frame
 flow_strategy:
   mode: exploration_4gen_frame_locked
@@ -32,7 +32,7 @@ keyframes:
   KF1_CONSTRAINT: all_ten_grains_are_in_the_tiny_pan_and_count_is_still_legible
   KF2_DANGER: one_rice_grain_is_balancing_at_the_pan_edge_about_to_fall
   KF3_PAYOFF: exactly_ten_grains_form_a_complete_tiny_fried_rice_serving
-  KF4_TWIST: cat_paw_takes_only_one_green_onion_piece_while_rice_remains
+  KF4_RESOLUTION: finished_serving_is_arranged_so_all_ten_grains_remain_visually_accounted_for_and_cat_paw_makes_one_satisfied_tap
 scenes:
   - id: G1
     start_frame: KF0_OPEN
@@ -45,21 +45,24 @@ scenes:
   - id: G3
     start_frame: KF2_DANGER
     end_frame: KF3_PAYOFF
-    action: fallen_grain_is_saved_then_tiny_egg_and_scallion_finish_the_rice
+    action: endangered_grain_is_saved_then_tiny_egg_and_scallion_finish_the_rice_without_changing_the_ten_grain_count
   - id: G4
     start_frame: KF3_PAYOFF
-    end_frame: KF4_TWIST
-    action: final_fried_rice_reveal_then_cat_takes_only_scallion
+    end_frame: KF4_RESOLUTION
+    action: final_fried_rice_reveal_then_camera_confirms_the_ten_grain_result_and_cat_gives_one_satisfied_paw_tap
 editorial_seconds:
   opening_count_keyframe_hold: 0.8
   danger_freeze: 0.4
   payoff_punch_in: 0.6
   opening_frame_reuse_for_loop: 0.8
 experiment_variable: numeric_constraint_hook
+creator_signature:
+  narrator_angle: skeptical_counter_who_becomes_impressed
+  signature_line: "10粒、ちゃんと全員います。"
 originality_guard:
   unique_goal: cook_exactly_10_grains
   unique_conflict: losing_one_grain_breaks_the_rule
-  unique_ending: scallion_only_twist
+  unique_ending: visual_count_verification_and_satisfied_paw_tap
   do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
 ip_story_guard:
   character_motivation: prove_nothing_is_too_small_to_be_a_meal
@@ -69,5 +72,5 @@ episode_fingerprint:
   hook_mechanic: exact_number_constraint
   dominant_visual: countable_rice_grains
   conflict_mechanic: rule_break_if_one_item_is_lost
-  emotional_turn: precision_tension_then_pride
-  ending_mechanic: single_topping_choice
+  emotional_turn: precision_tension_then_verified_satisfaction
+  ending_mechanic: proof_of_constraint_success
