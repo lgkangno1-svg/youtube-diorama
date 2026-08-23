@@ -35,11 +35,24 @@ def humanize(value: Any) -> str:
     return str(value).replace("_", " ").strip()
 
 
-def get_scene_action(data: dict[str, Any], scene_id: str) -> str:
+def get_scene(data: dict[str, Any], scene_id: str) -> dict[str, Any]:
     for scene in data.get("scenes", []):
         if scene.get("id") == scene_id:
-            return humanize(scene.get("action"))
-    return ""
+            return scene
+    return {}
+
+
+def get_scene_action(data: dict[str, Any], scene_id: str) -> str:
+    return humanize(get_scene(data, scene_id).get("action"))
+
+
+def get_scene_seconds(data: dict[str, Any], scene_id: str) -> int:
+    value = get_scene(data, scene_id).get("generation_seconds", 8)
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        value = 8
+    return value if value in {4, 6, 8} else 8
 
 
 def resolution_value(data: dict[str, Any]) -> str:
@@ -56,7 +69,6 @@ def frame_text(data: dict[str, Any], name: str) -> str:
     if explicit:
         return humanize(explicit)
 
-    # Backward compatibility with pre-resolution manifests.
     if name == "KF4_RESOLUTION":
         legacy = data.get("keyframes", {}).get("KF4_TWIST")
         if legacy:
@@ -99,6 +111,14 @@ def build(data: dict[str, Any]) -> str:
         "- References: " + refs,
         "- Use Nano Banana 2 Lite for keyframes",
         "- Reserve the upper overlay-safe area; do not place the only critical visual cue at the very top edge",
+        "- Compatibility lock: keep First + Last clips on Veo 3.1 Lite; current Google Flow matrix lists Fast First + Last as coming soon",
+        "",
+        "## Production-card approval",
+        "",
+        f"- Title: {data.get('title', '')}",
+        f"- Hook: {data.get('hook', '')}",
+        "- Approve the five keyframes below as one contact sheet before spending video credits",
+        "- First-pass budget: four Lite generations; on a free non-subscriber account reserve the remaining 10 daily credits for one post-QC reroll",
         "",
         "## 5 keyframes",
         "",
@@ -118,11 +138,12 @@ def build(data: dict[str, Any]) -> str:
 
     for scene_id, start, end in transitions:
         action = get_scene_action(data, scene_id)
+        seconds = get_scene_seconds(data, scene_id)
         lines += [
-            f"### {scene_id}: {start} → {end}",
+            f"### {scene_id}: {start} → {end} ({seconds}s)",
             "",
             "```text",
-            f"Animate naturally from the supplied first frame to the supplied last frame. Action: {action}. "
+            f"Animate naturally from the supplied first frame to the supplied last frame in {seconds} seconds. Action: {action}. "
             f"Keep the motion simple, legible and physically plausible. {LOCK} {STYLE} Natural cooking ASMR only; no speech.",
             "```",
             "",
@@ -144,15 +165,18 @@ def build(data: dict[str, Any]) -> str:
         f"- signature_line: {narration.get('signature_line') or 'write one short Japanese line that could not be pasted unchanged onto another episode'}",
         "- Keep this layer brief; its purpose is authorship, character voice, and retention, not explaining every visible action.",
         "",
-        "## Human approval only",
+        "## Failure escalation — preserve frame lock",
         "",
-        f"1. Title: {data.get('title', '')}",
-        f"2. Hook: {data.get('hook', '')}",
-        "3. Approve the 5-keyframe contact sheet",
-        "4. Approve final export",
+        "1. Minor defect: fix in editor with crop, freeze, speed adjustment, or keyframe cutaway.",
+        "2. Structural defect: reroll only that G-scene with Veo 3.1 Lite.",
+        "3. Repeated failure: simplify the action or repair its start/end keyframes, then reroll Lite.",
+        "4. Do NOT treat Fast as a drop-in First+Last upgrade: current Google Flow support lists Fast First+Last as coming soon.",
+        "5. Use Fast/Quality only for a separate shot where losing the two-endpoint lock is acceptable and the current Flow UI supports the chosen mode.",
+        "6. Use Gemini Omni Flash video edit only when one 40-credit edit is expected to replace at least four Lite rerolls or supplies a uniquely needed edit capability.",
         "",
-        "If one generation fails, regenerate only that generation. Never regenerate the full episode by default.",
-        "Use Gemini Omni Flash video edit only when one 40-credit edit is expected to replace at least four Lite rerolls or provides a capability Lite cannot supply.",
+        "## Final human approval",
+        "",
+        "Approve only the final export after continuity, hook readability, creator signature, resolution, and upload metadata are checked.",
     ]
 
     return "\n".join(lines) + "\n"
