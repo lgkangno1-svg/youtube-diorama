@@ -1,0 +1,35 @@
+episode_id: TK-003
+status: planned
+target_market: JP
+audience: [teens, twenties]
+format: story
+food: udon
+setting: rainy_night_tiny_shop
+length_target_seconds: 50
+hook: "お客さんは、まだ0人。"
+title: "雨の日、猫が小さなうどん屋を開きました。"
+core_question: will_any_customer_arrive
+midpoint_risk: rain_gets_heavier_and_broth_is_almost_overcooked
+payoff: first_customer_arrives
+character_twist: cat_prepares_two_bowls_but_keeps_the_smaller_one_for_itself
+loop_end: shop_lantern_returns_to_empty_opening_frame
+flow_strategy:
+  primary_model: veo-3.1-lite
+  output_count: 1
+  use_quality_only_for: [rainy_shop_hero_shot]
+  prioritize_atmosphere: true
+  one_motion_per_clip: true
+scenes:
+  - id: S1
+    action: empty_rainy_udon_shop_with_cat_waiting
+  - id: S2
+    action: cat_prepares_broth_while_no_customer_arrives
+  - id: S3
+    action: rain_intensifies_and_noodles_almost_overcook
+  - id: S4
+    action: tiny_door_bell_moves_and_customer_shadow_appears
+  - id: S5
+    action: steaming_udon_is_completed
+  - id: S6
+    action: first_customer_gets_bowl_and_cat_keeps_tiny_bowl
+experiment_variable: worldbuilding_story_retention
