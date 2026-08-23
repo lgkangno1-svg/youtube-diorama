@@ -16,7 +16,7 @@ open_loops:
   - at_second: 25
     question: what_will_the_cat_choose
 payoff: parsley_twist
-character_twist: cat_ignores_omurice_and_takes_parsley
+resolution: cat_ignores_omurice_and_takes_parsley
 loop_end: reuse_opening_keyframe_after_parsley_twist
 flow_strategy:
   mode: exploration_4gen_frame_locked
@@ -44,7 +44,7 @@ keyframes:
   KF1_CONSTRAINT: 3cm_scale_is_obvious_with_tiny_rice_and_pan_beside_cat_paw
   KF2_DANGER: ultra_thin_omelet_edge_is_about_to_tear_in_pan
   KF3_PAYOFF: intact_3cm_omurice_is_finished_on_tiny_white_plate
-  KF4_TWIST: cat_paw_has_taken_parsley_while_omurice_remains_untouched
+  KF4_RESOLUTION: cat_paw_has_taken_parsley_while_omurice_remains_untouched
 scenes:
   - id: G1
     purpose: hook_plus_constraint
@@ -65,10 +65,10 @@ scenes:
     end_frame: KF3_PAYOFF
     action: omelet_survives_then_almost_slips_while_being_placed_on_rice
   - id: G4
-    purpose: payoff_plus_twist
+    purpose: payoff_plus_resolution
     generation_seconds: 8
     start_frame: KF3_PAYOFF
-    end_frame: KF4_TWIST
+    end_frame: KF4_RESOLUTION
     action: finished_omurice_reveal_then_paw_ignores_it_and_takes_parsley
 editorial_seconds:
   opening_keyframe_hold: 0.8
@@ -76,6 +76,9 @@ editorial_seconds:
   hero_keyframe_punch_in: 0.6
   reaction_hold: 0.5
   opening_keyframe_reuse_for_loop: 0.8
+creator_signature:
+  narrator_angle: amused_witness_to_the_cats_bad_priorities
+  signature_line: "そこまで作って、パセリなんだ。"
 success_metrics:
   viewed_vs_swiped_target: ">=75%"
   avg_percentage_viewed_target: ">=95%"
