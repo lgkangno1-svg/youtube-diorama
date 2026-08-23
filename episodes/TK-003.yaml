@@ -14,26 +14,42 @@ payoff: first_customer_arrives
 character_twist: cat_keeps_the_smaller_bowl
 loop_end: reuse_empty_shop_opening_frame
 flow_strategy:
-  mode: exploration_4gen
+  mode: exploration_4gen_frame_locked
   primary_model: veo-3.1-lite
   output_count: 1
   max_lite_generations_first_pass: 4
   non_ultra_credit_budget_first_pass: 40
   ultra_credit_budget_first_pass: 20
+  frame_mode: first_plus_last
+  keyframe_count: 5
   fifth_generation_requires_winner_gate: true
   image_preflight_model: nano-banana-2-lite
   explicitly_select_image_model: true
   use_quality_only_for: [rainy_shop_hero_shot_after_format_wins]
   prioritize_atmosphere: true
   do_not_generate_separate_cta_clip: true
+keyframes:
+  KF0_OPEN: empty_tiny_udon_shop_at_rainy_night_with_cat_waiting_and_no_customer
+  KF1_CONSTRAINT: cat_begins_broth_and_noodle_prep_while_empty_seat_is_visible
+  KF2_DANGER: rain_is_heavy_and_noodles_are_about_to_overcook_in_steaming_pot
+  KF3_PAYOFF: saved_noodles_are_ready_as_shop_door_bell_moves_and_customer_shadow_appears
+  KF4_TWIST: first_customer_has_full_bowl_while_cat_keeps_the_smallest_bowl_for_itself
 scenes:
   - id: G1
+    start_frame: KF0_OPEN
+    end_frame: KF1_CONSTRAINT
     action: empty_rainy_shop_and_cat_waiting_then_broth_prep_begins
   - id: G2
+    start_frame: KF1_CONSTRAINT
+    end_frame: KF2_DANGER
     action: rain_intensifies_while_noodles_almost_overcook
   - id: G3
+    start_frame: KF2_DANGER
+    end_frame: KF3_PAYOFF
     action: noodles_are_saved_then_door_bell_moves_and_customer_shadow_appears
   - id: G4
+    start_frame: KF3_PAYOFF
+    end_frame: KF4_TWIST
     action: steaming_udon_is_served_and_cat_keeps_smaller_bowl
 editorial_seconds:
   opening_rain_keyframe_hold: 1.0
@@ -51,3 +67,9 @@ ip_story_guard:
   character_motivation: earn_the_shop_first_customer_on_a_bad_weather_night
   world_state_change: the_tiny_shop_gets_its_first_customer
   callback_or_new_lore: cat_always_keeps_the_smallest_bowl_for_itself
+episode_fingerprint:
+  hook_mechanic: social_problem_zero_customers
+  dominant_visual: rainy_steam_lit_shop
+  conflict_mechanic: waiting_vs_food_overcook
+  emotional_turn: loneliness_to_first_connection
+  ending_mechanic: character_keeps_smallest_portion
