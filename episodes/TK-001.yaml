@@ -16,15 +16,18 @@ open_loops:
   - at_second: 25
     question: what_will_the_cat_choose
 payoff: parsley_twist
+character_twist: cat_ignores_omurice_and_takes_parsley
 loop_end: reuse_opening_keyframe_after_parsley_twist
 flow_strategy:
-  mode: exploration_4gen
+  mode: exploration_4gen_frame_locked
   primary_model: veo-3.1-lite
   upgrade_model: veo-3.1-quality
   output_count: 1
   max_lite_generations_first_pass: 4
   non_ultra_credit_budget_first_pass: 40
   ultra_credit_budget_first_pass: 20
+  frame_mode: first_plus_last
+  keyframe_count: 5
   fifth_generation_requires_winner_gate: true
   image_preflight_model: nano-banana-2-lite
   explicitly_select_image_model: true
@@ -36,22 +39,36 @@ references:
   - KITCHEN_MASTER_COUNTER
   - PAN_MASTER
   - PLATE_MASTER
+keyframes:
+  KF0_OPEN: cat_paw_touches_pearl_sized_egg_cup_beside_tiny_pan_no_finished_food_visible
+  KF1_CONSTRAINT: 3cm_scale_is_obvious_with_tiny_rice_and_pan_beside_cat_paw
+  KF2_DANGER: ultra_thin_omelet_edge_is_about_to_tear_in_pan
+  KF3_PAYOFF: intact_3cm_omurice_is_finished_on_tiny_white_plate
+  KF4_TWIST: cat_paw_has_taken_parsley_while_omurice_remains_untouched
 scenes:
   - id: G1
     purpose: hook_plus_constraint
     generation_seconds: 8
+    start_frame: KF0_OPEN
+    end_frame: KF1_CONSTRAINT
     action: paw_pushes_tiny_egg_cup_toward_pan_then_reveals_tiny_rice_amount
   - id: G2
     purpose: progress_plus_danger
     generation_seconds: 8
+    start_frame: KF1_CONSTRAINT
+    end_frame: KF2_DANGER
     action: ketchup_rice_cooks_then_omelet_edge_almost_tears
   - id: G3
     purpose: recovery_plus_final_risk
     generation_seconds: 8
+    start_frame: KF2_DANGER
+    end_frame: KF3_PAYOFF
     action: omelet_survives_then_almost_slips_while_being_placed_on_rice
   - id: G4
     purpose: payoff_plus_twist
     generation_seconds: 8
+    start_frame: KF3_PAYOFF
+    end_frame: KF4_TWIST
     action: finished_omurice_reveal_then_paw_ignores_it_and_takes_parsley
 editorial_seconds:
   opening_keyframe_hold: 0.8
@@ -73,3 +90,9 @@ ip_story_guard:
   character_motivation: prove_the_tiny_shop_can_serve_a_real_signature_dish
   world_state_change: first_signature_menu_item_is_completed
   callback_or_new_lore: cat_prefers_garnish_over_the_dish_it_worked_hard_to_make
+episode_fingerprint:
+  hook_mechanic: impossible_scale_reveal
+  dominant_visual: yellow_omelet_macro
+  conflict_mechanic: fragile_food_near_failure
+  emotional_turn: relief_then_comedy
+  ending_mechanic: unexpected_garnish_choice
