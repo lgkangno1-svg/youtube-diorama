@@ -80,10 +80,12 @@ creator_signature:
   narrator_angle: amused_witness_to_the_cats_bad_priorities
   signature_line: "そこまで作って、パセリなんだ。"
 success_metrics:
-  viewed_vs_swiped_target: ">=75%"
-  avg_percentage_viewed_target: ">=95%"
-  loop_rewatch_signal: true
-  comments_goal: menu_choice
+  comparison_method: same_channel_same_observation_horizon_percentiles
+  primary: [stayed_to_watch_pct, avg_percentage_viewed_pct]
+  secondary: [subscribers_per_1000_engaged, comments_per_1000_engaged]
+  external_reach_only: public_views
+  snapshots_hours: [24, 72]
+  no_universal_absolute_thresholds: true
 originality_guard:
   unique_goal: make_3cm_omurice
   unique_conflict: omelet_almost_tears
