@@ -5,7 +5,7 @@ audience: [teens, twenties]
 format: experiment
 food: fried_rice
 constraint: exactly_10_rice_grains
-length_target_seconds: 38
+length_target_seconds: 35
 hook: "今日使う米は、10粒だけ。"
 title: "米10粒でチャーハンは作れる？"
 core_question: can_ten_grains_become_real_fried_rice
@@ -14,34 +14,38 @@ payoff: complete_tiny_fried_rice
 character_twist: cat_takes_only_one_green_onion_piece
 loop_end: reuse_opening_counting_frame
 flow_strategy:
+  mode: exploration_4gen
   primary_model: veo-3.1-lite
   output_count: 1
-  max_lite_generations_first_pass: 5
-  non_ultra_credit_budget_first_pass: 50
-  ultra_credit_budget_first_pass: 25
-  free_daily_credit_compatible: true
-  use_quality_only_for: [final_food_macro_if_lite_is_unusable]
-  build_keyframes_with_free_image_model_first: true
-  prefer_start_end_frames: true
+  max_lite_generations_first_pass: 4
+  non_ultra_credit_budget_first_pass: 40
+  ultra_credit_budget_first_pass: 20
+  fifth_generation_requires_winner_gate: true
+  image_preflight_model: nano-banana-2-lite
+  explicitly_select_image_model: true
+  use_quality_only_for: [final_food_macro_after_format_wins]
   do_not_generate_separate_cta_clip: true
 scenes:
-  - id: S1
-    action: ten_grains_are_counted_beside_pan
-  - id: S2
-    action: grains_enter_pan_and_begin_sizzling
-  - id: S3
-    action: one_grain_nearly_falls_out
-  - id: S4
-    action: tiny_egg_and_scallion_complete_the_fried_rice
-  - id: S5
+  - id: G1
+    action: exactly_ten_grains_are_counted_then_move_toward_pan
+  - id: G2
+    action: grains_sizzle_and_one_grain_nearly_falls_out
+  - id: G3
+    action: fallen_grain_is_saved_then_tiny_egg_and_scallion_finish_the_rice
+  - id: G4
     action: final_fried_rice_reveal_then_cat_takes_only_scallion
 editorial_seconds:
-  count_hold: 0.5
-  danger_freeze: 0.5
-  opening_frame_reuse_for_loop: 1.0
+  opening_count_keyframe_hold: 0.8
+  danger_freeze: 0.4
+  payoff_punch_in: 0.6
+  opening_frame_reuse_for_loop: 0.8
 experiment_variable: numeric_constraint_hook
 originality_guard:
   unique_goal: cook_exactly_10_grains
   unique_conflict: losing_one_grain_breaks_the_rule
   unique_ending: scallion_only_twist
   do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
+ip_story_guard:
+  character_motivation: prove_nothing_is_too_small_to_be_a_meal
+  world_state_change: ten_grain_challenge_becomes_a_shop_record
+  callback_or_new_lore: cat_counts_every_ingredient_when_nervous
