@@ -58,7 +58,7 @@ def main() -> None:
     ranked = []
 
     for candidate in data.get("candidates", []):
-        if candidate.get("status") not in {"candidate", "ready"}:
+        if candidate.get("status") not in {"candidate", "ready", "priority_candidate"}:
             continue
         if not trend_valid(candidate.get("trend_window"), today):
             continue
@@ -77,6 +77,8 @@ def main() -> None:
         print(f"   premise: {item.get('premise', '')}")
         print(f"   narration: {item.get('narration_recommendation', 'none')}")
         print(f"   trend_window: {item.get('trend_window') or 'evergreen'}")
+        print(f"   flow_reliability: {item.get('flow_reliability', 'n/a')}/20")
+        print(f"   expected_credit_efficiency: {item.get('expected_credit_efficiency', 'n/a')}/20")
         print()
 
     print("Selection is not automatic production approval.")
