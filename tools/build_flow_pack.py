@@ -7,7 +7,6 @@ Usage:
 
 Requires: PyYAML
 """
-
 from __future__ import annotations
 
 import argparse
@@ -15,7 +14,6 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-
 
 STYLE = (
     "Photorealistic miniature Japanese kitchen, vertical 9:16, macro lens, shallow depth of field, "
@@ -35,19 +33,8 @@ def humanize(value: Any) -> str:
     return str(value).replace("_", " ").strip()
 
 
-def get_scene(data: dict[str, Any], scene_id: str) -> dict[str, Any]:
-    for scene in data.get("scenes", []):
-        if scene.get("id") == scene_id:
-            return scene
-    return {}
-
-
-def get_scene_action(data: dict[str, Any], scene_id: str) -> str:
-    return humanize(get_scene(data, scene_id).get("action"))
-
-
-def get_scene_seconds(data: dict[str, Any], scene_id: str) -> int:
-    value = get_scene(data, scene_id).get("generation_seconds", 8)
+def get_scene_seconds(scene: dict[str, Any]) -> int:
+    value = scene.get("generation_seconds", 8)
     try:
         value = int(value)
     except (TypeError, ValueError):
@@ -55,49 +42,35 @@ def get_scene_seconds(data: dict[str, Any], scene_id: str) -> int:
     return value if value in {4, 6, 8} else 8
 
 
-def resolution_value(data: dict[str, Any]) -> str:
-    return humanize(
-        data.get("resolution")
-        or data.get("character_twist")
-        or data.get("originality_guard", {}).get("unique_ending")
-        or data.get("payoff")
-    )
+def ordered_keyframes(data: dict[str, Any]) -> list[str]:
+    explicit = list((data.get("keyframes") or {}).keys())
+    if explicit:
+        return explicit
+    return ["KF0_OPEN", "KF1_CONSTRAINT", "KF2_DANGER", "KF3_PAYOFF", "KF4_RESOLUTION"]
 
 
 def frame_text(data: dict[str, Any], name: str) -> str:
-    explicit = data.get("keyframes", {}).get(name)
+    explicit = (data.get("keyframes") or {}).get(name)
     if explicit:
         return humanize(explicit)
-
-    if name == "KF4_RESOLUTION":
-        legacy = data.get("keyframes", {}).get("KF4_TWIST")
-        if legacy:
-            return humanize(legacy)
-
-    fallback = {
-        "KF0_OPEN": f"opening visual for hook: {data.get('hook', '')}; show the constraint immediately",
-        "KF1_CONSTRAINT": f"constraint clearly visible: {humanize(data.get('constraint') or data.get('core_question'))}",
-        "KF2_DANGER": f"danger moment: {humanize(data.get('midpoint_risk') or data.get('originality_guard', {}).get('unique_conflict'))}",
-        "KF3_PAYOFF": f"payoff visual: {humanize(data.get('payoff'))}",
-        "KF4_RESOLUTION": f"ending resolution visual: {resolution_value(data)}",
-    }
-    return fallback[name]
+    return humanize(name)
 
 
 def build(data: dict[str, Any]) -> str:
     episode_id = data["episode_id"]
     refs = ", ".join(data.get("references", [])) or "master cat, kitchen, cookware references"
+    strategy = data.get("flow_strategy", {}) or {}
+    scenes = data.get("scenes", []) or []
+    kfs = ordered_keyframes(data)
+    planned = int(strategy.get("max_lite_generations_first_pass") or len(scenes) or 4)
+    non_ultra = int(strategy.get("non_ultra_credit_budget_first_pass") or planned * 10)
+    ultra = int(strategy.get("ultra_credit_budget_first_pass") or planned * 5)
+    pacing = humanize(strategy.get("pacing") or "controlled")
+    max_cuts = strategy.get("max_visual_cuts_per_8s_generation")
+    narration_policy = humanize(strategy.get("narration_policy") or "none by default")
+    audio_policy = humanize(strategy.get("audio_policy") or "natural cooking ASMR")
 
-    kfs = ["KF0_OPEN", "KF1_CONSTRAINT", "KF2_DANGER", "KF3_PAYOFF", "KF4_RESOLUTION"]
-    transitions = [
-        ("G1", "KF0_OPEN", "KF1_CONSTRAINT"),
-        ("G2", "KF1_CONSTRAINT", "KF2_DANGER"),
-        ("G3", "KF2_DANGER", "KF3_PAYOFF"),
-        ("G4", "KF3_PAYOFF", "KF4_RESOLUTION"),
-    ]
-
-    lines: list[str] = []
-    lines += [
+    lines: list[str] = [
         f"# {episode_id} — Flow Pack",
         "",
         "> Generated deterministically from the episode manifest. Do not ask an LLM to rewrite unless a scene fails.",
@@ -107,78 +80,72 @@ def build(data: dict[str, Any]) -> str:
         "- Model: Veo 3.1 Lite",
         "- Video output count: 1",
         "- Aspect ratio: 9:16",
-        "- Frame mode: First + Last",
-        "- References: " + refs,
-        "- Use Nano Banana 2 Lite for keyframes",
-        "- Reserve the upper overlay-safe area; do not place the only critical visual cue at the very top edge",
-        "- Compatibility lock: keep First + Last clips on Veo 3.1 Lite; current Google Flow matrix lists Fast First + Last as coming soon",
+        f"- Frame mode: {humanize(strategy.get('frame_mode') or 'first plus last')}",
+        f"- References: {refs}",
+        f"- Pacing: {pacing}",
+        f"- Narration policy: {narration_policy}",
+        f"- Audio policy: {audio_policy}",
+        "- Keep first+last continuity shots on Lite; Fast is not a drop-in replacement for this mode.",
         "",
         "## Production-card approval",
         "",
         f"- Title: {data.get('title', '')}",
         f"- Hook: {data.get('hook', '')}",
-        "- Approve the five keyframes below as one contact sheet before spending video credits",
-        "- First-pass budget: four Lite generations; on a free non-subscriber account reserve the remaining 10 daily credits for one post-QC reroll",
+        f"- Approve the {len(kfs)} free keyframes/contact sheet before spending video credits",
+        f"- First-pass budget: {planned} Lite generations = {non_ultra} credits non-Ultra / {ultra} Ultra",
+        "- Do not spend the unused daily allowance just because it exists; reserve it for a clearly failed shot or the next episode.",
         "",
-        "## 5 keyframes",
+        f"## {len(kfs)} keyframes",
         "",
     ]
 
     for kf in kfs:
-        lines += [
-            f"### {kf}",
-            "",
-            "```text",
-            f"{frame_text(data, kf)}. {STYLE}",
-            "```",
-            "",
-        ]
+        lines += [f"### {kf}", "", "```text", f"{frame_text(data, kf)}. {STYLE}", "```", ""]
 
-    lines += ["## 4 video generations", ""]
+    lines += [f"## {len(scenes)} video generations", ""]
 
-    for scene_id, start, end in transitions:
-        action = get_scene_action(data, scene_id)
-        seconds = get_scene_seconds(data, scene_id)
+    for scene in scenes:
+        scene_id = scene.get("id", "G")
+        start = scene.get("start_frame", "")
+        end = scene.get("end_frame", "")
+        action = humanize(scene.get("action"))
+        seconds = get_scene_seconds(scene)
+        pacing_clause = (
+            "Use one calm continuous action with no unnecessary camera change. Let the motion breathe and hold briefly after the action completes."
+            if pacing == "healing"
+            else "Keep motion simple, legible and physically plausible."
+        )
+        cut_clause = f" Maximum visual cuts in this {seconds}s generation: {max_cuts}." if max_cuts else ""
         lines += [
             f"### {scene_id}: {start} → {end} ({seconds}s)",
             "",
             "```text",
             f"Animate naturally from the supplied first frame to the supplied last frame in {seconds} seconds. Action: {action}. "
-            f"Keep the motion simple, legible and physically plausible. {LOCK} {STYLE} Natural cooking ASMR only; no speech.",
+            f"{pacing_clause}{cut_clause} {LOCK} {STYLE} No dialogue. No music. Keep only subtle clean cooking/room ASMR if it renders naturally.",
             "```",
             "",
         ]
 
-    fp = data.get("episode_fingerprint", {})
-    if fp:
-        lines += ["## Originality fingerprint", ""]
-        for key, value in fp.items():
-            lines.append(f"- {key}: {humanize(value)}")
-        lines.append("")
-
-    narration = data.get("creator_signature", {})
+    signature = data.get("creator_signature", {}) or {}
     lines += [
-        "## Creator signature layer",
+        "## Creator signature / narration",
         "",
-        "Add narration/captions in post; do not spend Flow credits generating dialogue unless the episode specifically requires it.",
-        f"- narrator_angle: {humanize(narration.get('narrator_angle') or 'one concise observation or joke unique to this episode')}",
-        f"- signature_line: {narration.get('signature_line') or 'write one short Japanese line that could not be pasted unchanged onto another episode'}",
-        "- Keep this layer brief; its purpose is authorship, character voice, and retention, not explaining every visible action.",
+        "Default to no narration. If an A/B test or story context requires voice, record it in post rather than spending Flow credits on dialogue.",
+        f"- narrator_angle: {humanize(signature.get('narrator_angle') or 'optional')}",
+        f"- signature_line: {signature.get('signature_line') or 'none'}",
         "",
-        "## Failure escalation — preserve frame lock",
+        "## Failure escalation",
         "",
-        "1. Minor defect: fix in editor with crop, freeze, speed adjustment, or keyframe cutaway.",
-        "2. Structural defect: reroll only that G-scene with Veo 3.1 Lite.",
-        "3. Repeated failure: simplify the action or repair its start/end keyframes, then reroll Lite.",
-        "4. Do NOT treat Fast as a drop-in First+Last upgrade: current Google Flow support lists Fast First+Last as coming soon.",
-        "5. Use Fast/Quality only for a separate shot where losing the two-endpoint lock is acceptable and the current Flow UI supports the chosen mode.",
-        "6. Use Gemini Omni Flash video edit only when one 40-credit edit is expected to replace at least four Lite rerolls or supplies a uniquely needed edit capability.",
+        "1. Minor defect: fix in editor with crop, freeze, slow push-in, speed adjustment, sound bridge, or a free keyframe cutaway.",
+        "2. Structural defect: reroll only that scene with Veo 3.1 Lite.",
+        "3. Repeated failure: simplify the action or repair its first/last keyframes before rerolling.",
+        "4. Do not upgrade a frame-locked shot to Fast merely because Lite failed; current Flow support does not make Fast a like-for-like First+Last replacement.",
+        "5. Use Fast/Quality only for a separate hero insert where losing endpoint lock is acceptable.",
         "",
-        "## Final human approval",
+        "## Final approval",
         "",
-        "Approve only the final export after continuity, hook readability, creator signature, resolution, and upload metadata are checked.",
+        "Approve only the final export after continuity, slow/healing pacing, hook readability, resolution, and upload metadata are checked.",
     ]
-
     return "\n".join(lines) + "\n"
 
 
@@ -187,10 +154,8 @@ def main() -> None:
     parser.add_argument("manifest", type=Path)
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
-
     data = yaml.safe_load(args.manifest.read_text(encoding="utf-8"))
     output = build(data)
-
     out = args.out or Path("generated") / f"{data['episode_id']}_flow_pack.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(output, encoding="utf-8")
