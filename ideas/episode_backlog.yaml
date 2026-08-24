@@ -1,0 +1,120 @@
+updated_at: 2026-08-24
+scoring:
+  benchmark_evidence: 20
+  japan_relevance: 15
+  healing_fit: 20
+  flow_efficiency: 20
+  originality: 15
+  worldbuilding: 10
+rules:
+  - Do not copy a benchmark plot, title, branded product, or exact ending.
+  - Extract only the mechanic that made the reference attractive.
+  - Reject an idea if it is too similar to any of the last five episode fingerprints.
+  - Prefer one main object, one calm action chain, one visible problem, one satisfying resolution.
+  - Default production target is H30: three 8-second Veo 3.1 Lite generations, output_count 1.
+  - Trend ideas expire unless current Japanese evidence still exists at production time.
+candidates:
+  - id: IDEA-001
+    working_title_ja: "猫の小さな月見食堂、最初の一皿。"
+    premise: "A tiny autumn diner opens at night; the cat slowly cooks a 3cm egg-topped rice bowl while a paper moon hangs outside. The yolk almost breaks before plating; the first empty stool is finally occupied at the end."
+    benchmark_mechanic: [familiar_cat_job, seasonal_food_recognition, visible_yolk_tension]
+    benchmark_evidence: 19
+    japan_relevance: 15
+    healing_fit: 20
+    flow_efficiency: 18
+    originality: 14
+    worldbuilding: 10
+    trend_window: "2026-08-26..2026-09-30"
+    narration_recommendation: none
+    status: candidate
+  - id: IDEA-002
+    working_title_ja: "3ミリのグミ、どこまで伸びる？"
+    premise: "In a tiny candy lab, one translucent 3mm gummy is slowly stretched beside a miniature ruler; it nearly snaps, then is laid down to prove the final length."
+    benchmark_mechanic: [texture_transformation, visible_rule, single_object_experiment]
+    benchmark_evidence: 18
+    japan_relevance: 15
+    healing_fit: 17
+    flow_efficiency: 20
+    originality: 14
+    worldbuilding: 7
+    trend_window: "2026-08-25..2026-09-03"
+    narration_recommendation: none
+    status: candidate
+  - id: IDEA-003
+    working_title_ja: "雨の日だけ開く、猫のおでん屋。"
+    premise: "A tiny oden stall opens in gentle rain. The cat arranges three miniature ingredients, slowly pours broth, waits with no customers, and receives one tiny order token at the end."
+    benchmark_mechanic: [cat_has_a_job, daily_worldbuilding, weather_ambience]
+    benchmark_evidence: 17
+    japan_relevance: 14
+    healing_fit: 20
+    flow_efficiency: 18
+    originality: 15
+    worldbuilding: 10
+    trend_window: null
+    narration_recommendation: none
+    status: candidate
+  - id: IDEA-004
+    working_title_ja: "一滴の卵で、だし巻きは作れる？"
+    premise: "The cat receives only one tiny drop of egg and carefully rolls an impossibly small tamagoyaki; one fold sticks to the pan, then releases cleanly."
+    benchmark_mechanic: [clear_numeric_constraint, fragile_food_tension, satisfying_fold]
+    benchmark_evidence: 16
+    japan_relevance: 14
+    healing_fit: 19
+    flow_efficiency: 19
+    originality: 14
+    worldbuilding: 7
+    trend_window: null
+    narration_recommendation: optional_one_line
+    status: candidate
+  - id: IDEA-005
+    working_title_ja: "猫の喫茶店、3cmメロンソーダを作る夜。"
+    premise: "The cat closes a tiny kissaten, then makes one last 3cm melon soda for itself: ice clink, green soda pour, miniature cream float, quiet window light."
+    benchmark_mechanic: [cat_job_world, colorful_transformation, private_after_hours_moment]
+    benchmark_evidence: 17
+    japan_relevance: 13
+    healing_fit: 20
+    flow_efficiency: 19
+    originality: 15
+    worldbuilding: 10
+    trend_window: null
+    narration_recommendation: none
+    status: candidate
+  - id: IDEA-006
+    working_title_ja: "猫の小さな栗ごはん、秋の最初の湯気。"
+    premise: "The cat prepares the shop's first autumn chestnut rice in a tiny clay pot; the lid rattles gently, steam escapes, and the first chestnut is placed into a tiny bowl."
+    benchmark_mechanic: [familiar_japanese_food, steam_payoff, seasonal_worldbuilding]
+    benchmark_evidence: 15
+    japan_relevance: 15
+    healing_fit: 20
+    flow_efficiency: 18
+    originality: 15
+    worldbuilding: 9
+    trend_window: "2026-08-24..2026-10-15"
+    narration_recommendation: none
+    status: candidate
+  - id: IDEA-007
+    working_title_ja: "最後の一個だけ、色が違う。"
+    premise: "The cat decorates four tiny translucent fruit jellies in a calm candy-shop sequence; the last one unexpectedly turns moon-yellow under the shop light and becomes the display piece."
+    benchmark_mechanic: [progressive_decoration, color_transformation, quiet_visual_surprise]
+    benchmark_evidence: 18
+    japan_relevance: 11
+    healing_fit: 19
+    flow_efficiency: 18
+    originality: 14
+    worldbuilding: 8
+    trend_window: null
+    narration_recommendation: none
+    status: candidate
+  - id: IDEA-008
+    working_title_ja: "閉店後、猫が自分のために焼く3cmパン。"
+    premise: "After closing the tiny bakery, the cat slowly shapes one 3cm bun, waits by the oven, hears the soft crust crack, and eats none of it—leaving it for tomorrow's first customer."
+    benchmark_mechanic: [cat_job_world, private_life_glimpse, sensory_baking_payoff]
+    benchmark_evidence: 17
+    japan_relevance: 12
+    healing_fit: 20
+    flow_efficiency: 17
+    originality: 15
+    worldbuilding: 10
+    trend_window: null
+    narration_recommendation: optional_one_line
+    status: candidate
