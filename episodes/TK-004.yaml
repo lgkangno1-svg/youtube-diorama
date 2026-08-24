@@ -2,34 +2,42 @@ episode_id: TK-004
 status: priority_trend_window
 target_market: JP
 audience: [teens, twenties]
-format: trend_experiment
-food: original_mini_gummy
+format: trend_physics_challenge
+food: original_micro_stretch_gummy
 setting: tiny_japanese_candy_lab
 trend_window:
-  cultural_moment: "9月3日 グミの日"
-  publish_target: "2026-08-28_to_2026-09-03"
-  evidence_theme: "Japanese convenience stores are launching texture-led gummy products ahead of Gummy Day"
+  cultural_moment: "2026-08-24 current gummy challenge launch + 9月3日 グミの日"
+  publish_target: "2026-08-24_to_2026-09-03"
+  evidence_theme: "Japanese youth gummy demand is high, and a national gummy product launched on 2026-08-24 around the physical challenge of slowly lifting a long gummy without breaking it"
   brand_copying: false
-  use_generic_texture_language_only: true
-length_target_seconds: 36
-hook: "3ミリのグミ、食感まで作れる？"
-title: "猫が3ミリのグミを3種類作ったら、最後だけ変でした。"
-core_question: can_the_cat_create_three_visibly_different_gummy_textures_at_3mm_scale
-midpoint_risk: the_crunchy_shell_cracks_before_the_soft_center_sets
-payoff: three_distinct_mini_gummies_are_completed
-resolution: cat_does_not_pick_a_flavor_and_instead_taps_the_one_with_the_strangest_texture_then_labels_it_as_the_winner_via_voiceover
-loop_end: return_to_three_empty_molds_from_opening
+  use_generic_mechanic_only: true
+  do_not_use_brand_name_or_packaging: true
+length_target_seconds: 34
+hook: "3ミリのグミ、切らずにどこまで伸ばせる？"
+title: "猫が3ミリのグミを伸ばしたら、予想より長かった。"
+core_question: can_the_cat_slowly_pull_one_micro_gummy_into_a_surprisingly_long_unbroken_strand
+midpoint_risk: the_thinning_center_nearly_snaps_just_before_the_marked_goal
+payoff: the_gummy_crosses_the_goal_mark_without_breaking
+resolution: cat_stops_at_the_goal_instead_of_overpulling_and_places_the_unbroken_gummy_beside_a_tiny_ruler_for_proof
+loop_end: ruler_and_short_gummy_return_to_opening_position
 trend_translation:
   source_structure_only:
-    - chilled_crunchy_texture
-    - crispy_plus_bouncy_two_layer_texture
-    - mochi_like_soft_chew
+    - slow_pull_physics_challenge
+    - visible_length_progress
+    - near_snap_suspense
+    - proof_at_end
   do_not_recreate:
     - retailer_packaging
     - brand_names
     - logos
-    - exact_product_shapes
-    - exact_flavor_combinations
+    - branded_straw_or_powder_method
+    - exact_product_shape
+    - exact_flavor_pair
+why_this_is_cheaper_than_previous_version:
+  - one_hero_gummy_instead_of_three_texture_variants
+  - one_clear_physics_action_instead_of_three_material_behaviors
+  - fewer_translucent_surface_states_to_keep_consistent
+  - proof_resolution_uses_static_ruler_and_existing_frames
 flow_strategy:
   mode: exploration_4gen_frame_locked
   primary_model: veo-3.1-lite
@@ -42,53 +50,53 @@ flow_strategy:
   fifth_generation_requires_winner_gate: true
   image_preflight_model: nano-banana-2-lite
   explicitly_select_image_model: true
-  use_quality_only_for: [three_texture_hero_macro_after_format_wins]
+  use_quality_only_for: [final_unbroken_gummy_ruler_hero_after_format_wins]
   do_not_generate_separate_cta_clip: true
 keyframes:
-  KF0_OPEN: three_empty_3mm_gummy_molds_beside_white_socked_orange_cat_paw_in_tiny_candy_lab
-  KF1_CONSTRAINT: three_tiny_clear_mixtures_with_visibly_different_surface_preparations_ready_for_molding
-  KF2_DANGER: one_crunchy_shell_is_cracking_while_soft_center_is_still_unset
-  KF3_PAYOFF: three_completed_micro_gummies_show_glassy_crunchy_layered_bouncy_and_soft_mochi_like_visual_textures
-  KF4_RESOLUTION: cat_paw_ignores_flavor_order_and_taps_the_visually_strangest_texture_as_winner_beside_three_empty_molds
+  KF0_OPEN: short_3mm_micro_gummy_beside_tiny_ruler_and_white_socked_orange_cat_paw_in_tiny_candy_lab
+  KF1_CONSTRAINT: cat_paw_begins_slowly_lifting_the_same_gummy_while_bottom_end_stays_anchored_and_ruler_remains_visible
+  KF2_DANGER: gummy_is_long_and_very_thin_at_center_with_one_visible_near_snap_point_just_before_goal_mark
+  KF3_PAYOFF: unbroken_gummy_crosses_goal_mark_with_clear_ruler_proof_and_same_cat_paw_holding_position
+  KF4_RESOLUTION: cat_stops_pulling_and_lays_same_unbroken_long_gummy_beside_ruler_for_clean_length_proof
 scenes:
   - id: G1
     start_frame: KF0_OPEN
     end_frame: KF1_CONSTRAINT
-    action: cat_prepares_three_micro_batches_with_three_different_texture_methods
+    action: cat_starts_one_slow_controlled_pull_with_ruler_always_visible
   - id: G2
     start_frame: KF1_CONSTRAINT
     end_frame: KF2_DANGER
-    action: molding_begins_and_the_crunchy_shell_nearly_fails_before_center_sets
+    action: gummy_length_increases_while_center_thins_and_nearly_snaps_before_goal
   - id: G3
     start_frame: KF2_DANGER
     end_frame: KF3_PAYOFF
-    action: cat_recovers_the_batch_and_reveals_three_visually_distinct_micro_gummies
+    action: cat_reduces_pull_speed_and_the_same_gummy_survives_past_goal_mark
   - id: G4
     start_frame: KF3_PAYOFF
     end_frame: KF4_RESOLUTION
-    action: macro_texture_comparison_then_cat_selects_texture_not_flavor
+    action: cat_stops_at_goal_then_places_unbroken_gummy_beside_ruler_for_static_proof
 editorial_seconds:
-  opening_three_mold_hold: 0.7
-  shell_crack_freeze: 0.35
-  three_texture_macro_punch_ins: 1.4
-  selection_pause: 0.55
-  opening_mold_reuse_for_loop: 0.7
-experiment_variable: topical_texture_transformation_retention
+  opening_scale_hold: 0.55
+  ruler_goal_mark_punch_in: 0.35
+  near_snap_freeze: 0.45
+  final_length_proof_hold: 0.9
+  opening_frame_reuse_for_loop: 0.6
+experiment_variable: topical_single_mechanic_physics_retention
 creator_signature:
-  narrator_angle: tiny_food_scientist_observing_texture_not_flavor
-  signature_line: "味じゃなくて、食感で選びました。"
+  narrator_angle: tiny_food_scientist_who_values_control_over_excess
+  signature_line: "切れる前に止めるのも、成功です。"
 originality_guard:
-  unique_goal: create_three_micro_textures
-  unique_conflict: shell_sets_before_center_and_nearly_cracks
-  unique_ending: texture_based_selection_resolution
+  unique_goal: stretch_one_micro_gummy_past_a_visible_length_goal_without_breaking
+  unique_conflict: single_strand_thins_to_near_snap_under_slow_pull
+  unique_ending: static_ruler_proof_resolution_without_comedy_theft
   do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
 ip_story_guard:
-  character_motivation: prove_the_tiny_kitchen_can_control_texture_not_just_size
-  world_state_change: cat_unlocks_a_tiny_candy_lab_corner_in_the_world
-  callback_or_new_lore: three_molds_remain_on_shelf_for_future_seasonal_sweets
+  character_motivation: prove_the_tiny_candy_lab_can_control_material_behavior_not_just_make_sweets
+  world_state_change: cat_adds_a_tiny_measurement_station_to_the_candy_lab
+  callback_or_new_lore: ruler_remains_on_lab_wall_for_future_precision_challenges
 episode_fingerprint:
-  hook_mechanic: scale_plus_texture_question
-  dominant_visual: three_micro_translucent_textures
-  conflict_mechanic: shell_vs_center_setting_time
-  emotional_turn: near_failure_to_sensory_curiosity
-  ending_mechanic: preference_resolution_not_comedy_food_theft
+  hook_mechanic: scale_plus_physics_question
+  dominant_visual: one_extending_translucent_gummy_against_ruler
+  conflict_mechanic: progressive_tension_near_snap
+  emotional_turn: curiosity_to_tension_to_controlled_relief
+  ending_mechanic: proof_resolution_with_measurement
