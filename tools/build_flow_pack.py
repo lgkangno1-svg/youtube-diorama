@@ -22,7 +22,7 @@ STYLE = (
 )
 
 LOCK = (
-    "Preserve exact cat fur pattern, cookware, food scale, kitchen layout and lighting between start and end frames. "
+    "Preserve exact cat fur pattern, cookware, food scale, kitchen layout and lighting. "
     "Do not duplicate, remove or morph ingredients unless the action explicitly requires it."
 )
 
@@ -77,7 +77,7 @@ def build(data: dict[str, Any]) -> str:
         "",
         "## Fixed settings",
         "",
-        "- Model: Veo 3.1 Lite",
+        "- Primary model: Veo 3.1 Lite",
         "- Video output count: 1",
         "- Aspect ratio: 9:16",
         f"- Frame mode: {humanize(strategy.get('frame_mode') or 'first plus last')}",
@@ -85,7 +85,8 @@ def build(data: dict[str, Any]) -> str:
         f"- Pacing: {pacing}",
         f"- Narration policy: {narration_policy}",
         f"- Audio policy: {audio_policy}",
-        "- Keep first+last continuity shots on Lite; Fast is not a drop-in replacement for this mode.",
+        "- Keep First+Last continuity shots on Lite; Fast is not a drop-in replacement for this mode.",
+        "- Extend is valid only from an 8s Veo 3.1 source clip and the extension must use Veo 3.1 Lite.",
         "",
         "## Production-card approval",
         "",
@@ -93,6 +94,7 @@ def build(data: dict[str, Any]) -> str:
         f"- Hook: {data.get('hook', '')}",
         f"- Approve the {len(kfs)} free keyframes/contact sheet before spending video credits",
         f"- First-pass budget: {planned} Lite generations = {non_ultra} credits non-Ultra / {ultra} Ultra",
+        "- Do not create multiple outputs in one request; Flow charges per generation, not per request.",
         "- Do not spend the unused daily allowance just because it exists; reserve it for a clearly failed shot or the next episode.",
         "",
         f"## {len(kfs)} keyframes",
@@ -106,25 +108,43 @@ def build(data: dict[str, Any]) -> str:
 
     for scene in scenes:
         scene_id = scene.get("id", "G")
-        start = scene.get("start_frame", "")
-        end = scene.get("end_frame", "")
+        generation_type = humanize(scene.get("generation_type") or "first plus last")
         action = humanize(scene.get("action"))
         seconds = get_scene_seconds(scene)
         pacing_clause = (
             "Use one calm continuous action with no unnecessary camera change. Let the motion breathe and hold briefly after the action completes."
-            if pacing == "healing"
+            if "healing" in pacing
             else "Keep motion simple, legible and physically plausible."
         )
         cut_clause = f" Maximum visual cuts in this {seconds}s generation: {max_cuts}." if max_cuts else ""
-        lines += [
-            f"### {scene_id}: {start} → {end} ({seconds}s)",
-            "",
-            "```text",
-            f"Animate naturally from the supplied first frame to the supplied last frame in {seconds} seconds. Action: {action}. "
-            f"{pacing_clause}{cut_clause} {LOCK} {STYLE} No dialogue. No music. Keep only subtle clean cooking/room ASMR if it renders naturally.",
-            "```",
-            "",
-        ]
+
+        if generation_type == "extend":
+            source_scene = scene.get("source_scene", "previous 8s scene")
+            lines += [
+                f"### {scene_id}: EXTEND {source_scene} ({seconds}s operation)",
+                "",
+                "- Select the completed 8s source clip in Flow and use Veo 3.1 Lite Extend.",
+                "- Do not create a second independent start-state for this beat unless Extend fails QC.",
+                "",
+                "```text",
+                f"Continue seamlessly from the supplied source clip. Action: {action}. {pacing_clause}{cut_clause} "
+                f"Maintain camera direction, cat anatomy, miniature scale, lighting and exact food state from the source. {LOCK} {STYLE} "
+                "No dialogue. No music. Keep native audio only if it is clean; otherwise replace the join with a reusable ASMR sound bridge in post.",
+                "```",
+                "",
+            ]
+        else:
+            start = scene.get("start_frame", "")
+            end = scene.get("end_frame", "")
+            lines += [
+                f"### {scene_id}: {start} → {end} ({seconds}s)",
+                "",
+                "```text",
+                f"Animate naturally from the supplied first frame to the supplied last frame in {seconds} seconds. Action: {action}. "
+                f"{pacing_clause}{cut_clause} {LOCK} {STYLE} No dialogue. No music. Keep only subtle clean cooking/room ASMR if it renders naturally.",
+                "```",
+                "",
+            ]
 
     signature = data.get("creator_signature", {}) or {}
     lines += [
@@ -137,14 +157,16 @@ def build(data: dict[str, Any]) -> str:
         "## Failure escalation",
         "",
         "1. Minor defect: fix in editor with crop, freeze, slow push-in, speed adjustment, sound bridge, or a free keyframe cutaway.",
-        "2. Structural defect: reroll only that scene with Veo 3.1 Lite.",
-        "3. Repeated failure: simplify the action or repair its first/last keyframes before rerolling.",
-        "4. Do not upgrade a frame-locked shot to Fast merely because Lite failed; current Flow support does not make Fast a like-for-like First+Last replacement.",
-        "5. Use Fast/Quality only for a separate hero insert where losing endpoint lock is acceptable.",
+        "2. First+Last structural defect: reroll only that scene with Veo 3.1 Lite.",
+        "3. Extend structural defect: reroll only the Extend once, or use the manifest fallback and generate the last beat as one normal Lite First+Last scene.",
+        "4. Never generate both Extend and its fallback proactively; choose one path first.",
+        "5. Repeated failure: simplify the action or repair the relevant keyframe/source clip before rerolling.",
+        "6. Do not upgrade a frame-locked shot to Fast merely because Lite failed; current Flow support does not make Fast a like-for-like First+Last replacement.",
+        "7. Use Fast/Quality only for a separate hero insert where losing endpoint lock is acceptable.",
         "",
         "## Final approval",
         "",
-        "Approve only the final export after continuity, slow/healing pacing, hook readability, resolution, and upload metadata are checked.",
+        "Approve only the final export after continuity, slow/healing pacing, hook readability, resolution, audio cleanliness, originality, and upload metadata are checked.",
     ]
     return "\n".join(lines) + "\n"
 
