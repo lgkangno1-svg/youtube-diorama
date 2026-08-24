@@ -61,6 +61,10 @@ experiment_variable: worldbuilding_story_retention
 creator_signature:
   narrator_angle: quiet_observer_of_the_shops_first_connection
   signature_line: "0人だった夜に、最初の一杯が出ました。"
+audience_loop:
+  mode: video_reply
+  trigger: viewer_comment_that_proposes_a_specific_next_customer_or_rainy_night_menu_with_a_new_story_problem
+  next_manifest_seed: selected_comment_becomes_story_seed_only_if_goal_conflict_and_resolution_differ_from_recent_episodes
 originality_guard:
   unique_goal: attract_first_customer
   unique_conflict: food_may_overcook_while_waiting
