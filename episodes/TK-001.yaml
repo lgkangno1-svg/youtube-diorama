@@ -2,38 +2,41 @@ episode_id: TK-001
 status: ready-for-flow
 target_market: JP
 audience: [teens, twenties]
-format: experiment
+format: healing_experiment
 food: omurice
 constraint: 3cm
-length_target_seconds: 36
+length_target_seconds: 38
 hook: "猫の手に卵を渡した結果…"
 title: "猫の手で3cmオムライスは作れる？"
 open_loops:
   - at_second: 0
     question: can_the_cat_make_it
-  - at_second: 9
+  - at_second: 11
     question: will_the_egg_tear
-  - at_second: 25
+  - at_second: 29
     question: what_will_the_cat_choose
 payoff: parsley_twist
 resolution: cat_ignores_omurice_and_takes_parsley
 loop_end: reuse_opening_keyframe_after_parsley_twist
 flow_strategy:
-  mode: exploration_4gen_frame_locked
+  mode: healing_h30_frame_locked
   primary_model: veo-3.1-lite
-  upgrade_model: veo-3.1-quality
   output_count: 1
-  max_lite_generations_first_pass: 4
-  non_ultra_credit_budget_first_pass: 40
-  ultra_credit_budget_first_pass: 20
+  max_lite_generations_first_pass: 3
+  non_ultra_credit_budget_first_pass: 30
+  ultra_credit_budget_first_pass: 15
   frame_mode: first_plus_last
-  keyframe_count: 5
-  fifth_generation_requires_winner_gate: true
+  keyframe_count: 4
   image_preflight_model: nano-banana-2-lite
   explicitly_select_image_model: true
   use_quality_only_for: [hero_food_reveal_after_format_wins]
   use_consistent_references: true
   do_not_generate_separate_cta_clip: true
+  pacing: healing
+  max_visual_cuts_per_8s_generation: 2
+  preferred_action_count_per_generation: 1
+  narration_policy: none_by_default
+  audio_policy: keep_clean_native_asmr_or_replace_in_post
 references:
   - CAT_MASTER_PAWS
   - KITCHEN_MASTER_COUNTER
@@ -43,42 +46,37 @@ keyframes:
   KF0_OPEN: cat_paw_touches_pearl_sized_egg_cup_beside_tiny_pan_no_finished_food_visible
   KF1_CONSTRAINT: 3cm_scale_is_obvious_with_tiny_rice_and_pan_beside_cat_paw
   KF2_DANGER: ultra_thin_omelet_edge_is_about_to_tear_in_pan
-  KF3_PAYOFF: intact_3cm_omurice_is_finished_on_tiny_white_plate
-  KF4_RESOLUTION: cat_paw_has_taken_parsley_while_omurice_remains_untouched
+  KF3_RESOLUTION: intact_3cm_omurice_is_finished_then_cat_paw_quietly_takes_only_the_parsley
 scenes:
   - id: G1
-    purpose: hook_plus_constraint
+    purpose: hook_plus_prep
     generation_seconds: 8
     start_frame: KF0_OPEN
     end_frame: KF1_CONSTRAINT
-    action: paw_pushes_tiny_egg_cup_toward_pan_then_reveals_tiny_rice_amount
+    action: paw_slowly_pushes_tiny_egg_cup_toward_pan_then_pauses_beside_the_tiny_rice_amount
   - id: G2
-    purpose: progress_plus_danger
+    purpose: cooking_plus_danger
     generation_seconds: 8
     start_frame: KF1_CONSTRAINT
     end_frame: KF2_DANGER
-    action: ketchup_rice_cooks_then_omelet_edge_almost_tears
+    action: rice_and_one_ketchup_drop_cook_slowly_then_the_thin_omelet_edge_almost_tears
   - id: G3
-    purpose: recovery_plus_final_risk
+    purpose: recovery_assembly_payoff_resolution
     generation_seconds: 8
     start_frame: KF2_DANGER
-    end_frame: KF3_PAYOFF
-    action: omelet_survives_then_almost_slips_while_being_placed_on_rice
-  - id: G4
-    purpose: payoff_plus_resolution
-    generation_seconds: 8
-    start_frame: KF3_PAYOFF
-    end_frame: KF4_RESOLUTION
-    action: finished_omurice_reveal_then_paw_ignores_it_and_takes_parsley
+    end_frame: KF3_RESOLUTION
+    action: omelet_survives_is_gently_placed_on_rice_then_hold_the_finished_omurice_before_the_paw_quietly_takes_the_parsley
 editorial_seconds:
-  opening_keyframe_hold: 0.8
-  cliffhanger_freeze: 0.4
-  hero_keyframe_punch_in: 0.6
-  reaction_hold: 0.5
-  opening_keyframe_reuse_for_loop: 0.8
+  opening_keyframe_hold: 1.5
+  environmental_room_hold: 2.0
+  cliffhanger_freeze: 0.6
+  hero_keyframe_slow_push_in: 3.0
+  reaction_hold: 1.5
+  opening_keyframe_reuse_for_loop: 1.0
 creator_signature:
   narrator_angle: amused_witness_to_the_cats_bad_priorities
   signature_line: "そこまで作って、パセリなんだ。"
+  delivery: optional_user_voice_only_if_ab_test_requires_it
 audience_loop:
   mode: poll
   question: "次に3cmで作るなら？"
