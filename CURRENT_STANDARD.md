@@ -23,6 +23,22 @@ Tiny Cat Kitchen은 `viral-chaos`가 아니라 **cozy / healing**이다.
 
 현재 공식 Flow 기준 Veo 3.1 Lite는 4/6/8초와 Extend가 generation당 non-Ultra 10 credits / Ultra 5 credits다. 따라서 특별한 이유가 없으면 8초를 쓴다.
 
+### Google AI Pro 비용 진실 — 모델명을 먼저 본다
+
+현재 운영 계정은 Google AI Pro를 기준으로 한다.
+
+공식 Google Flow 기준:
+- Google AI Pro 월 기본 Flow credits: **1,000**
+- Veo 3.1 Lite 4/6/8초 또는 Extend: **10 credits / generation**
+- Veo 3.1 Fast: **20 credits / generation**
+- Veo 3.1 Quality 8초: **100 credits / generation**
+- Gemini Omni Flash 4초: **15 credits** / 6초 20 / 8초 25 / 10초 30
+- Plus/Pro/Ultra의 1080p upscale: **0 credits**
+
+따라서 Flow UI에서 `15 credits`가 보였다는 이유만으로 Veo Lite의 비용을 15로 가정하지 않는다. **반드시 생성 직전 active model + duration + 표시 credit cost를 확인한다.** 현재 H30은 `Veo 3.1 Lite / 8s / output count 1 / 10 credits`가 UI에 실제로 표시될 때만 적용한다.
+
+UI가 공식 문서와 다르면 **UI 표시 비용을 그 생성의 source of truth로 기록하고 일단 생성하지 않은 채 운영 기준을 재검토**한다. 모델이 Gemini Omni Flash 등으로 바뀌어 있으면 Lite로 되돌릴 수 있는지 먼저 확인한다.
+
 기본 최대 first-pass 예산:
 
 ```text
@@ -240,6 +256,7 @@ Fresh benchmark / Japanese signal / audience request
 → candidate scoring with reliability + credit efficiency
 → originality gate
 → free image/reference preflight
+→ confirm Flow active model + duration + displayed credit cost
 → G1 8s Lite
 → QC
 → actual end-frame chain
