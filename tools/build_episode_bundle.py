@@ -7,8 +7,9 @@ Usage:
 Pipeline:
 1. Run deterministic originality validation. Abort on failure.
 2. Build the Google Flow prompt pack.
-3. Build the YouTube publish pack.
-4. Write a compact bundle index with two human approval gates.
+3. Build a deterministic healing edit plan.
+4. Build the YouTube publish pack.
+5. Write a compact bundle index with two human approval gates.
 
 No API calls, LLM calls, Flow generations, or uploads are performed.
 """
@@ -58,26 +59,30 @@ def main() -> int:
     try:
         run([python, str(tools / "validate_episode_originality.py"), str(manifest_abs)])
     except subprocess.CalledProcessError:
-        print("\nBUILD STOPPED: originality validation failed. No prompt or publish pack was created.", file=sys.stderr)
+        print("\nBUILD STOPPED: originality validation failed. No production pack was created.", file=sys.stderr)
         return 1
 
     flow_pack = generated_dir / f"{episode_id}_flow_pack.md"
+    edit_plan = generated_dir / f"{episode_id}_edit_plan.md"
     publish_pack = generated_dir / f"{episode_id}_publish_pack.md"
     bundle_index = generated_dir / f"{episode_id}_bundle.md"
 
     run([python, str(tools / "build_flow_pack.py"), str(manifest_abs), "--out", str(flow_pack)])
+    run([python, str(tools / "build_healing_edit_plan.py"), str(manifest_abs), "--out", str(edit_plan)])
     run([python, str(tools / "build_publish_pack.py"), str(manifest_abs), "--out", str(publish_pack)])
 
     title = data.get("title", "")
     hook = data.get("hook", "")
     signature = data.get("creator_signature", {}).get("signature_line", "")
     strategy = data.get("flow_strategy", {}) or {}
+    post = data.get("post_production", {}) or {}
     planned = int(strategy.get("max_lite_generations_first_pass") or len(data.get("scenes", [])) or 4)
     non_ultra = int(strategy.get("non_ultra_credit_budget_first_pass") or planned * 10)
     ultra = int(strategy.get("ultra_credit_budget_first_pass") or planned * 5)
     keyframe_count = int(strategy.get("keyframe_count") or len(data.get("keyframes", {})) or 0)
     pacing = strategy.get("pacing", "controlled")
-    narration_policy = strategy.get("narration_policy", "none_by_default")
+    narration_policy = strategy.get("narration_policy", post.get("narration_default", "none_by_default"))
+    motion_density = int(post.get("target_motion_density_pct_min", 0) or 0)
 
     bundle_index.write_text(
         "\n".join(
@@ -94,6 +99,7 @@ def main() -> int:
                 f"- Pacing: {pacing}",
                 f"- Narration policy: {narration_policy}",
                 f"- Flow pack: `{flow_pack.relative_to(root)}`",
+                f"- Edit plan: `{edit_plan.relative_to(root)}`",
                 f"- Approve {keyframe_count} free keyframes/contact sheet.",
                 "- Verify Flow output count is 1 before each generation.",
                 f"- Planned first-pass spend: {planned} × Veo 3.1 Lite = {non_ultra} credits non-Ultra / {ultra} Ultra.",
@@ -102,6 +108,8 @@ def main() -> int:
                 "## Approval B — before upload",
                 "",
                 f"- Publish pack: `{publish_pack.relative_to(root)}`",
+                f"- Keep moving-footage density at or above {motion_density}% when specified; calm does not mean static.",
+                "- Do not pad the Short just to hit 40 seconds; accept a strong 30–36 second cut.",
                 "- Check first 0.5–1.0s readability and cat/tool/scale continuity.",
                 "- Check that the final pace still feels calm after editing; do not create urgency with unnecessary cuts.",
                 "- Default to no narration. If voice is used, record it in post and keep it episode-specific.",
@@ -121,6 +129,7 @@ def main() -> int:
     print("\nREADY")
     print(bundle_index)
     print(flow_pack)
+    print(edit_plan)
     print(publish_pack)
     return 0
 
