@@ -8,11 +8,11 @@ setting: tiny_japanese_candy_lab
 trend_window:
   cultural_moment: "2026-08-24 current gummy challenge launch + 9月3日 グミの日"
   publish_target: "2026-08-24_to_2026-09-03"
-  evidence_theme: "Japanese youth gummy demand is high, and a national gummy product launched on 2026-08-24 around the physical challenge of slowly lifting a long gummy without breaking it"
+  evidence_theme: "Japanese youth gummy demand is high and late-August/early-September product activity makes texture/physical-behavior cues timely"
   brand_copying: false
   use_generic_mechanic_only: true
   do_not_use_brand_name_or_packaging: true
-length_target_seconds: 34
+length_target_seconds: 31
 hook: "3ミリのグミ、切らずにどこまで伸ばせる？"
 title: "猫が3ミリのグミを伸ばしたら、予想より長かった。"
 core_question: can_the_cat_slowly_pull_one_micro_gummy_into_a_surprisingly_long_unbroken_strand
@@ -33,58 +33,74 @@ trend_translation:
     - branded_straw_or_powder_method
     - exact_product_shape
     - exact_flavor_pair
-why_this_is_cheaper_than_previous_version:
-  - one_hero_gummy_instead_of_three_texture_variants
-  - one_clear_physics_action_instead_of_three_material_behaviors
-  - fewer_translucent_surface_states_to_keep_consistent
-  - proof_resolution_uses_static_ruler_and_existing_frames
+why_this_is_cheap:
+  - one_hero_gummy_instead_of_multiple_texture_variants
+  - one_clear_physics_action_across_three_generations
+  - only_four_keyframes_needed
+  - final_proof_is_part_of_the_third_generation_not_a_separate_generation
 flow_strategy:
-  mode: exploration_4gen_frame_locked
+  mode: healing_h30_frame_locked
   primary_model: veo-3.1-lite
   output_count: 1
-  max_lite_generations_first_pass: 4
-  non_ultra_credit_budget_first_pass: 40
-  ultra_credit_budget_first_pass: 20
+  max_lite_generations_first_pass: 3
+  non_ultra_credit_budget_first_pass: 30
+  ultra_credit_budget_first_pass: 15
   frame_mode: first_plus_last
-  keyframe_count: 5
-  fifth_generation_requires_winner_gate: true
+  keyframe_count: 4
   image_preflight_model: nano-banana-2-lite
   explicitly_select_image_model: true
   use_quality_only_for: [final_unbroken_gummy_ruler_hero_after_format_wins]
   do_not_generate_separate_cta_clip: true
+  pacing: calm_physics_experiment
+  preferred_action_count_per_generation: 1
+  max_visual_cuts_per_8s_generation: 1
+  narration_policy: none_by_default
 keyframes:
   KF0_OPEN: short_3mm_micro_gummy_beside_tiny_ruler_and_white_socked_orange_cat_paw_in_tiny_candy_lab
-  KF1_CONSTRAINT: cat_paw_begins_slowly_lifting_the_same_gummy_while_bottom_end_stays_anchored_and_ruler_remains_visible
+  KF1_PULL: cat_paw_is_slowly_lifting_the_same_gummy_while_bottom_end_stays_anchored_and_ruler_remains_visible
   KF2_DANGER: gummy_is_long_and_very_thin_at_center_with_one_visible_near_snap_point_just_before_goal_mark
-  KF3_PAYOFF: unbroken_gummy_crosses_goal_mark_with_clear_ruler_proof_and_same_cat_paw_holding_position
-  KF4_RESOLUTION: cat_stops_pulling_and_lays_same_unbroken_long_gummy_beside_ruler_for_clean_length_proof
+  KF3_RESOLUTION: same_unbroken_long_gummy_is_laid_beside_ruler_past_goal_mark_for_clean_length_proof_with_cat_paw_resting_nearby
 scenes:
   - id: G1
+    generation_type: first_plus_last
     start_frame: KF0_OPEN
-    end_frame: KF1_CONSTRAINT
-    action: cat_starts_one_slow_controlled_pull_with_ruler_always_visible
+    end_frame: KF1_PULL
+    purpose: hook_and_controlled_start
+    generation_seconds: 8
+    action: cat_begins_one_slow_controlled_pull_with_ruler_always_visible_and_no_camera_cut
   - id: G2
-    start_frame: KF1_CONSTRAINT
+    generation_type: first_plus_last
+    start_frame: KF1_PULL
     end_frame: KF2_DANGER
-    action: gummy_length_increases_while_center_thins_and_nearly_snaps_before_goal
+    purpose: progressive_stretch_and_near_snap
+    generation_seconds: 8
+    action: same_gummy_slowly_lengthens_while_center_thins_and_nearly_snaps_just_before_goal_with_no_extra_objects_added
   - id: G3
+    generation_type: first_plus_last
     start_frame: KF2_DANGER
-    end_frame: KF3_PAYOFF
-    action: cat_reduces_pull_speed_and_the_same_gummy_survives_past_goal_mark
-  - id: G4
-    start_frame: KF3_PAYOFF
-    end_frame: KF4_RESOLUTION
-    action: cat_stops_at_goal_then_places_unbroken_gummy_beside_ruler_for_static_proof
+    end_frame: KF3_RESOLUTION
+    purpose: controlled_recovery_goal_cross_and_proof
+    generation_seconds: 8
+    action: cat_reduces_pull_speed_same_gummy_survives_past_goal_then_is_gently_laid_beside_ruler_for_proof_in_one_continuous_calm_action
 editorial_seconds:
   opening_scale_hold: 0.55
   ruler_goal_mark_punch_in: 0.35
-  near_snap_freeze: 0.45
-  final_length_proof_hold: 0.9
+  near_snap_freeze: 0.35
+  final_length_proof_hold: 1.0
   opening_frame_reuse_for_loop: 0.6
+post_production:
+  target_motion_density_pct_min: 80
+  max_total_static_hold_seconds: 4
+  preferred_playback_speed_range: [0.92, 1.00]
+  sound_bridge_between_visual_cuts: true
+  generated_audio_policy: replace_if_stretch_sound_is_exaggerated_or_music_is_added
+  narration_default: none
+  preferred_final_runtime_seconds: [28, 33]
 experiment_variable: topical_single_mechanic_physics_retention
 creator_signature:
   narrator_angle: tiny_food_scientist_who_values_control_over_excess
   signature_line: "切れる前に止めるのも、成功です。"
+  delivery: optional_user_voice_only_if_visual_meaning_is_unclear
 originality_guard:
   unique_goal: stretch_one_micro_gummy_past_a_visible_length_goal_without_breaking
   unique_conflict: single_strand_thins_to_near_snap_under_slow_pull
