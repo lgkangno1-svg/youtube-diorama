@@ -79,6 +79,11 @@ editorial_seconds:
 creator_signature:
   narrator_angle: amused_witness_to_the_cats_bad_priorities
   signature_line: "そこまで作って、パセリなんだ。"
+audience_loop:
+  mode: poll
+  question: "次に3cmで作るなら？"
+  options: ["ラーメン", "寿司"]
+  next_manifest_seed: winning_option_becomes_candidate_food_but_requires_new_conflict_and_resolution
 success_metrics:
   comparison_method: same_channel_same_observation_horizon_percentiles
   primary: [stayed_to_watch_pct, avg_percentage_viewed_pct]
