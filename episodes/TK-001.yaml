@@ -19,14 +19,14 @@ payoff: parsley_twist
 resolution: cat_ignores_omurice_and_takes_parsley
 loop_end: reuse_opening_keyframe_after_parsley_twist
 flow_strategy:
-  mode: healing_h30_motion_dense_frame_locked
+  mode: healing_h30_extend_chain_trial
   primary_model: veo-3.1-lite
   output_count: 1
   max_lite_generations_first_pass: 3
   non_ultra_credit_budget_first_pass: 30
   ultra_credit_budget_first_pass: 15
-  frame_mode: first_plus_last
-  keyframe_count: 4
+  frame_mode: mixed_first_last_plus_extend
+  keyframe_count: 3
   image_preflight_model: nano-banana-2-lite
   explicitly_select_image_model: true
   use_quality_only_for: [hero_food_reveal_after_format_wins]
@@ -36,7 +36,13 @@ flow_strategy:
   max_visual_cuts_per_8s_generation: 2
   preferred_action_count_per_generation: 1
   narration_policy: none_by_default
-  audio_policy: keep_clean_native_asmr_or_replace_in_post
+  audio_policy: replace_at_extend_boundary_unless_native_audio_is_clean
+  extend_trial:
+    enabled: true
+    source_scene: G2
+    reason: reduce_one_independent_scene_setup_and_preserve_motion_continuity_at_same_credit_cost
+    fallback: generate_G3_as_normal_first_plus_last_lite_if_extend_output_is_unusable
+    do_not_reroll_both_paths: true
   fourth_generation_requires_qc_failure_or_winner_gate: true
 references:
   - CAT_MASTER_PAWS
@@ -47,31 +53,32 @@ keyframes:
   KF0_OPEN: cat_paw_touches_pearl_sized_egg_cup_beside_tiny_pan_no_finished_food_visible
   KF1_CONSTRAINT: 3cm_scale_is_obvious_with_tiny_rice_and_pan_beside_cat_paw
   KF2_DANGER: ultra_thin_omelet_edge_is_about_to_tear_in_pan
-  KF3_RESOLUTION: intact_3cm_omurice_is_finished_then_cat_paw_quietly_takes_only_the_parsley
 scenes:
   - id: G1
+    generation_type: first_plus_last
     purpose: hook_plus_prep
     generation_seconds: 8
     start_frame: KF0_OPEN
     end_frame: KF1_CONSTRAINT
     action: paw_slowly_pushes_tiny_egg_cup_toward_pan_then_places_the_tiny_rice_amount_and_pauses_for_steam
   - id: G2
+    generation_type: first_plus_last
     purpose: cooking_plus_danger
     generation_seconds: 8
     start_frame: KF1_CONSTRAINT
     end_frame: KF2_DANGER
     action: rice_and_one_ketchup_drop_cook_slowly_then_the_thin_omelet_edge_almost_tears_without_fast_camera_changes
   - id: G3
+    generation_type: extend
+    source_scene: G2
     purpose: recovery_assembly_payoff_resolution
     generation_seconds: 8
-    start_frame: KF2_DANGER
-    end_frame: KF3_RESOLUTION
-    action: omelet_survives_is_gently_placed_on_rice_then_hold_moving_steam_before_the_paw_quietly_takes_the_parsley
+    action: continue_seamlessly_from_the_near_tear_moment_the_omelet_recovers_is_gently_placed_on_rice_steam_moves_slowly_then_the_paw_quietly_takes_the_parsley
 editorial_seconds:
   opening_keyframe_hold: 0.7
   environmental_room_hold: 0.8
   cliffhanger_freeze: 0.3
-  hero_keyframe_slow_push_in: 1.2
+  hero_frame_slow_push_in: 1.2
   reaction_hold: 0.6
   opening_keyframe_reuse_for_loop: 0.7
 post_production:
@@ -81,7 +88,7 @@ post_production:
   slowdown_only_if_motion_remains_natural: true
   do_not_force_40_second_runtime: true
   preferred_final_runtime_seconds: [30, 36]
-  generated_audio_policy: keep_only_clean_single_take_audio_otherwise_replace_with_reusable_asmr_library
+  generated_audio_policy: keep_clean_native_audio_within_each_take_but_replace_or_sound_bridge_at_extend_boundary_if_needed
   sound_bridge_between_visual_cuts: true
   narration_default: none
   narration_if_needed_max_lines: 2
