@@ -18,13 +18,26 @@ candidates:
     working_title_ja: "猫の小さな月見食堂、最初の一皿。"
     premise: "A tiny autumn diner opens at night; the cat slowly cooks a 3cm egg-topped rice bowl while a paper moon hangs outside. The yolk almost breaks before plating; the first empty stool is finally occupied at the end."
     benchmark_mechanic: [familiar_cat_job, seasonal_food_recognition, visible_yolk_tension]
-    benchmark_evidence: 19
+    benchmark_evidence: 20
     japan_relevance: 15
     healing_fit: 20
     flow_efficiency: 18
     originality: 14
     worldbuilding: 10
-    trend_window: "2026-08-26..2026-09-30"
+    trend_window: "2026-08-24..2026-09-30"
+    narration_recommendation: none
+    status: priority_candidate
+  - id: IDEA-009
+    working_title_ja: "猫の焼きいも屋、秋の最初の一本。"
+    premise: "At a tiny evening sweet-potato stand, the cat slowly turns one 3cm sweet potato over warm coals; the skin begins to crack, steam escapes, and the golden center is opened for the first customer."
+    benchmark_mechanic: [seasonal_autumn_ingredient, single_object_slow_transformation, steam_and_crack_payoff, cat_job_world]
+    benchmark_evidence: 18
+    japan_relevance: 15
+    healing_fit: 20
+    flow_efficiency: 20
+    originality: 13
+    worldbuilding: 9
+    trend_window: "2026-08-24..2026-10-31"
     narration_recommendation: none
     status: candidate
   - id: IDEA-002
