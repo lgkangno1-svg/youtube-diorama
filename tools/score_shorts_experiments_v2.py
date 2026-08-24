@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Horizon-aware Tiny Cat Kitchen Shorts experiment scorer.
 
-Compare only snapshots with the same observation_hours (24h with 24h, 72h with
-72h). Public views are kept as external reach context but excluded from the
-internal quality score.
+Compare only real snapshots with the same observation_hours (24h with 24h, 72h
+with 72h). Public views are kept as external reach context but excluded from
+the internal quality score. Future-dated rows and zero-engagement placeholders
+are ignored so prefilled templates cannot be mistaken for failed experiments.
 """
 
 from __future__ import annotations
@@ -12,6 +13,7 @@ import csv
 import math
 import sys
 from collections import defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 REQUIRED = [
@@ -54,6 +56,30 @@ def diagnose(stw, apv, subs):
     return "KEEP_TESTING"
 
 
+def parse_published_at(value: str):
+    value = (value or "").strip()
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def skip_reason(row, now_utc):
+    published = parse_published_at(row.get("published_at", ""))
+    if published and published > now_utc:
+        return "future_published_at"
+    if num(row, "engaged_views") <= 0:
+        return "no_engaged_views_yet"
+    if int(num(row, "observation_hours")) not in {24, 72}:
+        return "unsupported_observation_horizon"
+    return None
+
+
 def main(path_str):
     path = Path(path_str)
     if not path.exists():
@@ -72,8 +98,27 @@ def main(path_str):
         print("Missing columns: " + ", ".join(missing), file=sys.stderr)
         return 2
 
+    now_utc = datetime.now(timezone.utc)
+    valid_rows = []
+    skipped = []
+    for row in rows:
+        reason = skip_reason(row, now_utc)
+        if reason:
+            skipped.append((row.get("episode_id", "?"), row.get("observation_hours", "?"), reason))
+        else:
+            valid_rows.append(row)
+
+    if skipped:
+        print("Skipped non-learning rows:")
+        for episode_id, hours, reason in skipped:
+            print(f"- {episode_id} {hours}h: {reason}")
+
+    if not valid_rows:
+        print("\nNo analyzable 24h/72h snapshots yet. Add real Studio data after publishing.")
+        return 0
+
     cohorts = defaultdict(list)
-    for r in rows:
+    for r in valid_rows:
         engaged = num(r, "engaged_views")
         item = dict(r)
         item["hours"] = int(num(r, "observation_hours"))
