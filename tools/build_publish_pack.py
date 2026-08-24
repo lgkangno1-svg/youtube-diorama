@@ -19,6 +19,58 @@ def h(v: Any) -> str:
     return "" if v is None else str(v).replace("_", " ").strip()
 
 
+def audience_loop_lines(data: dict[str, Any]) -> list[str]:
+    cfg = data.get("audience_loop", {}) or {}
+    mode = str(cfg.get("mode") or "").strip().lower()
+    if not mode:
+        return [
+            "## Audience loop",
+            "",
+            "- No interactive sticker is planned for this episode; use the pinned comment only.",
+            "- Do not add a generic like/subscribe CTA just to fill space.",
+        ]
+
+    lines = [
+        "## Audience loop — turn this Short into the next episode seed",
+        "",
+        "> Use only one primary interaction mechanic per episode. The goal is to collect the next creative input without another brainstorming/LLM pass.",
+        "",
+    ]
+
+    if mode == "poll":
+        question = cfg.get("question") or "次に見たいのはどっち？"
+        options = cfg.get("options") or []
+        lines += [f"- Mode: Poll Sticker", f"- Question: {question}"]
+        if options:
+            lines.append("- Options: " + " / ".join(str(x) for x in options[:2]))
+        lines.append("- Rule: the winning option becomes a candidate premise, not an automatic copy of the previous episode.")
+    elif mode in {"q&a", "qa", "qna"}:
+        question = cfg.get("question") or "次に小さくしてほしい料理は？"
+        lines += [
+            "- Mode: Q&A Sticker",
+            f"- Question: {question}",
+            "- Rule: collect recurring nouns/problems; use the strongest repeated suggestion as an idea seed, then run originality validation before Flow spend.",
+        ]
+    elif mode == "video_reply":
+        trigger = cfg.get("trigger") or "a specific funny or repeated viewer comment that can become a genuinely new episode premise"
+        lines += [
+            "- Mode: Video Reply",
+            f"- Trigger: {trigger}",
+            "- Rule: reply with a Short only when the comment creates a new goal/conflict/resolution; do not generate a near-duplicate just to acknowledge a comment.",
+            "- The original commenter will be notified by YouTube when the video reply is posted.",
+        ]
+    else:
+        lines += [
+            f"- Mode requested in manifest: {mode}",
+            "- Unknown mode: fall back to the pinned comment rather than improvising a new interaction workflow.",
+        ]
+
+    seed_rule = cfg.get("next_manifest_seed")
+    if seed_rule:
+        lines.append(f"- Next-manifest seed rule: {h(seed_rule)}")
+    return lines
+
+
 def build(data: dict[str, Any]) -> str:
     eid = data["episode_id"]
     title = data.get("title", "")
@@ -29,7 +81,7 @@ def build(data: dict[str, Any]) -> str:
     target = data.get("target_market", "JP")
 
     publishing = data.get("publishing", {})
-    audience_prompt = publishing.get("audience_prompt") or f"次はどんな小さな料理を見たい？"
+    audience_prompt = publishing.get("audience_prompt") or "次はどんな小さな料理を見たい？"
     description_line = publishing.get("description_line") or f"{hook} {food}を小さな世界で作ります。"
     hashtags = publishing.get("hashtags") or ["#Shorts", "#ミニチュア料理", "#猫", "#AI猫"]
 
@@ -60,13 +112,17 @@ def build(data: dict[str, Any]) -> str:
         audience_prompt,
         "```",
         "",
+    ]
+    lines += audience_loop_lines(data)
+    lines += [
+        "",
         "## Studio checklist",
         "",
         f"- Target market: {target}",
         "- Format: Short / 9:16",
         "- AI use disclosure: YES for photorealistic synthetic Tiny Cat Kitchen footage",
         "- Paid promotion: NO unless money/free product/other value was received from a brand",
-        "- Do not add a generic like/subscribe CTA if the episode already has an audience prompt",
+        "- Do not add a generic like/subscribe CTA if the episode already has an audience prompt or sticker",
         "- Keep sponsor/product tags empty unless actual Studio eligibility and a real commercial relationship/product are present",
         "- Check that the visible title/description do not claim the food or tools are physically real if the footage is synthetic",
         "",
