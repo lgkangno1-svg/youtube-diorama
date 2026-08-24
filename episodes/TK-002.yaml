@@ -59,6 +59,10 @@ experiment_variable: numeric_constraint_hook
 creator_signature:
   narrator_angle: skeptical_counter_who_becomes_impressed
   signature_line: "10粒、ちゃんと全員います。"
+audience_loop:
+  mode: q&a
+  question: "10粒だけで作ってほしい料理は？"
+  next_manifest_seed: most_repeated_viewer_idea_becomes_candidate_constraint_episode_after_originality_validation
 originality_guard:
   unique_goal: cook_exactly_10_grains
   unique_conflict: losing_one_grain_breaks_the_rule
