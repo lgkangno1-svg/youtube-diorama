@@ -33,7 +33,22 @@ ChatGPT가 수행:
 
 ## 핵심 비용 원칙 — Progressive Spend H30
 
-Veo 3.1 Lite 8초는 현재 non-Ultra 10 credits이다. 4/6/8초 비용이 같으므로 특별한 이유가 없으면 8초를 사용한다.
+운영 계정은 **Google AI Pro** 기준이다. 현재 공식 Google Flow 표에서 Pro는 월 1,000 Flow credits이며, Veo 3.1 Lite 4/6/8초와 Extend는 non-Ultra 10 credits/generation이다. Plus/Pro/Ultra의 1080p upscale은 0 credits다.
+
+중요: Flow에서 보이는 `15 credits`는 Veo Lite 비용이라고 단정하지 않는다. 현재 공식표에서 **Gemini Omni Flash 4초가 15 credits**다. 생성 직전 반드시 `active model + duration + displayed credit cost + output count`를 확인한다.
+
+H30 적용 조건:
+
+```text
+active model = Veo 3.1 Lite
+duration = 8s
+output count = 1
+displayed cost = 10 credits / generation
+```
+
+실제 Flow UI 표시가 공식표와 다르면 UI를 해당 생성의 source of truth로 기록하고 **일단 생성하지 않은 채 비용 기준을 재확인**한다. 모델이 Omni Flash/Fast/Quality로 바뀌어 있으면 Lite로 되돌릴 수 있는지 먼저 확인한다.
+
+4/6/8초 비용이 같으므로 특별한 이유가 없으면 8초를 사용한다.
 
 기본 최대 예산:
 
