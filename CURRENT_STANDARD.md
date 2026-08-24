@@ -1,247 +1,223 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-24 Healing H30 + Audience-to-Manifest + Dual-Metric Horizon Gate**
+최신 적용 기준: **2026-08-24 Progressive Spend H30 + Sequential Frame Chain + Motion-Dense Healing**
 
-## 1. 현재 최우선 제작 원칙
+## 1. 채널의 기본 감정
 
-Tiny Cat Kitchen의 기본 감정은 `viral-chaos`가 아니라 **cozy/healing**이다.
+Tiny Cat Kitchen은 `viral-chaos`가 아니라 **cozy / healing**이다.
 
-핵심 문장:
+핵심:
 
 > **Hook은 빠르게 이해시키고, 본문은 천천히 보여준다.**
 
-따라서 첫 0.5~1.5초에는 `고양이 앞발 + 말도 안 되게 작은 재료/규칙`을 즉시 보여주되, 이후에는 2초마다 컷을 바꾸지 않는다.
+- 첫 0.5~1.5초: 고양이 앞발 + 매우 작은 재료/규칙을 즉시 이해
+- 이후: 한 공간에서 느린 행동을 끝까지 보여줌
+- 2초마다 컷 전환, flash, meme transition, 과한 zoom 금지
+- calm은 static을 뜻하지 않는다. 작은 움직임은 계속 있어야 한다.
 
-권장 최종 Short:
-- 35~45초
-- 총 5~7개 visual beat
-- 평균 체감 shot duration 4~7초
-- action completion cut / sound bridge / gentle match cut 우선
-- fast swipe / flash / meme transition 금지
-
-현재 우선 문서:
-1. `docs/19_healing_pacing_audio_benchmark.md` — creative direction / H20-H30-H40
-2. `docs/17_audience_to_manifest_loop.md` — audience signal → next episode seed
-3. `docs/12_dual_metric_horizon_gate.md` — 24h/72h 성과판단
-4. `docs/11_engaged_view_truth_layer.md` — engaged-quality 중심 Flow 재투자
-5. `docs/10_frame_lock_compatibility_credit_reserve_hype.md` — Flow 기능/호환성
-6. `docs/09_resolution_diversity_creator_signature.md` — 원본성 / 결말 다양성
+권장 최종 길이는 **약 28~36초**를 기본으로 한다. 더 짧아도 완결성이 있으면 허용하고, 40초를 맞추기 위해 정지 keyframe을 길게 패딩하지 않는다.
 
 ---
 
-## 2. Flow 기본 예산 — H30
+## 2. 기본 Flow 구조 — Progressive Spend H30
 
-현재 첫 파일럿 기본값:
+현재 공식 Flow 기준 Veo 3.1 Lite는 4/6/8초와 Extend가 generation당 non-Ultra 10 credits / Ultra 5 credits다. 따라서 특별한 이유가 없으면 8초를 쓴다.
+
+기본 최대 first-pass 예산:
 
 ```text
-Nano Banana image preflight
-→ Veo 3.1 Lite 8s × 3 generations
-→ 24s generated motion
-→ free keyframe holds / slow push-ins / environmental stills / reaction holds
-→ 35~45s final Short
+Gate A: free image/reference/keyframe preflight = 0
+G1: 8s Lite = +10
+PASS 후 G2: 8s Lite = +10
+PASS 후 G3: 8s Lite = +10
+max first pass = 30 credits non-Ultra
 ```
 
-비용:
-- Non-Ultra: 3 × 10 = **30 credits**
-- Ultra: 3 × 5 = **15 credits**
+**G1/G2/G3를 한꺼번에 만들지 않는다.**
 
-H40은 자동 기본값이 아니다.
+- G1이 틀리면 G2/G3 금지
+- G2가 틀리면 G3 금지
+- minor timing/crop 문제는 편집으로 수리
+- 구조적 실패만 해당 generation 1회 reroll 검토
+- premise 자체가 약하면 추가 spend 중단
 
-### H20
-- 2 generations
-- premise / trend / hook validation
-- 25~32초 편집 후보
-
-### H30 — 기본
-- 3 generations
-- 24초 실제 motion + 무료 still/editorial hold
-- healing/credit 균형점
-
-### H40
-- 4 frame-locked generations
-- 복잡한 음식 변화나 flagship만
-- H30 QC가 명확히 부족할 때만 승격
-
-Google Flow 현재 공식 비용 기준:
-- Veo 3.1 Lite: 4/6/8초 모두 non-Ultra 10 / Ultra 5 credits
-- Fast: non-Ultra 20 / Ultra 10
-- Quality: 8초 100
-- 무료 비구독: 하루 50 Flow credits
-- 비용은 request가 아니라 generation당 부과
-- output count는 항상 1 확인
-
-중요:
-- Lite는 First + Last frame 지원
-- Fast는 First + Last가 동일한 drop-in upgrade가 아님
-- frame continuity가 중요한 컷은 Lite 유지
-- 남는 무료 크레딧을 억지로 다 쓰지 않는다
+H20은 2개의 8초 Lite로 충분한 단순 episode에 허용한다. H40은 검증된 승자 또는 명확한 1컷 구조적 결함이 있을 때만 허용한다.
 
 ---
 
-## 3. 8초 generation 사용법
+## 3. Sequential Frame Chain
 
-8초가 4초와 같은 비용이므로 특별한 이유가 없으면 8초를 사용한다.
+연속성 기본값:
 
-하지만 **8초에 4개의 빠른 컷을 강제로 넣지 않는다.**
+```text
+FREE OPEN FRAME
+  ↓
+G1 8s
+  ↓ save actual last usable frame
+G2 First frame
+  ↓
+G2 8s
+  ↓ save actual last usable frame
+G3 First frame
+  ↓
+G3 8s
+```
+
+G2/G3에는 무료로 준비한 target last frame을 추가로 사용할 수 있다.
+
+이유:
+- 같은 cat / cookware / food state를 실제 직전 프레임에서 이어감
+- 새 generation마다 캐릭터를 다시 해석하는 drift 감소
+- color/light/scale continuity 개선
+
+현재 Flow 공식 기능상 Veo 3.1 Lite는 First + Last frame을 지원하고, Fast의 First + Last는 아직 동일한 drop-in 대체가 아니다. Extend는 장면상 특별한 이점이 있을 때만 실험하며 기본값은 sequential First+Last chain이다.
+
+---
+
+## 4. 한 8초 generation의 문법
 
 기본:
 
-```text
-8초 = 1 calm action
-또는
-8초 = 최대 2개의 느린 beat
-```
+> **1 clip = 1 calm primary action + optional 1 micro-beat**
 
-예:
+좋은 예:
 
 ```text
-0~2s  앞발이 천천히 들어옴
-2~6s  작은 밥을 한두 번 젓음
-6~8s  멈춤 + 증기 + 여운
+0–1.5s  paw enters slowly
+1.5–6s  turns one tiny sweet potato over the heat
+6–8s    paw pauses; skin crack/steam continues
 ```
 
-Timestamp multi-shot은 기술적으로 가능하지만, healing main footage의 기본값이 아니다. 실험/정보형 영상 또는 B-roll 회수 목적에만 사용한다.
-
-2×2 video collage는 main footage에서 비권장. 이미지 contact sheet는 storyboard/approval 용도로 권장한다.
+금지:
+- 한 clip 안에서 준비→조리→완성→먹기 전부 수행
+- 여러 utensil 동시 사용
+- 3~4 camera angle montage
+- 서로 무관한 sound event 여러 개 겹치기
 
 ---
 
-## 4. 오디오 / 나레이션
+## 5. 오디오 / 나레이션
 
-### 기본값
+기본값:
 
 ```text
 No narration
-No music 또는 거의 들리지 않는 ambient music
-Cooking SFX + room tone
+No generated music
+Quiet room tone + one or two isolated natural ASMR families
 ```
 
-사용 가능한 핵심 SFX:
-- tiny sizzle
-- wood scrape
+재사용 SFX:
+- tiny paw tap
+- pan sizzle
+- wooden scrape
 - ceramic click
-- soft paw tap
 - water pour
-- rain / stove hum
+- rain ambience
+- stove/room tone
 
-Flow native audio가 깨끗한 single slow take라면 살릴 수 있다. 편집 flexibility가 필요한 source는 generated audio를 버리고 reusable SFX library로 교체한다.
+Flow 오디오가 깨끗하면 사용한다. 영상은 좋은데 오디오만 이상하면 **영상 재생성 금지**하고 후편집 SFX로 교체한다.
 
-### 사용자 나레이션
-
-필수 아님.
-
-다음 조건 중 하나일 때만 1~3문장 사용:
-- 화면만으로 story context가 약함
-- 캐릭터 성격을 기억시킬 한 줄이 필요함
-- 결말의 의미가 영상만으로 약함
-- A/B test에서 narration 효용을 검증하려는 경우
-
-42초 기준 총 음성 5~12초 이내. Flow에서 dialogue를 생성하지 않고 후편집에서 사용자가 직접 녹음한다.
+사용자 나레이션은 다음 중 하나일 때만 보통 일본어 0~2문장:
+- 화면만으로 규칙/상황 이해가 어려움
+- 캐릭터 성격을 한 줄로 강화 가능
+- payoff 의미를 한 줄이 크게 증폭
 
 ---
 
-## 5. 현재 TK-001 실행값
+## 6. 아이디어 선택 — 조회 가능성 + 제작 안정성
 
-`episodes/TK-001.yaml`은 H30으로 변경됨.
+다음 episode는 `ideas/episode_backlog.yaml`의 후보를 기반으로 평가한다.
+
+현재 scoring은 단순 트렌드성만 보지 않고:
+- benchmark evidence
+- Japan relevance
+- healing fit
+- visual satisfaction
+- **Flow reliability**
+- originality
+- worldbuilding
+- audience demand
+- **expected credit efficiency**
+
+를 본다.
+
+Flow reliability와 expected credit efficiency는 근거가 비슷한 후보끼리 비교할 때 특히 중요하다.
+
+현재 2026-08-24 계절 신호:
+- 月見 시즌이 실제 일본 외식/식품에서 시작됨
+- 9월 3일 グミの日 전후 texture 신제품 집중
+- さつまいも / 栗 가을 상품 출시 시작
+
+단, branded menu/plot/design을 복제하지 않고 계절·식감·역할 같은 추상 메커니즘만 사용한다.
+
+현재 저크레딧 관점의 강한 후보는 **한 개의 고구마가 천천히 익고 껍질이 갈라지며 김과 노란 속살이 보이는 焼きいも屋**다. 月見은 계절 인지도가 더 강하지만 계란 취급 + 손님 등장까지 포함하면 continuity risk가 더 높다. 실제 제작 순서는 최근 episode fingerprint와 현재 NEXT_EPISODE 상태를 확인한 뒤 결정한다.
+
+---
+
+## 7. 사용자의 평소 인터페이스
+
+사용자는 원칙적으로 ChatGPT에:
 
 ```text
-G1 8s: OPEN + PREP
-G2 8s: COOK + DANGER
-G3 8s: RECOVERY + ASSEMBLY + PAYOFF/RESOLUTION
+다음 영상 준비해줘.
 ```
 
-첫 pass:
-- 3 Lite generations
-- 30 credits non-Ultra / 15 Ultra
-- 4 keyframes
-- narration none by default
-- slow/healing pace
+라고만 말하면 된다.
 
-`tools/build_flow_pack.py`와 `tools/build_episode_bundle.py`는 이제 manifest의 scene 수와 budget을 읽으므로 4-generation을 강제하지 않는다.
+ChatGPT가:
+- 최신 benchmark / 일본 신호 확인
+- 과거 production + 24h/72h learning 확인
+- 후보 선정
+- 일본어 title/hook
+- narration 필요 여부
+- 3개의 느린 8초 action 설계
+- episode manifest 생성/수정
+- `production/NEXT_EPISODE.txt` 갱신
 
-실행:
+을 담당한다.
 
-```bash
-pip install -r tools/requirements.txt
-python tools/build_episode_bundle.py episodes/TK-001.yaml
+로컬에서는:
+
+```powershell
+./tools/make_next_short.ps1
 ```
 
-이 명령은 LLM/API/Flow를 호출하지 않고:
-- originality validation
-- Flow pack
-- publish pack
-- approval bundle
-
-을 생성한다.
+을 실행해 bundle / Flow pack / edit plan / publish pack을 만든다. 이 준비 단계는 Flow/LLM/API를 호출하지 않는다.
 
 ---
 
-## 6. 사용자 수동 작업 최소화
+## 8. 성과 학습
 
-사람 승인 지점은 2회만 유지한다.
+실제 데이터가 생기기 전에는 placeholder를 실패 데이터처럼 학습하지 않는다.
 
-### Approval A — Production Card
-- 일본어 title
-- 첫 1초 hook
-- 무료 keyframe/contact sheet
-- 예상 Flow spend
+매 episode에서 가능한 경우 기록:
+- Flow credits spent
+- rerolls
+- G1/G2/G3 first-pass success
+- usable motion seconds
+- continuity issue / failed action type
+- Flow audio kept/replaced
+- narration mode
+- final length
+- 24h / 72h Stayed to watch
+- APV
+- engaged views
+- subscribers
+- comments
 
-### Approval B — Final Export
-- 첫 1초 시인성
-- 고양이/도구/음식 scale continuity
-- healing pace 유지
-- ending/lore 변화
-- AI disclosure / upload metadata
-
-매 scene prompt는 사람이 다시 쓰지 않는다.
-
----
-
-## 7. Audience-to-Manifest
-
-다음 메뉴를 AI에게 무작정 브레인스토밍시키기 전에 시청자에게 먼저 묻는다.
+장기 최적화 대상:
 
 ```text
-Poll / Q&A / 구체 댓글
-→ audience demand seed
-→ originality validation (0 AI tokens)
-→ 통과 후보만 Flow spend
+usable motion / credit
+engaged views / credit
+subscribers / 100 credits
 ```
 
-Poll 승자라도 직전 영상의 goal/conflict/resolution을 그대로 반복하면 폐기한다.
+특정 음식이 성공했다고 그 음식을 복제하지 않는다. 성공한 **hook/action/pacing/audio/ending mechanism**만 다음 episode prior로 사용한다.
 
 ---
 
-## 8. 성과 판단 — 24h와 72h 분리
-
-2026-08-24 이후 public view는 reach 계기판으로 보고, 제작 재투자는 engaged quality로 판단한다.
-
-### 내부 제작 판단
-1. Stayed to watch
-2. Average percentage viewed
-3. Subscribers / 1,000 engaged views
-4. Comments / 1,000 engaged views
-
-### 외부 브랜드/협찬
-- public views
-- 28일/90일 reach
-- median reach per Short
-- Japan audience share
-
-24h와 72h snapshot은 같은 pool에서 비교하지 않는다.
-
-진단:
-
-```text
-STW 약함 + APV 강함 → 첫 0.5~1초만 수정
-STW 강함 + APV 약함 → middle pacing/conflict만 수정
-둘 다 약함 → 해당 premise에 추가 Flow spend 중단
-둘 다 강함 → narration/IP/next episode conversion 실험
-```
-
----
-
-## 9. YPP / AI 원본성 안전
+## 9. 원본성 / YPP 안전
 
 각 episode는 다음이 식별 가능해야 한다.
 - unique_goal
@@ -251,52 +227,33 @@ STW 강함 + APV 약함 → middle pacing/conflict만 수정
 - world_state_change
 - callback_or_new_lore
 
-최근 5편과 fingerprint 5개 중 최소 3개를 다르게 유지한다.
+최근 5편과 fingerprint 5개 중 최소 3개가 달라야 한다.
 
-YouTube monetization 기준상 동일 캐릭터 시리즈는 가능하지만, AI-generated generic template처럼 보이거나 같은 상황/결말을 반복하는 mass-produced content는 위험하다.
-
-따라서:
-- 음식만 바꾸고 같은 사건 복제 금지
-- twist 필수 아님
-- comedy / proof / emotional / transformation / choice / failure 등 resolution family 순환
-- photorealistic synthetic footage는 필요한 altered/synthetic disclosure 사용
+음식명만 바꾸고 같은 사건/갈등/결말을 반복하지 않는다. Photorealistic synthetic footage는 필요한 altered/synthetic disclosure를 사용한다.
 
 ---
 
-## 10. 수익화 우선순위
-
-2026 현재:
-- Expanded YPP: 500 subscribers + 3M qualified Shorts views/90d 또는 3,000 qualified watch hours
-- Full ads/Premium: 1,000 subscribers + 10M qualified Shorts views/90d
-
-2027-02-01 신규 진입:
-- 1,000 subscribers + 20M qualified Shorts views/90d 또는 8,000 qualified watch hours
-
-조기 단계부터 준비:
-- business contact
-- original IP portfolio
-- food/gadget 협업 카테고리
-- public reach media-kit 데이터
-- 실제 Studio에서 활성화된 Creator Partnerships / Shopping / fan funding만 사용
-
----
-
-## 11. 현재 Loop Engineering
+## 10. 현재 Loop Engineering
 
 ```text
-Audience signal / trend / core idea
-→ originality validation (0 AI tokens)
-→ free image preflight
-→ H30: 3 × 8s Lite generations
-→ slow editorial holds + reusable ASMR
-→ optional 1~3 line user narration only when useful
-→ Final Export approval
+Fresh benchmark / Japanese signal / audience request
+→ candidate scoring with reliability + credit efficiency
+→ originality gate
+→ free image/reference preflight
+→ G1 8s Lite
+→ QC
+→ actual end-frame chain
+→ G2 only after PASS
+→ QC
+→ actual end-frame chain
+→ G3 only if still needed
+→ reusable ASMR / optional short user narration
+→ 28–36s motion-dense healing edit
 → publish
-→ 24h / 72h engaged-quality read
-→ exact failure stage만 수정
-→ H20/H30/H40 중 다음 spend 결정
+→ 24h / 72h engaged-quality + production-cost learning
+→ update priors and next candidate
 ```
 
 최종 목표:
 
-> **작은 일본 세계에서 고양이가 천천히 한 끼를 완성하는 40초짜리 휴식 — 적은 Flow 크레딧으로 만들고, 시청자 데이터로 다음 편을 결정한다.**
+> **가장 싼 영상을 만드는 것이 아니라, 일본 시청자가 오래 보고 다시 찾을 만한 고품질 힐링 영상을 가장 적은 실패 generation으로 만드는 것.**
