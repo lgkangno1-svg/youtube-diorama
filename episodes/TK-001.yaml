@@ -5,21 +5,21 @@ audience: [teens, twenties]
 format: healing_experiment
 food: omurice
 constraint: 3cm
-length_target_seconds: 38
+length_target_seconds: 34
 hook: "猫の手に卵を渡した結果…"
 title: "猫の手で3cmオムライスは作れる？"
 open_loops:
   - at_second: 0
     question: can_the_cat_make_it
-  - at_second: 11
+  - at_second: 10
     question: will_the_egg_tear
-  - at_second: 29
+  - at_second: 26
     question: what_will_the_cat_choose
 payoff: parsley_twist
 resolution: cat_ignores_omurice_and_takes_parsley
 loop_end: reuse_opening_keyframe_after_parsley_twist
 flow_strategy:
-  mode: healing_h30_frame_locked
+  mode: healing_h30_motion_dense_frame_locked
   primary_model: veo-3.1-lite
   output_count: 1
   max_lite_generations_first_pass: 3
@@ -32,11 +32,12 @@ flow_strategy:
   use_quality_only_for: [hero_food_reveal_after_format_wins]
   use_consistent_references: true
   do_not_generate_separate_cta_clip: true
-  pacing: healing
+  pacing: healing_motion_dense
   max_visual_cuts_per_8s_generation: 2
   preferred_action_count_per_generation: 1
   narration_policy: none_by_default
   audio_policy: keep_clean_native_asmr_or_replace_in_post
+  fourth_generation_requires_qc_failure_or_winner_gate: true
 references:
   - CAT_MASTER_PAWS
   - KITCHEN_MASTER_COUNTER
@@ -53,26 +54,37 @@ scenes:
     generation_seconds: 8
     start_frame: KF0_OPEN
     end_frame: KF1_CONSTRAINT
-    action: paw_slowly_pushes_tiny_egg_cup_toward_pan_then_pauses_beside_the_tiny_rice_amount
+    action: paw_slowly_pushes_tiny_egg_cup_toward_pan_then_places_the_tiny_rice_amount_and_pauses_for_steam
   - id: G2
     purpose: cooking_plus_danger
     generation_seconds: 8
     start_frame: KF1_CONSTRAINT
     end_frame: KF2_DANGER
-    action: rice_and_one_ketchup_drop_cook_slowly_then_the_thin_omelet_edge_almost_tears
+    action: rice_and_one_ketchup_drop_cook_slowly_then_the_thin_omelet_edge_almost_tears_without_fast_camera_changes
   - id: G3
     purpose: recovery_assembly_payoff_resolution
     generation_seconds: 8
     start_frame: KF2_DANGER
     end_frame: KF3_RESOLUTION
-    action: omelet_survives_is_gently_placed_on_rice_then_hold_the_finished_omurice_before_the_paw_quietly_takes_the_parsley
+    action: omelet_survives_is_gently_placed_on_rice_then_hold_moving_steam_before_the_paw_quietly_takes_the_parsley
 editorial_seconds:
-  opening_keyframe_hold: 1.5
-  environmental_room_hold: 2.0
-  cliffhanger_freeze: 0.6
-  hero_keyframe_slow_push_in: 3.0
-  reaction_hold: 1.5
-  opening_keyframe_reuse_for_loop: 1.0
+  opening_keyframe_hold: 0.7
+  environmental_room_hold: 0.8
+  cliffhanger_freeze: 0.3
+  hero_keyframe_slow_push_in: 1.2
+  reaction_hold: 0.6
+  opening_keyframe_reuse_for_loop: 0.7
+post_production:
+  target_motion_density_pct_min: 80
+  max_total_static_hold_seconds: 5
+  preferred_playback_speed_range: [0.90, 1.00]
+  slowdown_only_if_motion_remains_natural: true
+  do_not_force_40_second_runtime: true
+  preferred_final_runtime_seconds: [30, 36]
+  generated_audio_policy: keep_only_clean_single_take_audio_otherwise_replace_with_reusable_asmr_library
+  sound_bridge_between_visual_cuts: true
+  narration_default: none
+  narration_if_needed_max_lines: 2
 creator_signature:
   narrator_angle: amused_witness_to_the_cats_bad_priorities
   signature_line: "そこまで作って、パセリなんだ。"
