@@ -29,7 +29,7 @@ runtime_strategy:
   mode: immersive_h40
   target_final_runtime_seconds: [38, 46]
   minimum_distinct_motion_beats: 4
-  fourth_beat_value: "quiet world-resolution: slide the tiny finished serving into its diorama stall position, then paws withdraw while steam remains"
+  fourth_beat_value: "quiet world-resolution: slide the same tiny roasting tray with the finished yakiimo into its diorama stall position, then paws withdraw while steam remains"
   do_not_pad_to_runtime: true
 flow_strategy:
   mode: progressive_h40_sequential_chain
@@ -60,10 +60,10 @@ references:
   - KITCHEN_WORLD_V1
 keyframes:
   KF0_OPEN: "true first-person cat POV looking down at a tiny wooden diorama workbench; only two cream-and-pale-ginger feline front paws at the bottom edges; between them sits one absurdly tiny 12mm purple sweet potato on a thumbnail-sized ceramic roasting tray; no cat face/head/body"
-  KF1_WARM: "same POV and paw positions; tiny 12mm sweet potato gently warmed on a miniature charcoal brazier, skin slightly darker; object remains much smaller than either paw"
-  KF2_CRACK: "same POV; sweet potato skin has one small natural crack with a very thin curl of steam; one paw lightly steadies the tiny tray from the side, no gripping"
-  KF3_OPEN: "same POV; tiny sweet potato is softly split enough to reveal bright golden center and steam; paws remain only at bottom edges, food still under one third paw width"
-  KF4_SERVE: "same POV; finished 12mm yakiimo rests on a tiny ceramic leaf-shaped plate inside a miniature stall serving niche; paws are beginning to withdraw, warm steam remains"
+  KF1_WARM: "same POV and paw positions; tiny 12mm sweet potato gently warmed on the same miniature ceramic roasting tray over a miniature charcoal brazier, skin slightly darker; object remains much smaller than either paw"
+  KF2_CRACK: "same POV; sweet potato skin has one small natural crack with a very thin curl of steam; one paw lightly steadies the same tiny roasting tray from the side, no gripping"
+  KF3_OPEN: "same POV and same tiny roasting tray; the tray now rests just away from the heat and the existing crack has widened naturally enough to reveal bright golden center and steam; paws remain only at bottom edges, food still under one third paw width"
+  KF4_SERVE: "same POV; the same thumbnail-sized ceramic roasting tray holding the finished 12mm yakiimo now rests inside a miniature stall serving niche; paws are beginning to withdraw, warm steam remains; no new plate or cookware appears"
 scenes:
   - id: G1
     generation_type: first_plus_last
@@ -87,16 +87,16 @@ scenes:
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G2
     end_frame: KF3_OPEN
-    action: "the two paws softly press the tiny sweet potato from opposite outer sides without pinching; the existing crack opens slightly and the golden center becomes visible"
-    action_guard: "feline paws remain anatomically real; no fingers; no precise human pinch; no cat face/body; one slow reveal only"
+    action: "one paw slowly slides the same tiny roasting tray a few millimeters away from the charcoal heat, then stops; during the quiet hold the existing crack widens naturally from residual heat and the golden center becomes visible"
+    action_guard: "one slide plus one passive material micro-beat; paw never touches or pinches the sweet potato; no fingers; no human-like squeeze; preserve the same tray, first-person camera and tiny scale"
   - id: G4
     generation_type: first_plus_last
     purpose: quiet_world_resolution
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G3
     end_frame: KF4_SERVE
-    action: "one paw slowly slides the tiny leaf-shaped plate into the miniature serving niche; both paws then withdraw a little while steam continues"
-    action_guard: "this is a world-resolution beat, not runtime padding; no eating, no customer, no camera cut, no full cat"
+    action: "one paw slowly slides the same ceramic roasting tray holding the finished yakiimo into the miniature serving niche; both paws then withdraw a little while steam continues"
+    action_guard: "use the exact same tray already present in G1-G3; introduce no new plate, bowl or cookware; this is a world-resolution beat, not runtime padding; no eating, no customer, no camera cut, no full cat"
 post_production:
   preferred_final_runtime_seconds: [38, 46]
   target_motion_density_pct_min: 82
@@ -114,7 +114,7 @@ success_metrics:
 originality_guard:
   unique_goal: make_a_12mm_yakiimo_from_cat_pov
   unique_conflict: heat_reveals_a_single_skin_crack_without_human_tool_use
-  unique_ending: paws_slide_the_tiny_serving_into_a_diorama_stall_and_withdraw
+  unique_ending: paws_slide_the_same_tiny_roasting_tray_into_a_diorama_stall_and_withdraw
   do_not_copy_branded_food_or_other_creator_plot: true
 episode_fingerprint:
   hook_mechanic: paw_to_object_impossible_scale_contrast
