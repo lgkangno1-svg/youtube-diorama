@@ -18,6 +18,12 @@ open_loops:
 payoff: parsley_twist
 resolution: cat_ignores_omurice_and_takes_parsley
 loop_end: reuse_opening_keyframe_after_parsley_twist
+brand_identity:
+  hero_cat: HERO_CAT_V1
+  kitchen_world: KITCHEN_WORLD_V1
+  canonical_doc: docs/24_hero_cat_brand_identity.md
+  identity_priority_over_food_detail: true
+  hero_cat_short_reference: "one cream-and-pale-ginger cat, round amber eyes, pink nose, soft round face, beige linen apron, real feline paws, no human fingers or thumbs"
 flow_strategy:
   mode: progressive_h30_sequential_chain
   primary_model: veo-3.1-lite
@@ -51,15 +57,15 @@ flow_strategy:
     reason: first production episode should prioritize controllable start/end continuity over an Extend experiment
   fourth_generation_requires_qc_failure_or_winner_gate: true
 references:
-  - CAT_MASTER_PAWS
-  - KITCHEN_MASTER_COUNTER
+  - HERO_CAT_V1
+  - KITCHEN_WORLD_V1
   - PAN_MASTER
   - PLATE_MASTER
 keyframes:
-  KF0_OPEN: cat_paw_beside_pearl_sized_egg_cup_tiny_pan_and_visible_3cm_rice_mound_no_finished_food
-  KF1_EGG_SET: thin_yellow_omelet_has_just_set_in_tiny_pan_with_3cm_rice_mound_waiting_beside_it
-  KF2_FOLD_SAFE: omelet_is_folded_around_3cm_rice_in_pan_intact_but_delicate_after_a_near_tear
-  KF3_PAYOFF: finished_3cm_omurice_on_tiny_plate_steam_visible_cat_paw_touching_parsley_instead_of_food
+  KF0_OPEN: HERO_CAT_V1_real_feline_paw_beside_pearl_sized_egg_cup_tiny_pan_and_visible_3cm_rice_mound_no_finished_food
+  KF1_EGG_SET: thin_yellow_omelet_has_just_set_in_tiny_pan_with_3cm_rice_mound_waiting_beside_it_same_HERO_CAT_V1_and_KITCHEN_WORLD_V1
+  KF2_FOLD_SAFE: omelet_is_folded_around_3cm_rice_in_pan_intact_but_delicate_after_a_near_tear_same_HERO_CAT_V1_and_KITCHEN_WORLD_V1
+  KF3_PAYOFF: finished_3cm_omurice_on_tiny_plate_steam_visible_HERO_CAT_V1_real_feline_paw_touching_parsley_instead_of_food
 scenes:
   - id: G1
     generation_type: first_plus_last
@@ -68,7 +74,7 @@ scenes:
     start_frame: KF0_OPEN
     end_frame: KF1_EGG_SET
     action: cat_paw_slowly_tilts_the_pearl_sized_egg_cup_into_the_tiny_pan_and_then_pauses_while_the_thin_egg_layer_sets
-    action_guard: one_paw_one_cup_one_pan_no_rice_cooking_no_camera_change
+    action_guard: one_real_feline_paw_one_cup_one_pan_no_rice_cooking_no_camera_change_preserve_HERO_CAT_V1
   - id: G2
     generation_type: first_plus_last
     purpose: fragile_fold_conflict_and_recovery
@@ -76,7 +82,7 @@ scenes:
     start_frame: ACTUAL_LAST_USABLE_FRAME_G1
     end_frame: KF2_FOLD_SAFE
     action: using_one_tiny_spatula_the_cat_paw_slowly_folds_the_thin_omelet_around_the_already_prepared_3cm_rice_the_edge_stretches_and_almost_tears_then_settles_intact
-    action_guard: one_continuous_fold_no_extra_ingredients_no_plating_no_camera_change
+    action_guard: one_continuous_fold_no_extra_ingredients_no_plating_no_camera_change_preserve_actual_G1_cat_identity
   - id: G3
     generation_type: first_plus_last
     purpose: plating_plus_parsley_payoff
@@ -84,7 +90,7 @@ scenes:
     start_frame: ACTUAL_LAST_USABLE_FRAME_G2
     end_frame: KF3_PAYOFF
     action: cat_paw_slowly_slides_the_finished_3cm_omurice_onto_the_tiny_plate_and_pauses_for_steam_then_as_a_single_small_comic_beat_touches_and_takes_the_parsley
-    action_guard: plating_is_the_primary_action_parsley_is_only_the_final_micro_beat_no_eating_no_camera_change
+    action_guard: plating_is_the_primary_action_parsley_is_only_the_final_micro_beat_no_eating_no_camera_change_preserve_actual_G2_cat_identity
 editorial_seconds:
   opening_keyframe_hold: 0.5
   environmental_room_hold: 0.5
