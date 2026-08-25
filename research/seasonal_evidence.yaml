@@ -1,4 +1,4 @@
-updated_at: 2026-08-25
+updated_at: 2026-08-26
 default_max_age_days: 14
 evidence:
   IDEA-001:
@@ -10,13 +10,14 @@ evidence:
       - "https://prtimes.jp/main/html/rd/p/000000151.000096786.html"
     abstract_lesson: "Use generic moon, egg-yolk, warm-night cues only; never copy branded menus or product designs."
   IDEA-009:
-    checked_at: "2026-08-25"
+    checked_at: "2026-08-26"
     market: JP
-    signal: "Multiple nationwide autumn launches plus current consumer preference evidence support sweet-potato/yakiimo relevance entering September."
+    signal: "Sweet-potato/yakiimo relevance is supported by live autumn retail launches, a current preference survey, and behavioral event attendance: Summer Satsumaimo Expo 2026 drew about 28,000 visitors across four days and 207 entries."
     sources:
       - "https://prtimes.jp/main/html/rd/p/000002701.000002360.html"
       - "https://prtimes.jp/main/html/rd/p/000001892.000030525.html"
-    abstract_lesson: "One whole sweet potato with slow heat, skin crack, steam and golden-center reveal remains the safest high-satisfaction abstraction."
+      - "https://prtimes.jp/main/html/rd/p/000000193.000047899.html"
+    abstract_lesson: "Interest is active before September, but production should stay generic and low-complexity: one tiny whole sweet potato, slow heat, skin crack, steam and golden-center reveal; never copy event vendors or winning menus."
   IDEA-002:
     checked_at: "2026-08-25"
     market: JP
