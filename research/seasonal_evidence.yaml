@@ -4,20 +4,30 @@ evidence:
   IDEA-001:
     checked_at: "2026-08-25"
     market: JP
-    signal: "月見 food launches are already active ahead of the 2026-09-25 harvest-moon peak."
-    abstract_lesson: "Use generic moon, egg-yolk, warm-night cues only; never copy branded menus."
+    signal: "月見 / 中秋 food and cultural activity is already active ahead of the 2026-09-25 peak."
+    sources:
+      - "https://prtimes.jp/main/html/rd/p/000000149.000096786.html"
+      - "https://prtimes.jp/main/html/rd/p/000000151.000096786.html"
+    abstract_lesson: "Use generic moon, egg-yolk, warm-night cues only; never copy branded menus or product designs."
   IDEA-009:
     checked_at: "2026-08-25"
     market: JP
     signal: "Multiple nationwide autumn launches plus current consumer preference evidence support sweet-potato/yakiimo relevance entering September."
+    sources:
+      - "https://prtimes.jp/main/html/rd/p/000002701.000002360.html"
+      - "https://prtimes.jp/main/html/rd/p/000001892.000030525.html"
     abstract_lesson: "One whole sweet potato with slow heat, skin crack, steam and golden-center reveal remains the safest high-satisfaction abstraction."
   IDEA-002:
     checked_at: "2026-08-25"
     market: JP
     signal: "FamilyMart's nationwide Gummy Day texture campaign is live ahead of 2026-09-03."
+    sources:
+      - "https://www.family.co.jp/company/news_releases/2026/20260821_01.html"
     abstract_lesson: "Borrow only the sensory-question mechanic; do not reproduce product shapes, names or branded endings."
   IDEA-006:
     checked_at: "2026-08-25"
     market: JP
     signal: "Sweet-potato and chestnut autumn-sweets rollouts are appearing in Japanese retail ahead of September."
+    sources:
+      - "https://prtimes.jp/main/html/rd/p/000000087.000037893.html"
     abstract_lesson: "Chestnut remains a valid seasonal ingredient, but prioritize simple steam/reveal actions over multi-step preparation."
