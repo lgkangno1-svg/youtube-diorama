@@ -17,6 +17,12 @@ Write-Host "Tiny Cat Kitchen — next episode: $EpisodeId" -ForegroundColor Cyan
 Write-Host "This command spends 0 Flow credits. It only prepares local production files." -ForegroundColor DarkGray
 Write-Host ""
 
+python (Join-Path $PSScriptRoot "validate_current_standard.py") $EpisodeId
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Episode manifest is stale or incompatible with CURRENT_STANDARD.md. Ask ChatGPT: 다음 영상 준비해줘"
+    exit $LASTEXITCODE
+}
+
 & (Join-Path $PSScriptRoot "make_short.ps1") $EpisodeId
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
