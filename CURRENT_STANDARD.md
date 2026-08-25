@@ -1,6 +1,6 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-24 Progressive Spend H30 + Sequential Frame Chain + Motion-Dense Healing**
+최신 적용 기준: **2026-08-25 Progressive Spend H30 + Sequential Frame Chain + Motion-Dense Healing + Seasonal Search Lead**
 
 ## 1. 채널의 기본 감정
 
@@ -140,11 +140,11 @@ Flow 오디오가 깨끗하면 사용한다. 영상은 좋은데 오디오만 �
 
 ---
 
-## 6. 아이디어 선택 — 조회 가능성 + 제작 안정성
+## 6. 아이디어 선택 — 조회 가능성 + 제작 안정성 + 선행 시즌성
 
 다음 episode는 `ideas/episode_backlog.yaml`의 후보를 기반으로 평가한다.
 
-현재 scoring은 단순 트렌드성만 보지 않고:
+현재 base scoring은:
 - benchmark evidence
 - Japan relevance
 - healing fit
@@ -157,16 +157,51 @@ Flow 오디오가 깨끗하면 사용한다. 영상은 좋은데 오디오만 �
 
 를 본다.
 
-Flow reliability와 expected credit efficiency는 근거가 비슷한 후보끼리 비교할 때 특히 중요하다.
+여기에 계절형 후보만 **Seasonal Search Lead boost**를 최대 +8점까지 별도로 적용한다. 이 boost는 제작 안정성 점수를 대체하지 않는다.
 
-현재 2026-08-24 계절 신호:
+### Seasonal Search Lead 기본값
+
+```text
+peak 36일+ 전     → 0점: 너무 이름
+peak 22~35일 전   → 작은 early-lead boost
+peak 8~21일 전    → strongest sweet spot
+peak 0~7일 전     → 강한 final-lead boost
+peak 기간         → 유효하지만 sweet spot보다 낮음
+peak 직후 tail    → 작은 잔여 boost
+그 이후           → 0점 / trend 만료
+```
+
+목적은 **시즌 당일 뒤늦게 따라가는 것이 아니라, 일본 시청자의 검색·시청·주제 관심이 올라오기 시작할 때 미리 후보를 앞당기는 것**이다.
+
+단, Shorts는 검색만으로 배포되지 않으므로 달력 날짜만으로 점수를 주지 않는다. 각 seasonal candidate는 다음을 구분한다.
+- `dated_event`: 十五夜, グミの日 같은 날짜형 이벤트
+- `broad_food_season`: 焼きいも, 栗 같은 긴 제철/식품 시즌
+
+각 후보는 `peak_start`, `peak_end`, `lead_days`, `tail_days`, `searchability`를 가질 수 있다. `searchability`는 0..20이며 일본에서 실제로 검색/인지될 가능성을 최신 신호로 검증한다.
+
+현재 2026-08-25 계절 신호:
 - 月見 시즌이 실제 일본 외식/식품에서 시작됨
+- 2026년 中秋の名月은 9월 25일이므로 8월 말은 early lead, 9월 초~중순은 더 강한 선행 구간
 - 9월 3일 グミの日 전후 texture 신제품 집중
 - さつまいも / 栗 가을 상품 출시 시작
 
 단, branded menu/plot/design을 복제하지 않고 계절·식감·역할 같은 추상 메커니즘만 사용한다.
 
-현재 저크레딧 관점의 강한 후보는 **한 개의 고구마가 천천히 익고 껍질이 갈라지며 김과 노란 속살이 보이는 焼きいも屋**다. 月見은 계절 인지도가 더 강하지만 계란 취급 + 손님 등장까지 포함하면 continuity risk가 더 높다. 실제 제작 순서는 최근 episode fingerprint와 현재 NEXT_EPISODE 상태를 확인한 뒤 결정한다.
+Flow reliability와 expected credit efficiency는 근거가 비슷한 후보끼리 비교할 때 특히 중요하다. 시즌성 때문에 구조적으로 불안정한 아이디어를 억지로 선택하지 않는다.
+
+현재 저크레딧 관점의 강한 후보는 **한 개의 고구마가 천천히 익고 껍질이 갈라지며 김과 노란 속살이 보이는 焼きいも屋**다. 月見은 계절 인지도가 더 강하지만 계란 취급 + 손님 등장까지 포함하면 continuity risk가 더 높다. 실제 제작 순서는 seasonal phase, 최근 episode fingerprint와 현재 NEXT_EPISODE 상태를 확인한 뒤 결정한다.
+
+로컬 점수 확인:
+
+```powershell
+python tools/select_next_episode.py --top 3
+```
+
+특정 미래 날짜에서 후보가 어떻게 움직이는지 확인:
+
+```powershell
+python tools/select_next_episode.py --date 2026-09-10 --top 5
+```
 
 ---
 
@@ -182,7 +217,9 @@ Flow reliability와 expected credit efficiency는 근거가 비슷한 후보끼�
 
 ChatGPT가:
 - 최신 benchmark / 일본 신호 확인
+- **앞으로 2~6주의 일본 시즌/기념일/제철 소재 선행 스캔**
 - 과거 production + 24h/72h learning 확인
+- base score + seasonal lead phase 비교
 - 후보 선정
 - 일본어 title/hook
 - narration 필요 여부
@@ -231,6 +268,14 @@ subscribers / 100 credits
 
 특정 음식이 성공했다고 그 음식을 복제하지 않는다. 성공한 **hook/action/pacing/audio/ending mechanism**만 다음 episode prior로 사용한다.
 
+시즌형 episode는 나중에 다음도 비교한다.
+- publish_date → peak_start까지 남은 일수
+- seasonal_phase
+- engaged views / credit
+- subscribers / credit
+
+실제 데이터가 쌓이면 8~21일 sweet spot prior를 채널 실적에 맞게 조정한다.
+
 ---
 
 ## 9. 원본성 / YPP 안전
@@ -253,7 +298,8 @@ subscribers / 100 credits
 
 ```text
 Fresh benchmark / Japanese signal / audience request
-→ candidate scoring with reliability + credit efficiency
+→ scan next 2–6 weeks of Japanese seasonal opportunities
+→ candidate base score + bounded seasonal lead boost
 → originality gate
 → free image/reference preflight
 → confirm Flow active model + duration + displayed credit cost
@@ -268,9 +314,10 @@ Fresh benchmark / Japanese signal / audience request
 → 28–36s motion-dense healing edit
 → publish
 → 24h / 72h engaged-quality + production-cost learning
+→ learn whether lead timing actually helped
 → update priors and next candidate
 ```
 
 최종 목표:
 
-> **가장 싼 영상을 만드는 것이 아니라, 일본 시청자가 오래 보고 다시 찾을 만한 고품질 힐링 영상을 가장 적은 실패 generation으로 만드는 것.**
+> **가장 싼 영상을 만드는 것이 아니라, 일본 시청자가 관심을 갖기 시작하는 시점에 맞춰 오래 보고 다시 찾을 만한 고품질 힐링 영상을 가장 적은 실패 generation으로 만드는 것.**
