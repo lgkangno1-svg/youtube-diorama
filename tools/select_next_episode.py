@@ -8,8 +8,8 @@ Usage:
 
 This tool does not invent ideas. It ranks ideas already maintained in
 ideas/episode_backlog.yaml, skips expired trend windows, and applies a bounded
-seasonal lead-time boost only when a candidate has explicit, fresh Japanese
-evidence metadata.
+seasonal lead-time boost only when the matching Japanese evidence ledger entry
+is still fresh.
 """
 from __future__ import annotations
 
@@ -22,10 +22,13 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKLOG = ROOT / "ideas" / "episode_backlog.yaml"
+SEASONAL_EVIDENCE = ROOT / "research" / "seasonal_evidence.yaml"
 
 
-def load() -> dict[str, Any]:
-    return yaml.safe_load(BACKLOG.read_text(encoding="utf-8")) or {}
+def load_yaml(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
 
 
 def parse_date(value: Any) -> date | None:
@@ -59,24 +62,20 @@ def base_score(candidate: dict[str, Any], weights: dict[str, int]) -> float:
 
 
 def seasonal_evidence_state(
-    config: dict[str, Any],
+    candidate: dict[str, Any],
     today: date,
-    defaults: dict[str, Any],
+    ledger: dict[str, Any],
 ) -> tuple[bool, str]:
-    """Return whether the seasonal demand evidence is fresh enough for a boost."""
-    checked = parse_date(config.get("evidence_checked_at"))
+    """Return whether current Japanese demand evidence is fresh enough."""
+    evidence_map = ledger.get("evidence", {}) or {}
+    entry = evidence_map.get(candidate.get("id"), {}) or {}
+    checked = parse_date(entry.get("checked_at"))
     if not checked:
         return False, "evidence-missing"
 
     max_age = max(
         1,
-        int(
-            config.get(
-                "evidence_max_age_days",
-                defaults.get("evidence_max_age_days", 14),
-            )
-            or 14
-        ),
+        int(entry.get("max_age_days", ledger.get("default_max_age_days", 14)) or 14),
     )
     age_days = (today - checked).days
     if age_days < 0:
@@ -90,19 +89,19 @@ def seasonal_adjustment(
     candidate: dict[str, Any],
     today: date,
     defaults: dict[str, Any],
+    evidence_ledger: dict[str, Any],
 ) -> tuple[float, str, str]:
     """Return bounded +points, timing phase, and evidence freshness state.
 
-    The highest boost is intentionally before the peak rather than on the
-    event day. Seasonality never receives an additive boost from stale or
-    missing evidence, so a calendar date cannot keep a candidate artificially
-    elevated after current Japanese interest signals disappear.
+    The strongest timing prior sits before peak demand. Missing or stale
+    evidence disables only the additive seasonal boost; the candidate retains
+    its normal production-quality base score.
     """
     config = candidate.get("seasonality") or {}
     if not isinstance(config, dict) or not config:
         return 0.0, "evergreen", "not-required"
 
-    evidence_ok, evidence_state = seasonal_evidence_state(config, today, defaults)
+    evidence_ok, evidence_state = seasonal_evidence_state(candidate, today, evidence_ledger)
 
     peak_start = parse_date(config.get("peak_start"))
     if not peak_start:
@@ -162,7 +161,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    data = load()
+    data = load_yaml(BACKLOG)
+    evidence_ledger = load_yaml(SEASONAL_EVIDENCE)
     weights = data.get("scoring", {}) or {}
     seasonal_defaults = data.get("seasonal_ranking", {}) or {}
     today = date.fromisoformat(args.date) if args.date else date.today()
@@ -174,7 +174,12 @@ def main() -> None:
         if not trend_valid(candidate.get("trend_window"), today):
             continue
         base = base_score(candidate, weights)
-        seasonal_boost, phase, evidence_state = seasonal_adjustment(candidate, today, seasonal_defaults)
+        seasonal_boost, phase, evidence_state = seasonal_adjustment(
+            candidate,
+            today,
+            seasonal_defaults,
+            evidence_ledger,
+        )
         ranked.append(
             (
                 final_score(base, seasonal_boost),
