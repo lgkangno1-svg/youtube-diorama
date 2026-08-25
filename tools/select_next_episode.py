@@ -8,7 +8,8 @@ Usage:
 
 This tool does not invent ideas. It ranks ideas already maintained in
 ideas/episode_backlog.yaml, skips expired trend windows, and applies a bounded
-seasonal lead-time boost when a candidate has explicit seasonality metadata.
+seasonal lead-time boost only when a candidate has explicit, fresh Japanese
+evidence metadata.
 """
 from __future__ import annotations
 
@@ -57,25 +58,55 @@ def base_score(candidate: dict[str, Any], weights: dict[str, int]) -> float:
     return round((total / max_total) * 100, 1) if max_total else 0.0
 
 
+def seasonal_evidence_state(
+    config: dict[str, Any],
+    today: date,
+    defaults: dict[str, Any],
+) -> tuple[bool, str]:
+    """Return whether the seasonal demand evidence is fresh enough for a boost."""
+    checked = parse_date(config.get("evidence_checked_at"))
+    if not checked:
+        return False, "evidence-missing"
+
+    max_age = max(
+        1,
+        int(
+            config.get(
+                "evidence_max_age_days",
+                defaults.get("evidence_max_age_days", 14),
+            )
+            or 14
+        ),
+    )
+    age_days = (today - checked).days
+    if age_days < 0:
+        return False, f"evidence-future:{abs(age_days)}d"
+    if age_days > max_age:
+        return False, f"evidence-stale:{age_days}d"
+    return True, f"evidence-fresh:{age_days}d"
+
+
 def seasonal_adjustment(
     candidate: dict[str, Any],
     today: date,
     defaults: dict[str, Any],
-) -> tuple[float, str]:
-    """Return bounded +points and a human-readable timing phase.
+) -> tuple[float, str, str]:
+    """Return bounded +points, timing phase, and evidence freshness state.
 
     The highest boost is intentionally before the peak rather than on the
-    event day. This lets the operator publish while audience interest/search
-    intent is rising, without allowing seasonality to override poor Flow
-    reliability or weak visual payoff.
+    event day. Seasonality never receives an additive boost from stale or
+    missing evidence, so a calendar date cannot keep a candidate artificially
+    elevated after current Japanese interest signals disappear.
     """
     config = candidate.get("seasonality") or {}
     if not isinstance(config, dict) or not config:
-        return 0.0, "evergreen"
+        return 0.0, "evergreen", "not-required"
+
+    evidence_ok, evidence_state = seasonal_evidence_state(config, today, defaults)
 
     peak_start = parse_date(config.get("peak_start"))
     if not peak_start:
-        return 0.0, "season-date-missing"
+        return 0.0, "season-date-missing", evidence_state
     peak_end = parse_date(config.get("peak_end")) or peak_start
     if peak_end < peak_start:
         peak_end = peak_start
@@ -111,8 +142,11 @@ def seasonal_adjustment(
             timing_factor = 0.0
             phase = f"post-season:{days_after_peak}d"
 
+    if not evidence_ok:
+        return 0.0, phase, evidence_state
+
     adjustment = max_boost * (searchability / 20.0) * timing_factor
-    return round(adjustment, 1), phase
+    return round(adjustment, 1), phase, evidence_state
 
 
 def final_score(base: float, seasonal_boost: float) -> float:
@@ -140,8 +174,17 @@ def main() -> None:
         if not trend_valid(candidate.get("trend_window"), today):
             continue
         base = base_score(candidate, weights)
-        seasonal_boost, phase = seasonal_adjustment(candidate, today, seasonal_defaults)
-        ranked.append((final_score(base, seasonal_boost), base, seasonal_boost, phase, candidate))
+        seasonal_boost, phase, evidence_state = seasonal_adjustment(candidate, today, seasonal_defaults)
+        ranked.append(
+            (
+                final_score(base, seasonal_boost),
+                base,
+                seasonal_boost,
+                phase,
+                evidence_state,
+                candidate,
+            )
+        )
 
     ranked.sort(key=lambda item: (item[0], item[1]), reverse=True)
 
@@ -150,19 +193,22 @@ def main() -> None:
         return
 
     print(f"Tiny Cat Kitchen next-episode candidates — {today.isoformat()}\n")
-    for idx, (value, base, boost, phase, item) in enumerate(ranked[: max(1, args.top)], 1):
+    for idx, (value, base, boost, phase, evidence_state, item) in enumerate(
+        ranked[: max(1, args.top)], 1
+    ):
         print(f"{idx}. {item.get('id')} — {value}/100 (base {base} + seasonal {boost})")
         print(f"   {item.get('working_title_ja', '')}")
         print(f"   premise: {item.get('premise', '')}")
         print(f"   narration: {item.get('narration_recommendation', 'none')}")
         print(f"   trend_window: {item.get('trend_window') or 'evergreen'}")
         print(f"   seasonal_phase: {phase}")
+        print(f"   seasonal_evidence: {evidence_state}")
         print(f"   flow_reliability: {item.get('flow_reliability', 'n/a')}/20")
         print(f"   expected_credit_efficiency: {item.get('expected_credit_efficiency', 'n/a')}/20")
         print()
 
     print("Selection is not automatic production approval.")
-    print("ChatGPT should still verify current Japanese evidence and compare the winner with the last five episode fingerprints before creating the manifest.")
+    print("ChatGPT should refresh stale seasonal evidence and compare the winner with the last five episode fingerprints before creating the manifest.")
 
 
 if __name__ == "__main__":
