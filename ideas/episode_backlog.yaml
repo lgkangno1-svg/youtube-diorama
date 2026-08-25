@@ -9,8 +9,17 @@ scoring:
   worldbuilding: 5
   audience_demand: 5
   expected_credit_efficiency: 10
+seasonal_ranking:
+  max_boost_points: 8
+  default_lead_days: 35
+  default_tail_days: 7
 rules:
   - Scores are 0..20; weights above sum to 100.
+  - Seasonal timing is a bounded additive boost, not a replacement for Flow reliability, visual payoff, or audience evidence.
+  - For dated Japanese events, prefer the rising-interest window before the peak: roughly 8..21 days before is the default sweet spot, 22..35 days before gets a smaller early-lead boost, and the final 7 days still get a strong but slightly lower boost.
+  - For broad food seasons, use a peak_start..peak_end range and a shorter lead window so the concept can enter rotation just before stores, menus, and social conversation become saturated.
+  - A seasonal candidate must include current Japanese evidence before production; a calendar date by itself is not evidence of demand.
+  - Searchability means how naturally Japanese viewers may search or recognize the seasonal term; keep it 0..20 and do not inflate it without evidence.
   - Do not copy a benchmark plot, title, branded product, or exact ending.
   - Extract only the mechanic that made the reference attractive.
   - Reject an idea if it is too similar to any of the last five episode fingerprints.
@@ -34,9 +43,17 @@ candidates:
     audience_demand: 17
     expected_credit_efficiency: 14
     trend_window: "2026-08-24..2026-09-30"
+    seasonality:
+      type: dated_event
+      label_ja: "十五夜・月見"
+      peak_start: "2026-09-25"
+      peak_end: "2026-09-25"
+      lead_days: 35
+      tail_days: 5
+      searchability: 20
     narration_recommendation: none
     status: priority_candidate
-    production_note: "Strong seasonal recognition, but egg handling plus customer arrival creates more continuity risk than one-object concepts. Keep only if the seasonal upside justifies that risk."
+    production_note: "2026 中秋の名月 is September 25. Enter rotation before the exact date, but keep current Japanese food/social evidence as a separate gate. Strong seasonal recognition, but egg handling plus customer arrival creates more continuity risk than one-object concepts."
   - id: IDEA-009
     working_title_ja: "猫の焼きいも屋、秋の最初の一本。"
     premise: "At a tiny evening sweet-potato stand, the cat slowly turns one 3cm sweet potato over warm coals; the skin begins to crack, steam escapes, and the golden center is opened for the first customer."
@@ -51,6 +68,14 @@ candidates:
     audience_demand: 16
     expected_credit_efficiency: 20
     trend_window: "2026-08-24..2026-10-31"
+    seasonality:
+      type: broad_food_season
+      label_ja: "さつまいも・焼きいも"
+      peak_start: "2026-09-01"
+      peak_end: "2026-10-31"
+      lead_days: 21
+      tail_days: 7
+      searchability: 17
     narration_recommendation: none
     status: priority_candidate
     production_note: "Current best low-credit candidate. New 2026-08-25 directional demand evidence: in a Lotte survey of 2,832 Japanese women aged 20-60 who regularly buy chilled desserts, about 70% selected sweet potato as an autumn flavor and about 60% selected yakiimo as their favorite sweet-potato sweet. Because the sample is category- and gender-specific, this only modestly raises demand/evidence scores. Keep the creative abstraction generic: one whole sweet potato, slow heat, skin crack, steam and golden-center reveal; do not copy any branded product."
@@ -68,6 +93,14 @@ candidates:
     audience_demand: 18
     expected_credit_efficiency: 15
     trend_window: "2026-08-25..2026-09-03"
+    seasonality:
+      type: dated_event
+      label_ja: "グミの日"
+      peak_start: "2026-09-03"
+      peak_end: "2026-09-03"
+      lead_days: 21
+      tail_days: 1
+      searchability: 19
     narration_recommendation: none
     status: candidate
     production_note: "Gummy Day demand is timely, but stretching a deformable object can cause shape drift; run only with locked endpoints and a simple ruler composition."
@@ -133,6 +166,14 @@ candidates:
     audience_demand: 13
     expected_credit_efficiency: 17
     trend_window: "2026-08-24..2026-10-15"
+    seasonality:
+      type: broad_food_season
+      label_ja: "栗・栗ごはん"
+      peak_start: "2026-09-10"
+      peak_end: "2026-10-15"
+      lead_days: 28
+      tail_days: 5
+      searchability: 14
     narration_recommendation: none
     status: candidate
   - id: IDEA-007

@@ -28,6 +28,7 @@
 ### 로컬 deterministic tools
 담당:
 - backlog score 계산
+- seasonal lead-time ranking
 - originality validation
 - Flow prompt pack
 - healing edit plan
@@ -92,11 +93,64 @@
 
 단, 싸게 만들 수 있다는 이유만으로 시각적 payoff가 약한 아이디어를 선택하지 않는다.
 
+### 3.1 Seasonal Search Lead Engine
+
+계절성은 정적 9축 점수를 덮어쓰지 않고 **최대 +8점의 bounded timing boost**로만 작동한다.
+
+후보가 계절/기념일 기반이면 `seasonality`를 기록한다.
+
+```yaml
+seasonality:
+  type: dated_event | broad_food_season
+  label_ja: "十五夜・月見"
+  peak_start: "2026-09-25"
+  peak_end: "2026-09-25"
+  lead_days: 35
+  tail_days: 5
+  searchability: 20
+```
+
+기본 timing prior:
+
+```text
+peak 36일+ 전     → boost 0 (너무 이름)
+peak 22~35일 전   → early lead, 작은 boost
+peak 8~21일 전    → sweet spot, 최대 boost
+peak 0~7일 전     → final lead, 강한 boost
+peak 기간         → 유효하지만 sweet spot보다 낮음
+peak 직후 tail    → 작은 잔여 boost
+그 이후           → boost 0 / trend_window로 만료
+```
+
+이유:
+- Shorts는 검색만으로 배포되는 포맷이 아니므로 seasonality를 과대평가하지 않는다.
+- 그러나 일본 시청자의 검색/시청 관심과 주제 관심도가 올라오는 **피크 직전**에 노출될 준비를 하는 편이 유리하다.
+- 날짜형 이벤트와 긴 식재료 시즌을 같은 방식으로 다루지 않는다. 날짜형은 event date 중심, 고구마/밤 같은 broad season은 peak range 중심으로 설계한다.
+
+`searchability`는 단순 달력 인지도가 아니다. 일본에서 자연스럽게 검색/인지될 표현인지, 현재 상품/문화/소셜 신호가 있는지를 연구 loop가 확인한 뒤 0..20으로 기록한다.
+
+중요한 gate:
+
+> 달력에 날짜가 있다는 이유만으로 제작하지 않는다. 제작 직전 최신 일본 증거가 없으면 seasonal boost를 신뢰하지 않는다.
+
+2026 예시:
+- `グミの日`처럼 날짜가 고정된 이벤트는 1~3주 전부터 후보 우선순위를 올린다.
+- `十五夜・月見`은 2026-09-25 피크를 기준으로 수 주 전부터 서서히 올리고, 8~21일 전을 strongest lead window로 본다.
+- `焼きいも / さつまいも`처럼 가을 전체에 걸친 식재료는 9월 초 시즌 진입을 기준으로 짧은 lead + 긴 peak range를 사용한다.
+
 점수 확인:
 
 ```powershell
 python tools/select_next_episode.py --top 3
 ```
+
+특정 날짜의 seasonal ranking을 검증하려면:
+
+```powershell
+python tools/select_next_episode.py --date 2026-09-10 --top 5
+```
+
+출력은 `base score + seasonal boost + seasonal_phase`를 분리해서 보여준다.
 
 점수 1위는 자동 제작 명령이 아니다. 최신 일본 신호, 최근 5편 fingerprint, 실제 production history를 마지막으로 확인한 뒤 manifest로 승격한다.
 
@@ -114,14 +168,15 @@ ChatGPT 처리:
 1. benchmark log / current Japanese signal 확인
 2. production + analytics history 확인
 3. backlog 갱신
-4. top candidates 비교
-5. originality fingerprint 검토
-6. 가장 좋은 후보 1개 선택
-7. HERO_CAT_V1 / KITCHEN_WORLD_V1 continuity 확인
-8. episode YAML 생성/수정
-9. narration decision
-10. Progressive Spend H30 기준 장면 설계
-11. `production/NEXT_EPISODE.txt` 갱신
+4. **앞으로 2~6주의 일본 계절/기념일/식품 시즌을 먼저 스캔하고 seasonal lead window 갱신**
+5. top candidates 비교
+6. originality fingerprint 검토
+7. 가장 좋은 후보 1개 선택
+8. HERO_CAT_V1 / KITCHEN_WORLD_V1 continuity 확인
+9. episode YAML 생성/수정
+10. narration decision
+11. Progressive Spend H30 기준 장면 설계
+12. `production/NEXT_EPISODE.txt` 갱신
 
 사용자가 소재를 지정하면 후보로 넣되, Flow reliability나 originality가 낮으면 더 안전한 변형안을 사용한다.
 
@@ -249,11 +304,13 @@ steam payoff → comments/APV good
 정기 연구는:
 1. 최신 성공/급상승 인접 콘텐츠 확인
 2. 일본 최신 계절/음식/소셜 신호 확인
-3. Google Flow 공식 가격/기능 변경 확인
-4. benchmark log에 의미 있는 메커니즘만 기록
-5. backlog 후보 추가/재평가/만료
-6. analytics learning과 모순 여부 확인
-7. production standard를 바꿀 근거가 있을 때만 문서/도구 변경
+3. **앞으로 2~6주에 올 일본 기념일/행사/제철 식재료를 선행 스캔**
+4. 날짜형 event와 broad food season을 구분해 `seasonality` peak/lead/searchability 갱신
+5. Google Flow 공식 가격/기능 변경 확인
+6. benchmark log에 의미 있는 메커니즘만 기록
+7. backlog 후보 추가/재평가/만료
+8. analytics learning과 모순 여부 확인
+9. production standard를 바꿀 근거가 있을 때만 문서/도구 변경
 
 **의미 있는 새 근거나 운영 불일치가 없으면 repo를 수정하지 않는다.**
 
@@ -275,6 +332,8 @@ F. audience-selected candidate
 ```
 
 같은 conflict + ending family를 연속 반복하지 않는다.
+
+Seasonal injection은 매편 강제하지 않는다. lead window에 들어온 강한 후보가 있고 production quality가 충분할 때만 rotation에서 앞당긴다.
 
 ---
 
