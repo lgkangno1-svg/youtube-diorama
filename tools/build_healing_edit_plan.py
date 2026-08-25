@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""Build a no-LLM healing edit plan from an episode YAML manifest.
-
-Usage:
-  python tools/build_healing_edit_plan.py episodes/TK-001.yaml
-  python tools/build_healing_edit_plan.py episodes/TK-001.yaml --out generated/TK-001_edit_plan.md
-
-The planner does not call Flow, an LLM, or YouTube. It only converts manifest
-rules into a concrete edit timeline so the editor does not have to redesign
-pacing by hand every episode.
-"""
+"""Build a no-LLM healing edit plan from an episode YAML manifest."""
 from __future__ import annotations
 
 import argparse
@@ -25,9 +16,10 @@ def build(data: dict[str, Any]) -> str:
     episode_id = data["episode_id"]
     scenes = data.get("scenes", [])
     post = data.get("post_production", {})
+    runtime = data.get("runtime_strategy", {})
     editorial = data.get("editorial_seconds", {})
 
-    preferred = post.get("preferred_final_runtime_seconds", [30, 36])
+    preferred = runtime.get("target_final_seconds") or post.get("preferred_final_runtime_seconds", [30, 36])
     target_runtime = sum(preferred) / 2 if isinstance(preferred, list) and len(preferred) == 2 else float(data.get("length_target_seconds", 34))
     target_motion_density = float(post.get("target_motion_density_pct_min", 80)) / 100.0
     max_static = float(post.get("max_total_static_hold_seconds", 5))
@@ -36,7 +28,6 @@ def build(data: dict[str, Any]) -> str:
 
     raw_motion = sum(float(s.get("generation_seconds", 8)) for s in scenes)
     desired_motion = target_runtime * target_motion_density
-    # playback speed <1 increases duration: effective = raw / speed
     required_speed = raw_motion / desired_motion if desired_motion > 0 else 1.0
     chosen_speed = clamp(required_speed, min_speed, 1.0)
     stretched_motion = raw_motion / chosen_speed
@@ -44,8 +35,8 @@ def build(data: dict[str, Any]) -> str:
     holds = {
         "opening": float(editorial.get("opening_keyframe_hold", 0)),
         "room": float(editorial.get("environmental_room_hold", 0)),
-        "danger": float(editorial.get("cliffhanger_freeze", 0)),
-        "hero": float(editorial.get("hero_keyframe_slow_push_in", editorial.get("hero_keyframe_punch_in", 0))),
+        "danger": float(editorial.get("cliffhanger_freeze", editorial.get("conflict_micro_hold", 0))),
+        "hero": float(editorial.get("hero_keyframe_slow_push_in", editorial.get("hero_keyframe_punch_in", editorial.get("hero_frame_slow_push_in", 0)))),
         "reaction": float(editorial.get("reaction_hold", 0)),
         "loop": float(editorial.get("opening_keyframe_reuse_for_loop", 0)),
     }
@@ -60,14 +51,17 @@ def build(data: dict[str, Any]) -> str:
         "",
         "## Guardrails",
         "",
+        f"- Runtime mode: {runtime.get('mode', 'compact_h30')}",
         f"- Generated motion source: {raw_motion:.1f}s",
-        f"- Suggested playback speed: {chosen_speed:.2f}x (only if paw/food motion still looks natural)",
+        f"- Suggested playback speed: {chosen_speed:.2f}x (only if paw/object motion still looks natural)",
         f"- Estimated moving footage after speed adjustment: {stretched_motion:.1f}s",
         f"- Static/keyframe material budget: ≤ {max_static:.1f}s",
         f"- Estimated final runtime: ~{estimated_runtime:.1f}s",
         f"- Estimated motion density: {motion_density*100:.0f}% (target ≥ {target_motion_density*100:.0f}%)",
-        "- Do not pad runtime merely to reach 40 seconds.",
-        "- If slowdown creates judder, paw deformation, or unnatural steam, use 1.00x instead and accept the shorter Short.",
+        "- Keep true first-person cat POV and front-paws-only framing throughout the edit.",
+        "- The tiny hero object should remain visually much smaller than one paw; do not crop away the scale reference.",
+        "- Do not pad runtime merely to hit a round number.",
+        "- If slowdown creates judder, paw deformation, or unnatural steam, use 1.00x and accept the shorter Short.",
         "",
         "## Timeline",
         "",
@@ -75,8 +69,8 @@ def build(data: dict[str, Any]) -> str:
 
     cursor = 0.0
     if holds["opening"] > 0:
-        duration = min(holds["opening"], 1.0)
-        lines.append(f"- {cursor:04.1f}–{cursor+duration:04.1f}s: OPEN keyframe / subtle push-in")
+        duration = min(holds["opening"], 0.8)
+        lines.append(f"- {cursor:04.1f}–{cursor+duration:04.1f}s: OPEN scale-reveal keyframe / tiny subtle push-in")
         cursor += duration
 
     for idx, scene in enumerate(scenes, 1):
@@ -86,19 +80,19 @@ def build(data: dict[str, Any]) -> str:
         lines.append(f"- {cursor:04.1f}–{cursor+duration:04.1f}s: {scene.get('id', f'G{idx}')} — {purpose}; {chosen_speed:.2f}x")
         cursor += duration
         if idx == 2 and holds["danger"] > 0:
-            duration2 = min(holds["danger"], 0.5)
-            lines.append(f"- {cursor:04.1f}–{cursor+duration2:04.1f}s: danger micro-hold (no dramatic SFX)")
+            duration2 = min(holds["danger"], 0.35)
+            lines.append(f"- {cursor:04.1f}–{cursor+duration2:04.1f}s: tactile micro-hold; keep ASMR natural")
             cursor += duration2
 
     remaining = max(0.0, min(max_static, target_runtime - cursor))
     if remaining > 0:
-        hero = min(remaining, max(0.5, holds["hero"]))
-        lines.append(f"- {cursor:04.1f}–{cursor+hero:04.1f}s: hero food detail / subtle living motion if available")
+        hero = min(remaining, max(0.4, holds["hero"]))
+        lines.append(f"- {cursor:04.1f}–{cursor+hero:04.1f}s: hero micro-detail with living motion if available")
         cursor += hero
         remaining -= hero
     if remaining > 0:
-        loop = min(remaining, max(0.4, holds["loop"]))
-        lines.append(f"- {cursor:04.1f}–{cursor+loop:04.1f}s: quiet loop return")
+        loop = min(remaining, max(0.3, holds["loop"]))
+        lines.append(f"- {cursor:04.1f}–{cursor+loop:04.1f}s: quiet loop return / paws withdraw")
         cursor += loop
 
     narration = post.get("narration_default", "none")
@@ -107,13 +101,14 @@ def build(data: dict[str, Any]) -> str:
         "## Audio",
         "",
         f"- Narration default: {narration}",
-        "- Prefer a reusable licensed/self-created ASMR library when generated audio is inconsistent.",
-        "- Maintain one room-tone/sizzle bed across visual cuts as a sound bridge.",
-        "- If footage is slowed, replace or separately time-process its native audio rather than leaving pitch/tempo artifacts.",
+        "- Prefer close, tiny tactile ASMR over large cinematic impacts.",
+        "- Maintain one subtle room-tone bed across joins.",
+        "- If footage is slowed, replace or separately time-process native audio rather than leaving pitch artifacts.",
         "",
         "## QC stop rule",
         "",
-        "Do not buy a fourth Lite generation just to make the Short longer. Spend the extra 10 credits only when one of the three generated scenes has a structural continuity defect or the format has already proven itself as a winner.",
+        "A fourth Lite generation is valid only when the manifest declares immersive_h40 and G4 adds an independent tactile/world-resolution beat. "
+        "If G4 merely extends runtime, skip it. Never buy G2/G3/G4 before the previous scene passes POV, scale, anatomy and continuity QC.",
     ]
     return "\n".join(lines) + "\n"
 
