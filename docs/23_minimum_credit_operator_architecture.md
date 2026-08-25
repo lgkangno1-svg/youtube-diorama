@@ -1,258 +1,253 @@
 # 23 — Minimum-Credit Operator Architecture
 
-목표: 사용자가 매번 주제, 대본, Flow 프롬프트, 편집 순서를 고민하지 않고 **ChatGPT에 한 문장 → 필요한 generation만 순차 실행 → 결과를 다시 학습**하게 한다.
+목표: 사용자가 매번 주제, 대본, Flow 프롬프트, 편집 순서를 고민하지 않고 **한 문장 → 무료 preflight → 필요한 generation만 순차 실행 → 결과 학습**으로 끝내게 한다.
 
 관련 source of truth:
 - production: `CURRENT_STANDARD.md`
 - learning: `docs/22_continuous_episode_learning_engine.md`
-- brand continuity: `docs/24_hero_cat_brand_identity.md`
+- character/world: `docs/24_hero_cat_brand_identity.md`
+- Shorts camera/scale: `docs/25_pov_paws_microworld_grammar.md`
 
-## 최종 사용자 인터페이스
+## 사용자 인터페이스
 
-평소 사용자가 ChatGPT에 말할 것은 원칙적으로 하나다.
+평소 사용자는:
 
 ```text
-다음 영상 준비해줘.
+다음 영상 준비해줘
 ```
 
-ChatGPT가 수행:
-- 최근 일본/글로벌 AI cat / miniature / ASMR / relaxing Shorts 벤치마킹
-- 일본 계절/문화/음식 트렌드 확인
-- 과거 24h/72h 성과와 Flow 실패 기록 확인
-- 후보 점수화/중복 제거
-- 다음 episode 선정
-- 일본어 title / hook / optional narration 작성
-- episode manifest 생성
-- `production/NEXT_EPISODE.txt` 갱신
+라고만 말한다.
 
-사용자가 로컬에서 실행:
+ChatGPT가:
+- 최신 일본 seasonal/search/social signal 확인
+- benchmark mechanics 확인
+- production/analytics history 확인
+- POV paw-only 적합성 평가
+- 다음 episode 선정
+- H30 vs H40 runtime gate 선택
+- manifest / NEXT_EPISODE 준비
+
+사용자는:
 
 ```powershell
 ./tools/make_next_short.ps1
 ```
 
-그 뒤 Flow에서 G1부터 순차 진행한다.
+만 실행한다.
 
----
+## Gate A — 0 credits
 
-## 핵심 비용 원칙 — Progressive Spend H30
+Flow video를 만들기 전에 무료 keyframe/reference를 먼저 검수한다.
 
-운영 계정은 Google AI Pro 기준이다. 현재 공식 Google Flow 표에서 Pro는 월 1,000 Flow credits이며, Veo 3.1 Lite 4/6/8초와 Extend는 non-Ultra 10 credits/generation이다. Plus/Pro/Ultra의 1080p upscale은 0 credits다.
+반드시 PASS:
+- true first-person cat POV
+- front paws only
+- face/head/body/full cat hidden
+- real feline paw anatomy
+- hero object가 한 앞발 폭의 절반 이하로 보임
+- 5~20mm 수준의 tiny-object 느낌
+- macro miniature diorama workbench
+- 첫 1초에 scale contrast가 이해됨
 
-`15 credits`가 보인다는 이유만으로 Lite라고 가정하지 않는다. 현재 공식표에서 Gemini Omni Flash 4초가 15 credits다.
+다음이면 즉시 STOP:
+- 고양이가 카운터 뒤에서 보이는 third-person chef shot
+- 고양이 얼굴/전신 노출
+- 음식/도구가 앞발과 비슷하거나 더 큼
+- human fingers/thumbs
+- paw가 사람처럼 tool을 grip
 
-생성 직전 확인:
+## Flow settings
+
+생성 직전 실제 UI 확인:
 
 ```text
-active model = Veo 3.1 Lite
-duration = 8s
+Veo 3.1 Lite
+9:16
+8 seconds
 output count = 1
-displayed cost = 10 credits / generation
+표시 비용 = 10 credits / generation (현재 UI가 그렇게 보일 때)
 ```
 
-UI가 공식 문서와 다르면 실제 UI 비용을 기록하고 생성 전에 모델/조건을 재확인한다.
+UI가 다르면 생성하지 말고 모델/비용을 재검토한다.
 
-기본 first-pass 최대:
+## Progressive Spend
+
+### G1 — 누적 10
+
+G1은 channel grammar anchor다.
+
+QC:
+- POV
+- paws only
+- scale cuteness
+- anatomy
+- miniature material language
+- primary action
+
+하나라도 구조적으로 틀리면 G2 금지.
+
+### G2 — 누적 20
+
+G1의 actual last usable frame을 G2 First frame으로 사용한다.
+
+### G3 — 누적 30
+
+G2의 actual last usable frame을 G3 First frame으로 사용한다.
+
+여기까지로 완결되면 `compact_h30`으로 끝낸다.
+
+### G4 — 누적 40, 조건부
+
+다음 조건을 모두 만족할 때만 사용:
+- G3까지 PASS
+- manifest runtime mode = `immersive_h40`
+- 네 번째 독립 motion/world beat가 존재
+- G4를 빼면 세계관 여운/serving/resolution이 실제로 약해짐
+
+예:
+- 완성품을 tiny serving alcove에 밀어 넣기
+- paws가 천천히 빠지고 작은 세계가 계속 살아 있음
+- loopable afterglow
+
+금지:
+- 40초를 맞추기 위한 패딩
+- 이미 끝난 음식의 반복 close-up
+- 남은 credits 소진
+
+## Runtime 선택
+
+### compact_h30
 
 ```text
-G1 = 10
-G2 = 10
-G3 = 10
-max first pass = 30 credits
+3 × 8s raw motion = 24s
+final target ≈ 30~36s
 ```
 
-하지만 30 credits를 미리 쓰지 않는다.
+적합:
+- 3개 beat로 이야기 완결
+- scale reveal → making → payoff
 
-### Gate A — 0 credits
+### immersive_h40
 
-무료 image/reference/keyframe을 먼저 검수한다.
+```text
+4 × 8s raw motion = 32s
+final target ≈ 38~46s
+```
 
-현재 brand identity:
-- `HERO_CAT_V1`: cream fur + pale ginger markings, round amber eyes, pink nose, beige linen apron
-- 실제 feline paws, human fingers/thumbs 금지
-- `KITCHEN_WORLD_V1`: warm miniature Japanese-inspired wooden kitchen, pottery, soft natural light
+적합:
+- tiny world를 느끼게 할 4번째 독립 beat가 있음
+- world-resolution이 retention/payoff를 높일 합리적 이유가 있음
 
-FAIL 조건:
-- cat face/fur/apron identity drift
-- human hand/finger anatomy
-- kitchen identity가 크게 달라짐
-- cookware/food scale 붕괴
-- 첫 1초의 행동이 읽히지 않음
-- 복잡하고 산만한 composition
+### 48~60s
 
-**음식이 예뻐도 hero identity가 다르면 Veo를 진행하지 않는다.**
+실제 채널 성과 데이터가 지지하기 전에는 기본값이 아니다.
 
-### Gate B — G1만 생성: 누적 10 credits
+## Paw-action rule
 
-G1은 영상 전체의 스타일 앵커다.
+Veo reliability 우선:
 
-다음이 틀리면 G2/G3 금지:
-- HERO_CAT_V1
-- KITCHEN_WORLD_V1
-- scale
-- lighting/material language
-- main physical action
+좋음:
+- nudge
+- press
+- pat
+- roll
+- steady
+- slide
+- tap
 
-작은 timing 문제는 편집으로 수리하고 구조적 문제만 G1 reroll을 검토한다.
+나쁨:
+- tongs/chopsticks/knife를 fingers로 잡는 동작
+- 인간형 pinch
+- 손목 twist
 
-### Gate C — G2: 누적 20 credits
+도구가 필요하면 넓은 손잡이를 paw pad로 눌러 움직이게 한다.
 
-G1의 실제 마지막 usable frame을 이미지로 저장해 **G2 First frame**으로 사용한다.
+## 8초 generation 문법
 
-G2는 새로운 세계를 다시 생성하지 않고 G1 상태를 이어간다.
+> **1 calm tactile primary action + optional 1 micro-payoff**
 
-G2가 구조적으로 통과한 뒤에만 G3로 간다.
+예:
 
-### Gate D — G3: 누적 30 credits
+```text
+0~1.5s  paw approaches absurdly tiny object
+1.5~6s  one press / roll / slide action
+6~8s    paw stops; steam/crack/gloss/crumb continues
+```
 
-G2의 실제 마지막 usable frame을 다시 저장해 G3 First frame으로 사용한다.
-
-G3는 payoff/resolution만 담당한다.
-
-G1+G2만으로 충분한 완성도가 나오면 G3를 반드시 쓸 필요는 없다. 단, 정지화면 패딩으로 10 credits를 아끼지 않는다.
-
----
+no rapid montage / no camera orbit / no full-cat reveal.
 
 ## Sequential Frame Chain
 
 ```text
-FREE OPEN FRAME
-   ↓
-G1 8s
-   ↓ save actual last usable frame
-G2 8s
-   ↓ save actual last usable frame
-G3 8s
+G1
+↓ actual last usable frame
+G2
+↓ actual last usable frame
+G3
+↓ actual last usable frame
+G4 only if immersive_h40
 ```
 
-각 G2/G3에는 미리 만든 target last frame을 추가할 수 있다.
+연속성 우선순위:
+1. first-person camera position
+2. paw fur/anatomy
+3. hero-object size ratio
+4. cookware/food state
+5. lighting/workbench
 
-장점:
-- 실제 직전 cat / cookware / food state 계승
-- 캐릭터 재해석 drift 감소
-- color/light/scale continuity 개선
-- endpoint 통제 강화
-
-현재 기본값은 sequential First+Last chain이며 Extend는 명확한 장면상 이점이 있을 때만 실험한다.
-
----
-
-## 8초 generation 문법
-
-한 clip은:
-
-> **1 calm primary action + optional 1 micro-beat**
-
-좋은 예:
-
-```text
-0–1.5s  real feline paw enters slowly
-1.5–6s  turns one tiny sweet potato over the heat
-6–8s    paw pauses; skin crack/steam continues
-```
-
-금지:
-- 2초마다 shot change
-- 3~4 camera angle montage
-- 여러 utensil 동시 사용
-- 여러 unrelated sound event
-- 한 clip 안에서 준비→조리→완성→먹기 전부 수행
-
----
-
-## 오디오 정책
+## Audio
 
 기본:
 - no narration
 - no generated music
-- quiet room tone + one or two isolated natural ASMR families
+- quiet close ASMR
 
-권장 prompt:
+좋은 소리:
+- tiny ceramic click
+- subtle wood scrape
+- crumb/dough press
+- soft sizzle
+- paper rustle
 
-```text
-No speech. No music. Quiet room tone. Only isolated natural miniature cooking sounds appropriate to the visible action. No overlapping unrelated sound effects.
-```
+영상이 좋고 audio만 나쁘면 재생성하지 않고 후편집 교체.
 
-영상은 좋은데 audio만 이상하면 영상 재생성 금지. reusable SFX로 교체한다.
-
-나레이션은 다음 중 하나가 명확할 때만 일본어 0~2문장:
-1. 화면만으로 constraint 이해가 어려움
-2. character personality를 한 줄로 강화
-3. payoff 의미를 크게 증폭
-
----
-
-## 크레딧 구조 선택
-
-### H20
-2 × 8s Lite = 20 credits.
-
-조건:
-- 매우 단순한 process
-- 18~26초 Short로 충분
-- 무료 frame이 패딩처럼 보이지 않음
-
-### H30 — DEFAULT
-3 × 8s Lite = 30 credits.
-
-조건:
-- setup → transformation/conflict → payoff가 필요
-- 대부분의 Tiny Cat Kitchen Shorts
-
-### H40 — WINNER / STRUCTURAL FIX ONLY
-H30 + 1 Lite generation.
-
-허용:
-- 상위권으로 검증된 episode
-- 명확한 한 컷 구조적 실패
-- 추가 generation이 retention/payoff를 실제 개선할 이유가 있음
-
-금지:
-- 남은 credit 소진 목적
-- minor visual defect
-- runtime을 억지로 늘리기 위해
-
-Quality/Fast/Omni는 탐색 기본값으로 사용하지 않는다.
-
----
-
-## 사용자가 결과를 돌려주는 최소 입력
+## 결과를 보여줄 때
 
 ```text
-G1 만들었어. 봐줘.
+G1 만들었어. 봐줘
 ```
 
-영상/스크린샷 첨부.
+ChatGPT 판정:
+- `PASS`
+- `EDITABLE`
+- `REROLL`
+- `STOP`
 
-ChatGPT 판단:
-- PASS → G2
-- EDITABLE → regeneration 없이 편집
-- REROLL → 해당 scene만 수정
-- STOP → premise/identity/visual system 문제, 추가 spend 중단
+추가 shorthand:
+- `POV FAIL`
+- `SCALE FAIL`
+- `ANATOMY FAIL`
+- `CAMERA FAIL`
+- `PADDING FAIL`
 
-업로드 후에는 24h/72h Studio screenshot만 보내도 된다.
-
----
-
-## 매 영상 후 학습
+## 학습
 
 콘텐츠:
 - Stayed to watch
 - APV
 - engaged views
-- subscribers / 1k engaged
-- comments / 1k engaged
+- subscribers
+- comments
+- beat별 drop-off 가능하면 기록
 
 제작:
-- actual Flow credits
-- reroll count
-- G1/G2/G3 first-pass success
-- usable motion seconds
+- actual credits
+- rerolls
+- G1/G2/G3/G4 first-pass success
+- POV/scale/anatomy failures
 - failed action type
-- continuity failure type
-- narration yes/no
-- Flow audio kept/replaced
-- final duration
+- usable motion seconds
+- final runtime
 
 장기 최적화:
 
@@ -262,4 +257,4 @@ engaged views / credit
 subscribers / 100 credits
 ```
 
-가장 싼 영상을 만드는 것이 아니라 **성과 가능성이 높은 고품질 영상을 가장 적은 실패 generation으로 만드는 시스템**이 목표다.
+초기 runtime experiment는 `30~36s compact_h30`과 `38~46s immersive_h40`을 비교한다. 더 긴 영상은 실제 데이터가 지지할 때만 확장한다.

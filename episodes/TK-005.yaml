@@ -1,0 +1,124 @@
+episode_id: TK-005
+status: ready-for-flow
+target_market: JP
+audience: [teens, twenties]
+format: healing_microworld_pov
+food: yakiimo
+constraint: 12mm_sweet_potato
+length_target_seconds: 41
+hook: "この小ささで、焼きいも作れる？"
+title: "猫の前足で作る、12mmの焼きいも。"
+brand_identity:
+  hero_cat: HERO_CAT_V1
+  kitchen_world: KITCHEN_WORLD_V1
+  shorts_visual_grammar: POV_PAWS_MICROWORLD_V1
+  canonical_docs:
+    - docs/24_hero_cat_brand_identity.md
+    - docs/25_pov_paws_microworld_grammar.md
+camera_grammar:
+  mode: first_person_cat_pov
+  visible_cat_parts: [front_paws_only]
+  hide_face_head_body: true
+  paws_enter_from: bottom_edge
+  hero_object_size_mm: [10, 15]
+  hero_object_paw_width_ratio: [0.18, 0.32]
+  framing: macro_tabletop_workbench
+  camera_motion: mostly_locked_subtle_breathing_drift_only
+  third_person_full_cat_is_fail: true
+runtime_strategy:
+  mode: immersive_h40
+  target_final_runtime_seconds: [38, 46]
+  minimum_distinct_motion_beats: 4
+  fourth_beat_value: "quiet world-resolution: slide the tiny finished serving into its diorama stall position, then paws withdraw while steam remains"
+  do_not_pad_to_runtime: true
+flow_strategy:
+  mode: progressive_h40_sequential_chain
+  primary_model: veo-3.1-lite
+  output_count: 1
+  max_lite_generations_first_pass: 4
+  non_ultra_credit_budget_first_pass: 40
+  frame_mode: sequential_actual_end_frame_plus_target_last
+  narration_policy: none_by_default
+  audio_policy: clean_close_tactile_asmr_no_generated_music
+  pacing: healing_motion_dense
+  max_visual_cuts_per_8s_generation: 0
+  preferred_action_count_per_generation: 1
+  progressive_spend_gate:
+    g2_requires_g1_pass: true
+    g3_requires_g2_pass: true
+    g4_requires_g3_pass: true
+    stop_if_pov_scale_anatomy_or_premise_fails: true
+    reroll_only_structural_failure: true
+  sequential_chain:
+    g2_start_source: save_actual_last_usable_frame_from_G1
+    g3_start_source: save_actual_last_usable_frame_from_G2
+    g4_start_source: save_actual_last_usable_frame_from_G3
+    use_free_target_last_frames_when_helpful: true
+references:
+  - HERO_CAT_V1_PAWS
+  - POV_PAWS_MICROWORLD_V1
+  - KITCHEN_WORLD_V1
+keyframes:
+  KF0_OPEN: "true first-person cat POV looking down at a tiny wooden diorama workbench; only two cream-and-pale-ginger feline front paws at the bottom edges; between them sits one absurdly tiny 12mm purple sweet potato on a thumbnail-sized ceramic roasting tray; no cat face/head/body"
+  KF1_WARM: "same POV and paw positions; tiny 12mm sweet potato gently warmed on a miniature charcoal brazier, skin slightly darker; object remains much smaller than either paw"
+  KF2_CRACK: "same POV; sweet potato skin has one small natural crack with a very thin curl of steam; one paw lightly steadies the tiny tray from the side, no gripping"
+  KF3_OPEN: "same POV; tiny sweet potato is softly split enough to reveal bright golden center and steam; paws remain only at bottom edges, food still under one third paw width"
+  KF4_SERVE: "same POV; finished 12mm yakiimo rests on a tiny ceramic leaf-shaped plate inside a miniature stall serving niche; paws are beginning to withdraw, warm steam remains"
+scenes:
+  - id: G1
+    generation_type: first_plus_last
+    purpose: impossible_scale_reveal_and_warming
+    generation_seconds: 8
+    start_frame: KF0_OPEN
+    end_frame: KF1_WARM
+    action: "one front paw slowly nudges the thumbnail-sized roasting tray a few millimeters toward the tiny charcoal heat, then stops; the sweet potato itself barely moves"
+    action_guard: "true first-person POV; front paws only; no face/head/body; no tongs; no gripping; keep the 12mm sweet potato dramatically smaller than the paw; one calm action"
+  - id: G2
+    generation_type: first_plus_last
+    purpose: slow_roast_and_skin_crack
+    generation_seconds: 8
+    start_frame: ACTUAL_LAST_USABLE_FRAME_G1
+    end_frame: KF2_CRACK
+    action: "one paw gently presses the edge of the tiny tray to steady it while heat darkens the skin; a small crack slowly appears and a thin wisp of steam escapes"
+    action_guard: "no tool grip; paw does not pick up food; preserve exact first-person camera and miniature scale; one material transformation"
+  - id: G3
+    generation_type: first_plus_last
+    purpose: golden_center_reveal
+    generation_seconds: 8
+    start_frame: ACTUAL_LAST_USABLE_FRAME_G2
+    end_frame: KF3_OPEN
+    action: "the two paws softly press the tiny sweet potato from opposite outer sides without pinching; the existing crack opens slightly and the golden center becomes visible"
+    action_guard: "feline paws remain anatomically real; no fingers; no precise human pinch; no cat face/body; one slow reveal only"
+  - id: G4
+    generation_type: first_plus_last
+    purpose: quiet_world_resolution
+    generation_seconds: 8
+    start_frame: ACTUAL_LAST_USABLE_FRAME_G3
+    end_frame: KF4_SERVE
+    action: "one paw slowly slides the tiny leaf-shaped plate into the miniature serving niche; both paws then withdraw a little while steam continues"
+    action_guard: "this is a world-resolution beat, not runtime padding; no eating, no customer, no camera cut, no full cat"
+post_production:
+  preferred_final_runtime_seconds: [38, 46]
+  target_motion_density_pct_min: 82
+  max_total_static_hold_seconds: 3
+  preferred_playback_speed_range: [0.92, 1.00]
+  slowdown_only_if_motion_remains_natural: true
+  narration_default: none
+  generated_audio_policy: keep_only_clean_tiny_close_asmr_otherwise_replace_in_edit
+  sound_bridge_between_generations: true
+  do_not_force_60_second_runtime: true
+success_metrics:
+  primary: [stayed_to_watch_pct, avg_percentage_viewed_pct]
+  secondary: [engaged_views_per_credit, subscribers_per_100_credits, comments_per_1000_engaged]
+  snapshots_hours: [24, 72]
+originality_guard:
+  unique_goal: make_a_12mm_yakiimo_from_cat_pov
+  unique_conflict: heat_reveals_a_single_skin_crack_without_human_tool_use
+  unique_ending: paws_slide_the_tiny_serving_into_a_diorama_stall_and_withdraw
+  do_not_copy_branded_food_or_other_creator_plot: true
+episode_fingerprint:
+  hook_mechanic: paw_to_object_impossible_scale_contrast
+  dominant_visual: purple_12mm_sweet_potato_macro
+  conflict_mechanic: slow_skin_crack
+  emotional_turn: tiny_scale_awe_to_warm_reveal
+  ending_mechanic: quiet_world_resolution

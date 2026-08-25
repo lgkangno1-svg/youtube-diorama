@@ -1,264 +1,246 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-25 Progressive Spend H30 + Sequential Frame Chain + Motion-Dense Healing + Seasonal Search Lead**
+최신 적용 기준: **2026-08-25 POV Paws Microworld + Adaptive H30/H40 + Sequential Frame Chain + Seasonal Search Lead**
 
-## 1. 채널의 기본 감정
+## 1. 채널의 핵심 경험
 
-Tiny Cat Kitchen은 `viral-chaos`가 아니라 **cozy / healing**이다.
+Tiny Cat Kitchen의 기본 Shorts는 **고양이를 밖에서 보는 영상이 아니다.**
 
-핵심:
+> **시청자가 고양이가 된 것처럼 1인칭 시점에서 앞발만 보며, 터무니없이 작은 디오라마 음식/물건을 조심스럽게 만드는 힐링 ASMR 영상**이다.
 
-> **Hook은 빠르게 이해시키고, 본문은 천천히 보여준다.**
+Source of truth:
+- character/world: `docs/24_hero_cat_brand_identity.md`
+- Shorts camera/scale: `docs/25_pov_paws_microworld_grammar.md`
 
-- 첫 0.5~1.5초: 고양이 앞발 + 매우 작은 재료/규칙을 즉시 이해
-- 이후: 한 공간에서 느린 행동을 끝까지 보여줌
-- 2초마다 컷 전환, flash, meme transition, 과한 zoom 금지
-- calm은 static을 뜻하지 않는다. 작은 움직임은 계속 있어야 한다.
+기본 영상 문법:
+- true first-person cat POV
+- 화면 아래쪽에 cream + pale ginger 앞발 1~2개만 등장
+- 얼굴/눈/귀/머리/몸통/꼬리/full cat 금지
+- hero food/object는 앞발보다 압도적으로 작아야 함
+- 기본 hero object 약 5~20mm, 화면상 한 앞발 폭의 15~50% 정도
+- macro close-up + miniature diorama workbench
+- 한 8초 clip에 1 primary tactile action + optional 1 micro-payoff
+- no rapid montage / no meme zoom / no third-person chef shot
 
-권장 최종 길이는 **약 28~36초**를 기본으로 한다. 더 짧아도 완결성이 있으면 허용하고, 40초를 맞추기 위해 정지 keyframe을 길게 패딩하지 않는다.
+예쁜 영상이어도 다음이면 FAIL:
+- 고양이가 카운터 뒤에서 요리하는 3인칭 구도
+- 고양이 얼굴/전신이 보임
+- 음식/팬이 앞발과 비슷하거나 더 큼
+- 사람 손가락/엄지/사람형 grip
+- 주방 전체가 주인공이고 tiny-object scale contrast가 약함
 
----
+## 2. Paw-action grammar
 
-## 2. 기본 Flow 구조 — Progressive Spend H30
+Veo 안정성을 위해 고양이 발은 사람 손처럼 도구를 움켜쥐지 않는다.
 
-현재 공식 Flow 기준 Veo 3.1 Lite는 4/6/8초와 Extend가 generation당 non-Ultra 10 credits / Ultra 5 credits다. 따라서 특별한 이유가 없으면 8초를 쓴다.
+선호:
+- nudge
+- press
+- pat
+- roll
+- steady
+- slide
+- tap
 
-### Google AI Pro 비용 진실 — 모델명을 먼저 본다
+조건부:
+- 넓은 도구 손잡이를 발바닥으로 위에서 눌러 몇 mm 이동
+- 작은 그릇의 옆면을 밀어 기울이기
 
-현재 운영 계정은 Google AI Pro를 기준으로 한다.
+피함:
+- chopsticks / knife / tongs를 손가락처럼 grip
+- thumb/index pinch
+- 사람 손목처럼 비틀기
 
-공식 Google Flow 기준:
-- Google AI Pro 월 기본 Flow credits: **1,000**
-- Veo 3.1 Lite 4/6/8초 또는 Extend: **10 credits / generation**
-- Veo 3.1 Fast: **20 credits / generation**
-- Veo 3.1 Quality 8초: **100 credits / generation**
-- Gemini Omni Flash 4초: **15 credits** / 6초 20 / 8초 25 / 10초 30
-- Plus/Pro/Ultra의 1080p upscale: **0 credits**
+## 3. Flow spend — Progressive Spend
 
-따라서 Flow UI에서 `15 credits`가 보였다는 이유만으로 Veo Lite의 비용을 15로 가정하지 않는다. **반드시 생성 직전 active model + duration + 표시 credit cost를 확인한다.** 현재 H30은 `Veo 3.1 Lite / 8s / output count 1 / 10 credits`가 UI에 실제로 표시될 때만 적용한다.
-
-UI가 공식 문서와 다르면 **UI 표시 비용을 그 생성의 source of truth로 기록하고 일단 생성하지 않은 채 운영 기준을 재검토**한다. 모델이 Gemini Omni Flash 등으로 바뀌어 있으면 Lite로 되돌릴 수 있는지 먼저 확인한다.
-
-기본 최대 first-pass 예산:
-
-```text
-Gate A: free image/reference/keyframe preflight = 0
-G1: 8s Lite = +10
-PASS 후 G2: 8s Lite = +10
-PASS 후 G3: 8s Lite = +10
-max first pass = 30 credits non-Ultra
-```
-
-**G1/G2/G3를 한꺼번에 만들지 않는다.**
-
-- G1이 틀리면 G2/G3 금지
-- G2가 틀리면 G3 금지
-- minor timing/crop 문제는 편집으로 수리
-- 구조적 실패만 해당 generation 1회 reroll 검토
-- premise 자체가 약하면 추가 spend 중단
-
-H20은 2개의 8초 Lite로 충분한 단순 episode에 허용한다. H40은 검증된 승자 또는 명확한 1컷 구조적 결함이 있을 때만 허용한다.
-
----
-
-## 3. Sequential Frame Chain
-
-연속성 기본값:
+현재 운영 계정은 Google AI Pro 기준이다. 생성 직전 Flow UI에서 반드시 확인한다.
 
 ```text
-FREE OPEN FRAME
-  ↓
-G1 8s
-  ↓ save actual last usable frame
-G2 First frame
-  ↓
-G2 8s
-  ↓ save actual last usable frame
-G3 First frame
-  ↓
-G3 8s
+active model = Veo 3.1 Lite
+duration = 8 seconds
+output count = 1
+displayed cost = 10 credits / generation
 ```
 
-G2/G3에는 무료로 준비한 target last frame을 추가로 사용할 수 있다.
+UI가 다르면 실제 표시 비용을 source of truth로 기록하고 생성 전에 재검토한다.
 
-이유:
-- 같은 cat / cookware / food state를 실제 직전 프레임에서 이어감
-- 새 generation마다 캐릭터를 다시 해석하는 drift 감소
-- color/light/scale continuity 개선
+모든 generation은 순차 사용한다.
 
-현재 Flow 공식 기능상 Veo 3.1 Lite는 First + Last frame을 지원하고, Fast의 First + Last는 아직 동일한 drop-in 대체가 아니다. Extend는 장면상 특별한 이점이 있을 때만 실험하며 기본값은 sequential First+Last chain이다.
+```text
+FREE keyframe/reference preflight
+→ G1 8s
+→ POV/SCALE/ANATOMY/QC
+→ save actual last usable frame
+→ G2 only after PASS
+→ QC
+→ G3 only after PASS
+→ QC
+→ G4 only if runtime gate says it adds an independent beat
+```
 
----
+G2/G3/G4를 미리 생성하지 않는다.
 
-## 4. 한 8초 generation의 문법
+## 4. Runtime policy — 세계관 몰입과 지루함 사이
+
+Shorts가 1분이어야 하는 것은 아니다. 우리 목표는 **길이를 채우는 것보다 작은 세계 안에서 완결된 tactile journey를 느끼게 하는 것**이다.
+
+초기 prior:
+
+### compact_h30
+- 3 × 8s Lite = 30 credits first-pass ceiling
+- raw motion 24s
+- 보통 final 30~36s
+- 3개의 독립 beat로 setup → tactile transformation → payoff가 완결될 때
+
+### immersive_h40
+- 4 × 8s Lite = 40 credits first-pass ceiling
+- raw motion 32s
+- 보통 final 38~46s
+- 4번째 장면이 독립적인 world-resolution / serving / afterglow / loop beat를 가질 때
+- **길이 패딩용 G4 금지**
+
+### 48~60s
+- 실제 Tiny Cat Kitchen의 24h/72h retention 및 engaged-views/credit 데이터가 지지할 때만 실험
+- 처음부터 60초를 목표로 늘리지 않는다.
+
+현재 worldbuilding 목적의 대표 영상은 `immersive_h40`을 사용할 수 있다. 단, G1→G2→G3까지의 QC gate는 그대로이고 G4도 G3 PASS 후에만 쓴다.
+
+## 5. Immersive beat grammar
+
+좋은 4-beat 구조:
+
+```text
+Beat 1 — impossible scale reveal
+앞발 옆에 5~20mm 재료/도구가 보여 1초 안에 "너무 작다"가 이해됨
+
+Beat 2 — tactile making
+누르기/굴리기/접기/밀기 등 하나의 작은 상태 변화
+
+Beat 3 — satisfying finish
+김, 갈라짐, 광택, 단면, 작은 완성품 등 visual payoff
+
+Beat 4 — world resolution
+완성품을 미니 서빙 공간에 밀어 넣고 앞발이 빠짐 / 작은 세계가 계속 살아 있음
+```
+
+Beat 4를 삭제해도 만족감과 세계관이 동일하면 H30으로 끝낸다.
+
+## 6. Sequential Frame Chain
 
 기본:
 
-> **1 clip = 1 calm primary action + optional 1 micro-beat**
-
-좋은 예:
-
 ```text
-0–1.5s  paw enters slowly
-1.5–6s  turns one tiny sweet potato over the heat
-6–8s    paw pauses; skin crack/steam continues
+G1
+↓ actual last usable frame
+G2 First frame
+↓ actual last usable frame
+G3 First frame
+↓ actual last usable frame
+G4 First frame (only immersive_h40)
 ```
 
-금지:
-- 한 clip 안에서 준비→조리→완성→먹기 전부 수행
-- 여러 utensil 동시 사용
-- 3~4 camera angle montage
-- 서로 무관한 sound event 여러 개 겹치기
+목적:
+- 같은 paw fur pattern
+- 같은 first-person camera
+- 같은 workbench
+- 같은 tiny-object scale
+- 같은 food state
+- 같은 lighting/material language
 
----
+G2 이후 긴 full-cat description을 반복하지 않는다. 얼굴이 다시 생길 위험이 있다.
 
-## 5. 오디오 / 나레이션
+## 7. Audio
 
-기본값:
+기본:
 
 ```text
 No narration
 No generated music
-Quiet room tone + one or two isolated natural ASMR families
+Quiet room tone + close tiny tactile ASMR
 ```
 
-재사용 SFX:
-- tiny paw tap
-- pan sizzle
-- wooden scrape
-- ceramic click
-- water pour
-- rain ambience
-- stove/room tone
+좋은 소리:
+- tiny ceramic click
+- wood scrape
+- dry crumb / dough press
+- soft tiny sizzle
+- paper rustle
+- faint steam / room ambience
 
-Flow 오디오가 깨끗하면 사용한다. 영상은 좋은데 오디오만 이상하면 **영상 재생성 금지**하고 후편집 SFX로 교체한다.
+물체가 아주 작으므로 cinematic impact sound를 크게 쓰지 않는다.
 
-사용자 나레이션은 다음 중 하나일 때만 보통 일본어 0~2문장:
-- 화면만으로 규칙/상황 이해가 어려움
-- 캐릭터 성격을 한 줄로 강화 가능
-- payoff 의미를 한 줄이 크게 증폭
+영상은 좋고 Flow audio만 이상하면 영상 재생성 금지. 후편집 SFX로 교체한다.
 
----
+## 8. Seasonal Search Lead
 
-## 6. 아이디어 선택 — 조회 가능성 + 제작 안정성 + 선행 시즌성
-
-다음 episode는 `ideas/episode_backlog.yaml`의 후보를 기반으로 평가한다.
-
-현재 base scoring은:
+아이디어 base score는 기존 9축을 유지한다.
 - benchmark evidence
 - Japan relevance
 - healing fit
 - visual satisfaction
-- **Flow reliability**
+- Flow reliability
 - originality
 - worldbuilding
 - audience demand
-- **expected credit efficiency**
+- expected credit efficiency
 
-를 본다.
-
-여기에 계절형 후보만 **Seasonal Search Lead boost**를 최대 +8점까지 별도로 적용한다. 이 boost는 제작 안정성 점수를 대체하지 않는다.
-
-### Seasonal Search Lead 기본값
+계절 후보에는 최신 일본 근거가 있을 때만 bounded seasonal boost를 추가한다.
 
 ```text
-peak 36일+ 전     → 0점: 너무 이름
-peak 22~35일 전   → 작은 early-lead boost
-peak 8~21일 전    → strongest sweet spot
-peak 0~7일 전     → 강한 final-lead boost
-peak 기간         → 유효하지만 sweet spot보다 낮음
-peak 직후 tail    → 작은 잔여 boost
-그 이후           → 0점 / trend 만료
+peak 36일+ 전   → 0
+peak 22~35일 전 → early lead
+peak 8~21일 전  → strongest lead
+peak 0~7일 전   → strong final lead
+peak 기간       → valid but lower than sweet spot
+post-peak tail  → small residual
 ```
 
-목적은 **시즌 당일 뒤늦게 따라가는 것이 아니라, 일본 시청자의 검색·시청·주제 관심이 올라오기 시작할 때 미리 후보를 앞당기는 것**이다.
+정기 loop는 앞으로 2~6주의 일본 시즌/기념일/제철 소재를 선행 스캔한다. 달력 날짜만으로 boost를 주지 않고 `research/seasonal_evidence.yaml` freshness를 확인한다.
 
-단, Shorts는 검색만으로 배포되지 않으므로 달력 날짜만으로 점수를 주지 않는다. 각 seasonal candidate는 다음을 구분한다.
-- `dated_event`: 十五夜, グミの日 같은 날짜형 이벤트
-- `broad_food_season`: 焼きいも, 栗 같은 긴 제철/식품 시즌
+## 9. 다음 영상 준비 인터페이스
 
-각 후보는 `peak_start`, `peak_end`, `lead_days`, `tail_days`, `searchability`를 가질 수 있다. `searchability`는 0..20이며 일본에서 실제로 검색/인지될 가능성을 최신 신호로 검증한다.
-
-현재 2026-08-25 계절 신호:
-- 月見 시즌이 실제 일본 외식/식품에서 시작됨
-- 2026년 中秋の名月은 9월 25일이므로 8월 말은 early lead, 9월 초~중순은 더 강한 선행 구간
-- 9월 3일 グミの日 전후 texture 신제품 집중
-- さつまいも / 栗 가을 상품 출시 시작
-
-단, branded menu/plot/design을 복제하지 않고 계절·식감·역할 같은 추상 메커니즘만 사용한다.
-
-Flow reliability와 expected credit efficiency는 근거가 비슷한 후보끼리 비교할 때 특히 중요하다. 시즌성 때문에 구조적으로 불안정한 아이디어를 억지로 선택하지 않는다.
-
-현재 저크레딧 관점의 강한 후보는 **한 개의 고구마가 천천히 익고 껍질이 갈라지며 김과 노란 속살이 보이는 焼きいも屋**다. 月見은 계절 인지도가 더 강하지만 계란 취급 + 손님 등장까지 포함하면 continuity risk가 더 높다. 실제 제작 순서는 seasonal phase, 최근 episode fingerprint와 현재 NEXT_EPISODE 상태를 확인한 뒤 결정한다.
-
-로컬 점수 확인:
-
-```powershell
-python tools/select_next_episode.py --top 3
-```
-
-특정 미래 날짜에서 후보가 어떻게 움직이는지 확인:
-
-```powershell
-python tools/select_next_episode.py --date 2026-09-10 --top 5
-```
-
----
-
-## 7. 사용자의 평소 인터페이스
-
-사용자는 원칙적으로 ChatGPT에:
+사용자는:
 
 ```text
-다음 영상 준비해줘.
+다음 영상 준비해줘
 ```
 
 라고만 말하면 된다.
 
 ChatGPT가:
-- 최신 benchmark / 일본 신호 확인
-- **앞으로 2~6주의 일본 시즌/기념일/제철 소재 선행 스캔**
-- 과거 production + 24h/72h learning 확인
-- base score + seasonal lead phase 비교
-- 후보 선정
-- 일본어 title/hook
-- narration 필요 여부
-- 3개의 느린 8초 action 설계
+- 일본 최신 시즌/트렌드/벤치마크 조사
+- backlog + analytics + production history 비교
+- POV_PAWS_MICROWORLD_V1 적합성 평가
+- H30 vs H40 runtime gate 선택
 - episode manifest 생성/수정
 - `production/NEXT_EPISODE.txt` 갱신
 
-을 담당한다.
-
-로컬에서는:
+사용자는 로컬에서:
 
 ```powershell
 ./tools/make_next_short.ps1
 ```
 
-을 실행해 bundle / Flow pack / edit plan / publish pack을 만든다. 이 준비 단계는 Flow/LLM/API를 호출하지 않는다.
+을 실행한다.
 
----
-
-## 8. 성과 학습
-
-실제 데이터가 생기기 전에는 placeholder를 실패 데이터처럼 학습하지 않는다.
+## 10. 성과 학습
 
 매 episode에서 가능한 경우 기록:
-- Flow credits spent
+- actual Flow credits
 - rerolls
-- G1/G2/G3 first-pass success
+- G1/G2/G3/G4 first-pass success
+- POV / scale / anatomy failure
+- failed action type
 - usable motion seconds
-- continuity issue / failed action type
-- Flow audio kept/replaced
-- narration mode
-- final length
-- 24h / 72h Stayed to watch
+- final runtime
+- narration/audio replacement
+- 24h/72h Stayed to watch
 - APV
 - engaged views
 - subscribers
 - comments
 
-장기 최적화 대상:
+핵심 장기 지표:
 
 ```text
 usable motion / credit
@@ -266,58 +248,12 @@ engaged views / credit
 subscribers / 100 credits
 ```
 
-특정 음식이 성공했다고 그 음식을 복제하지 않는다. 성공한 **hook/action/pacing/audio/ending mechanism**만 다음 episode prior로 사용한다.
+runtime 학습:
+- 30~36s compact_h30
+- 38~46s immersive_h40
 
-시즌형 episode는 나중에 다음도 비교한다.
-- publish_date → peak_start까지 남은 일수
-- seasonal_phase
-- engaged views / credit
-- subscribers / credit
+을 같은 채널에서 비교하고, 실제 drop-off와 engaged-views/credit가 쌓이면 prior를 조정한다.
 
-실제 데이터가 쌓이면 8~21일 sweet spot prior를 채널 실적에 맞게 조정한다.
+## 11. 최종 목표
 
----
-
-## 9. 원본성 / YPP 안전
-
-각 episode는 다음이 식별 가능해야 한다.
-- unique_goal
-- unique_conflict
-- unique_ending
-- character_motivation
-- world_state_change
-- callback_or_new_lore
-
-최근 5편과 fingerprint 5개 중 최소 3개가 달라야 한다.
-
-음식명만 바꾸고 같은 사건/갈등/결말을 반복하지 않는다. Photorealistic synthetic footage는 필요한 altered/synthetic disclosure를 사용한다.
-
----
-
-## 10. 현재 Loop Engineering
-
-```text
-Fresh benchmark / Japanese signal / audience request
-→ scan next 2–6 weeks of Japanese seasonal opportunities
-→ candidate base score + bounded seasonal lead boost
-→ originality gate
-→ free image/reference preflight
-→ confirm Flow active model + duration + displayed credit cost
-→ G1 8s Lite
-→ QC
-→ actual end-frame chain
-→ G2 only after PASS
-→ QC
-→ actual end-frame chain
-→ G3 only if still needed
-→ reusable ASMR / optional short user narration
-→ 28–36s motion-dense healing edit
-→ publish
-→ 24h / 72h engaged-quality + production-cost learning
-→ learn whether lead timing actually helped
-→ update priors and next candidate
-```
-
-최종 목표:
-
-> **가장 싼 영상을 만드는 것이 아니라, 일본 시청자가 관심을 갖기 시작하는 시점에 맞춰 오래 보고 다시 찾을 만한 고품질 힐링 영상을 가장 적은 실패 generation으로 만드는 것.**
+> **고양이 캐릭터를 보여주는 AI 영상이 아니라, 시청자가 고양이의 앞발이 된 듯한 시점에서 믿기 어려울 만큼 작은 음식/물건을 만지며 작은 세계에 잠깐 들어갔다 나오는 힐링 Shorts를 만든다.**

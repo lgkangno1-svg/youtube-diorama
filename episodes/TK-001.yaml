@@ -2,40 +2,61 @@ episode_id: TK-001
 status: ready-for-flow
 target_market: JP
 audience: [teens, twenties]
-format: healing_experiment
+format: pov_microworld_healing
 food: omurice
-constraint: 3cm
-length_target_seconds: 30
-hook: "猫の手に卵を渡した結果…"
-title: "猫の手で3cmオムライスは作れる？"
+constraint: 12mm
+length_target_seconds: 42
+hook: "前足よりずっと小さい、1.2cmのオムライス。"
+title: "猫の前足で1.2cmオムライスを作る夜。"
 open_loops:
   - at_second: 0
-    question: can_the_cat_make_it
-  - at_second: 9
-    question: will_the_egg_tear
-  - at_second: 22
-    question: what_will_the_cat_choose
-payoff: parsley_twist
-resolution: cat_ignores_omurice_and_takes_parsley
-loop_end: reuse_opening_keyframe_after_parsley_twist
+    question: can_something_this_small_become_real_food
+  - at_second: 10
+    question: will_the_micro_omelet_fold_without_tearing
+  - at_second: 24
+    question: how_small_will_the_finished_plate_feel_beside_the_paw
+payoff: finished_12mm_omurice_scale_reveal
+resolution: tiny_plate_slides_into_diorama_serving_spot_and_paws_withdraw
+loop_end: quiet_return_to_scale_reveal_workbench
+
 brand_identity:
   hero_cat: HERO_CAT_V1
   kitchen_world: KITCHEN_WORLD_V1
-  canonical_doc: docs/24_hero_cat_brand_identity.md
+  shorts_visual_grammar: POV_PAWS_MICROWORLD_V1
+  canonical_docs:
+    - docs/24_hero_cat_brand_identity.md
+    - docs/25_pov_paws_microworld_grammar.md
   identity_priority_over_food_detail: true
-  hero_cat_short_reference: "one cream-and-pale-ginger cat, round amber eyes, pink nose, soft round face, beige linen apron, real feline paws, no human fingers or thumbs"
+  hero_cat_short_reference: "HERO_CAT_V1_PAWS: one or two cream-and-pale-ginger real feline front paws only, entering from the bottom edge in true first-person cat POV; no face, head, torso, full body, human fingers, thumbs or human-like grip"
+
+camera_grammar:
+  mode: first_person_cat_pov
+  visible_cat_parts: [front_paws_only]
+  hide_face_head_body: true
+  camera_position: cat_working_position_looking_slightly_down_at_tabletop
+  hero_object_size_mm: [8, 14]
+  hero_object_paw_width_ratio: [0.20, 0.45]
+  macro_closeup: true
+  keep_paw_as_scale_reference: true
+  third_person_cat_shot_is_fail: true
+
+runtime_strategy:
+  mode: immersive_h40
+  target_final_seconds: [38, 46]
+  minimum_distinct_motion_beats: 4
+  fourth_beat_value: "quiet world-resolution: slide the tiny completed plate into its diorama serving place, then withdraw the paws while steam remains; establishes the miniature world and creates loopable afterglow"
+  do_not_target_60_seconds_without_retention_evidence: true
+
 flow_strategy:
-  mode: progressive_h30_sequential_chain
+  mode: progressive_h40_sequential_chain
   primary_model: veo-3.1-lite
   output_count: 1
-  max_lite_generations_first_pass: 3
-  non_ultra_credit_budget_first_pass: 30
-  ultra_credit_budget_first_pass: 15
+  max_lite_generations_first_pass: 4
+  non_ultra_credit_budget_first_pass: 40
   frame_mode: sequential_actual_end_frame_plus_target_last
-  keyframe_count: 4
+  keyframe_count: 5
   image_preflight_model: nano-banana-2-lite
   explicitly_select_image_model: true
-  use_quality_only_for: [hero_food_reveal_after_format_wins]
   use_consistent_references: true
   do_not_generate_separate_cta_clip: true
   pacing: healing_motion_dense
@@ -46,97 +67,115 @@ flow_strategy:
   progressive_spend_gate:
     g2_requires_g1_pass: true
     g3_requires_g2_pass: true
-    stop_if_premise_or_identity_fails: true
+    g4_requires_g3_pass: true
+    stop_if_premise_pov_scale_or_anatomy_fails: true
     reroll_only_structural_failure: true
   sequential_chain:
     g2_start_source: save_actual_last_usable_frame_from_G1
     g3_start_source: save_actual_last_usable_frame_from_G2
+    g4_start_source: save_actual_last_usable_frame_from_G3
     use_free_target_last_frames_when_helpful: true
-  extend_trial:
-    enabled: false
-    reason: first production episode should prioritize controllable start/end continuity over an Extend experiment
-  fourth_generation_requires_qc_failure_or_winner_gate: true
+
 references:
-  - HERO_CAT_V1
+  - HERO_CAT_V1_PAWS
+  - POV_PAWS_MICROWORLD_V1
   - KITCHEN_WORLD_V1
-  - PAN_MASTER
-  - PLATE_MASTER
+  - MICRO_PAN_MASTER
+  - MICRO_PLATE_MASTER
+
 keyframes:
-  KF0_OPEN: HERO_CAT_V1_real_feline_paw_beside_pearl_sized_egg_cup_tiny_pan_and_visible_3cm_rice_mound_no_finished_food
-  KF1_EGG_SET: thin_yellow_omelet_has_just_set_in_tiny_pan_with_3cm_rice_mound_waiting_beside_it_same_HERO_CAT_V1_and_KITCHEN_WORLD_V1
-  KF2_FOLD_SAFE: omelet_is_folded_around_3cm_rice_in_pan_intact_but_delicate_after_a_near_tear_same_HERO_CAT_V1_and_KITCHEN_WORLD_V1
-  KF3_PAYOFF: finished_3cm_omurice_on_tiny_plate_steam_visible_HERO_CAT_V1_real_feline_paw_touching_parsley_instead_of_food
+  KF0_OPEN: "true first-person cat POV over a warm miniature workbench; only two cream-and-pale-ginger feline front paws enter from the lower corners; centered between them is an absurdly tiny 8mm ceramic egg cup, a 12mm pan and a 12mm rice mound; no cat face or body; paw-to-object scale contrast is immediately obvious"
+  KF1_EGG_SET: "same POV and paws-only composition; a paper-thin yellow egg layer has just set inside the 12mm pan; the paw remains much larger than the pan; no face, no body"
+  KF2_FOLD_SAFE: "same first-person tabletop POV; the tiny omelet is folded around the 12mm rice mound and remains intact after a slight edge stretch; paws only at the lower frame edge"
+  KF3_PAYOFF: "same POV; finished 12mm omurice on a tiny plate, warm steam and glossy yellow surface, one resting paw beside it makes the finished food look extremely small"
+  KF4_WORLD: "same POV and workbench; tiny plated omurice now sits in a miniature serving alcove at the upper center; both paws are slowly withdrawing from the bottom edge; steam remains alive; no cat face or body"
+
 scenes:
   - id: G1
     generation_type: first_plus_last
-    purpose: hook_plus_scale
+    purpose: impossible_scale_reveal_and_micro_egg_pour
     generation_seconds: 8
     start_frame: KF0_OPEN
     end_frame: KF1_EGG_SET
-    action: cat_paw_slowly_tilts_the_pearl_sized_egg_cup_into_the_tiny_pan_and_then_pauses_while_the_thin_egg_layer_sets
-    action_guard: one_real_feline_paw_one_cup_one_pan_no_rice_cooking_no_camera_change_preserve_HERO_CAT_V1
+    action: "one front paw gently nudges the side of the tiny ceramic egg cup so it tips and releases one tiny drop of egg into the 12mm pan; the paw stops and the thin egg quietly sets"
+    action_guard: "paw nudges rather than grips; no fingers; one tactile action; keep the paw in frame as scale reference; never reveal face/head/body; no camera change"
   - id: G2
     generation_type: first_plus_last
-    purpose: fragile_fold_conflict_and_recovery
+    purpose: delicate_micro_fold
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G1
     end_frame: KF2_FOLD_SAFE
-    action: using_one_tiny_spatula_the_cat_paw_slowly_folds_the_thin_omelet_around_the_already_prepared_3cm_rice_the_edge_stretches_and_almost_tears_then_settles_intact
-    action_guard: one_continuous_fold_no_extra_ingredients_no_plating_no_camera_change_preserve_actual_G1_cat_identity
+    action: "one paw presses down on the wide top of a tiny flat wooden paddle, sliding it a few millimeters so the thin omelet folds once around the prepared rice; the edge stretches slightly then settles intact"
+    action_guard: "paw presses paddle from above and never grips it; one continuous fold only; no plating; keep true first-person POV and miniature scale"
   - id: G3
     generation_type: first_plus_last
-    purpose: plating_plus_parsley_payoff
+    purpose: satisfying_plate_and_scale_payoff
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G2
     end_frame: KF3_PAYOFF
-    action: cat_paw_slowly_slides_the_finished_3cm_omurice_onto_the_tiny_plate_and_pauses_for_steam_then_as_a_single_small_comic_beat_touches_and_takes_the_parsley
-    action_guard: plating_is_the_primary_action_parsley_is_only_the_final_micro_beat_no_eating_no_camera_change_preserve_actual_G2_cat_identity
+    action: "one paw slowly slides the tiny plate under the finished omurice while the other paw stays nearly still as a scale anchor; the food settles onto the plate and a thin curl of steam appears"
+    action_guard: "no human grip; no extra ingredients; one primary sliding action; finished food remains 20-45 percent of one paw width; no face/body"
+  - id: G4
+    generation_type: first_plus_last
+    purpose: quiet_world_resolution_and_loopable_afterglow
+    generation_seconds: 8
+    start_frame: ACTUAL_LAST_USABLE_FRAME_G3
+    end_frame: KF4_WORLD
+    action: "the nearest paw gently slides the tiny plated omurice forward into a miniature serving alcove; both paws then slowly withdraw while the 12mm dish remains steaming in the tiny diorama world"
+    action_guard: "G4 is an independent world-resolution beat, not runtime padding; no new food state; no third-person cat reveal; no camera move beyond subtle breathing drift"
+
 editorial_seconds:
-  opening_keyframe_hold: 0.5
-  environmental_room_hold: 0.5
+  opening_keyframe_hold: 0.4
+  environmental_room_hold: 0.0
   conflict_micro_hold: 0.2
-  hero_frame_slow_push_in: 0.8
-  reaction_hold: 0.5
-  opening_keyframe_reuse_for_loop: 0.5
+  hero_frame_slow_push_in: 0.5
+  reaction_hold: 0.3
+  opening_keyframe_reuse_for_loop: 0.4
+
 post_production:
-  target_motion_density_pct_min: 85
-  max_total_static_hold_seconds: 3
-  preferred_playback_speed_range: [0.94, 1.00]
+  target_motion_density_pct_min: 88
+  max_total_static_hold_seconds: 2
+  preferred_playback_speed_range: [0.90, 1.00]
   slowdown_only_if_motion_remains_natural: true
-  do_not_force_40_second_runtime: true
-  preferred_final_runtime_seconds: [28, 31]
+  do_not_force_60_second_runtime: true
+  preferred_final_runtime_seconds: [38, 46]
+  preserve_paw_scale_reference_in_crop: true
   generated_audio_policy: keep_clean_native_audio_within_each_take_otherwise_replace_with_reusable_isolated_asmr
   sound_bridge_between_visual_cuts: true
   narration_default: none
-  narration_if_needed_max_lines: 2
+  narration_if_needed_max_lines: 1
+
 creator_signature:
-  narrator_angle: amused_witness_to_the_cats_bad_priorities
-  signature_line: "そこまで作って、パセリなんだ。"
-  delivery: optional_user_voice_only_if_ab_test_requires_it
+  narrator_angle: silent_observer_inside_the_cats_tiny_workbench
+  signature_line: null
+  delivery: none_by_default
+
 audience_loop:
-  mode: poll
-  question: "次に3cmで作るなら？"
-  options: ["ラーメン", "寿司"]
-  next_manifest_seed: winning_option_becomes_candidate_food_but_requires_new_conflict_and_resolution
+  mode: comments_prompt_in_metadata_not_video
+  question: "次は何を1cmで作ってほしい？"
+
 success_metrics:
   comparison_method: same_channel_same_observation_horizon_percentiles
   primary: [stayed_to_watch_pct, avg_percentage_viewed_pct]
-  secondary: [subscribers_per_1000_engaged, comments_per_1000_engaged]
-  external_reach_only: public_views
+  secondary: [engaged_views_per_credit, subscribers_per_100_credits, comments_per_1000_engaged]
+  runtime_learning: [final_duration_seconds, dropoff_by_beat, rewatch_signal]
   snapshots_hours: [24, 72]
   no_universal_absolute_thresholds: true
+
 originality_guard:
-  unique_goal: make_3cm_omurice
-  unique_conflict: omelet_almost_tears
-  unique_ending: parsley_twist
+  unique_goal: make_a_real_12mm_omurice_in_first_person_cat_pov
+  unique_conflict: micro_omelet_edge_nearly_tears_during_one_fold
+  unique_ending: tiny_plate_moves_into_a_diorama_serving_alcove_and_paws_withdraw
   do_not_reuse_same_conflict_and_ending_pair_in_next_5_episodes: true
+
 ip_story_guard:
-  character_motivation: prove_the_tiny_shop_can_serve_a_real_signature_dish
-  world_state_change: first_signature_menu_item_is_completed
-  callback_or_new_lore: cat_prefers_garnish_over_the_dish_it_worked_hard_to_make
+  character_motivation: complete_one_absurdly_small_real_dish
+  world_state_change: miniature_serving_alcove_receives_its_first_dish
+  callback_or_new_lore: the_viewer_experiences_the_world_as_the_cat_not_as_an_external_observer
+
 episode_fingerprint:
-  hook_mechanic: impossible_scale_reveal
-  dominant_visual: yellow_omelet_macro
-  conflict_mechanic: fragile_food_near_failure
-  emotional_turn: relief_then_comedy
-  ending_mechanic: unexpected_garnish_choice
+  hook_mechanic: paw_to_object_impossible_scale_reveal
+  dominant_visual: first_person_paws_plus_12mm_yellow_food
+  conflict_mechanic: fragile_micro_fold
+  emotional_turn: tactile_tension_to_quiet_satisfaction
+  ending_mechanic: paws_withdraw_world_continues
