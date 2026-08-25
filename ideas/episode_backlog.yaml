@@ -1,4 +1,4 @@
-updated_at: 2026-08-24
+updated_at: 2026-08-25
 scoring:
   benchmark_evidence: 10
   japan_relevance: 10
@@ -41,19 +41,19 @@ candidates:
     working_title_ja: "猫の焼きいも屋、秋の最初の一本。"
     premise: "At a tiny evening sweet-potato stand, the cat slowly turns one 3cm sweet potato over warm coals; the skin begins to crack, steam escapes, and the golden center is opened for the first customer."
     benchmark_mechanic: [seasonal_autumn_ingredient, single_object_slow_transformation, steam_and_crack_payoff, cat_job_world]
-    benchmark_evidence: 18
+    benchmark_evidence: 19
     japan_relevance: 18
     healing_fit: 20
     visual_satisfaction: 19
     flow_reliability: 20
     originality: 14
     worldbuilding: 18
-    audience_demand: 14
+    audience_demand: 16
     expected_credit_efficiency: 20
     trend_window: "2026-08-24..2026-10-31"
     narration_recommendation: none
     status: priority_candidate
-    production_note: "Current best low-credit candidate: one object, one heat transformation, obvious steam/crack payoff, minimal hand-object continuity complexity."
+    production_note: "Current best low-credit candidate. New 2026-08-25 directional demand evidence: in a Lotte survey of 2,832 Japanese women aged 20-60 who regularly buy chilled desserts, about 70% selected sweet potato as an autumn flavor and about 60% selected yakiimo as their favorite sweet-potato sweet. Because the sample is category- and gender-specific, this only modestly raises demand/evidence scores. Keep the creative abstraction generic: one whole sweet potato, slow heat, skin crack, steam and golden-center reveal; do not copy any branded product."
   - id: IDEA-002
     working_title_ja: "3ミリのグミ、どこまで伸びる？"
     premise: "In a tiny candy lab, one translucent 3mm gummy is slowly stretched beside a miniature ruler; it nearly snaps, then is laid down to prove the final length."
