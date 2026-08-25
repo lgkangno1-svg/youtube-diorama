@@ -55,6 +55,7 @@ Veo reliability를 위해 고양이 발은 사람 손처럼 `grip`하지 않는�
 - tongs/knife/chopsticks를 손가락처럼 잡기
 - 두 발로 정교하게 집어서 회전시키기
 - 사람 손목처럼 비틀기
+- 매우 작은 음식 자체를 두 발 사이에서 정밀하게 squeeze/pinch하기
 
 ## Scale-cuteness gate
 
@@ -90,6 +91,21 @@ background props = secondary, never larger visual priority than hero object
 
 세계관 몰입을 위해 카메라를 매 장면 완전히 다른 위치로 순간이동시키지 않는다. G2/G3/G4는 실제 직전 usable frame을 이어서 같은 작업대에 계속 앉아 있는 느낌을 만든다.
 
+## Prop/state continuity gate
+
+Sequential frame chain은 고양이와 카메라뿐 아니라 **소품 상태까지 이어져야 한다.**
+
+기본 규칙:
+- G2 이후의 primary cookware/plate/tray는 가능하면 직전 usable frame에 이미 존재해야 한다.
+- 새 접시·그릇·도구를 다음 target last frame에 갑자기 추가하지 않는다.
+- `G3에는 roasting tray`, `G4에는 이유 없이 새 leaf plate`처럼 바뀌면 **PROP CONTINUITY FAIL**이다.
+- 새로운 소품이 꼭 필요하면 이전 generation의 실제 행동으로 먼저 화면에 도입하고, 그 행동 자체가 독립 beat로 가치가 있을 때만 허용한다.
+- 단순 서빙용이라면 새 접시를 생성하기보다 기존 tray/board/plate를 그대로 세계관 resolution에 재사용하는 편을 우선한다.
+
+이유:
+- First+Last chain에서 갑작스러운 새 소품은 food/cookware morph, duplicate props, scale drift를 유발할 수 있다.
+- Tiny Cat Kitchen은 작은 수공예 세계이므로 **같은 소품이 실제로 계속 존재하는 느낌**이 몰입에도 유리하다.
+
 ## Runtime grammar — immersion without padding
 
 목표는 60초를 채우는 것이 아니라 **작은 세계에 들어왔다가 만족스럽게 빠져나오는 시간**을 만드는 것이다.
@@ -122,7 +138,7 @@ background props = secondary, never larger visual priority than hero object
 G1: paw approaches a 10mm dough ball → gently presses once
 G2: paw rolls the now-flat dough → tiny filling becomes visible
 G3: paw taps the final garnish → steam or gloss payoff
-G4: paws slide the tiny plate into its diorama serving spot → withdraw, living steam remains
+G4: paws slide the same tiny serving tray into its diorama serving spot → withdraw, living steam remains
 ```
 
 ## Audio
@@ -155,4 +171,5 @@ True first-person POV of the cat itself. Only one or two cream-and-pale-ginger f
 - `CHARACTER FAIL`: 얼굴/몸통/전신 노출
 - `ANATOMY FAIL`: 사람 손/손가락/그립
 - `CAMERA FAIL`: 3인칭 셰프 구도
+- `PROP CONTINUITY FAIL`: 직전 장면에 없던 핵심 tray/plate/tool이 이유 없이 생김
 - `PADDING FAIL`: 독립 beat 없이 길이만 늘림
