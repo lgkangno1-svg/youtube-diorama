@@ -2,13 +2,14 @@ updated_at: 2026-08-26
 default_max_age_days: 14
 evidence:
   IDEA-001:
-    checked_at: "2026-08-25"
+    checked_at: "2026-08-26"
     market: JP
-    signal: "月見 / 中秋 food and cultural activity is already active ahead of the 2026-09-25 peak."
+    signal: "月見 / 中秋 seasonal activity is now moving from general late-August commercialization into explicit 2026-09-25 十五夜 reservation and limited-sale windows across multiple Japanese traditional-food retailers."
     sources:
-      - "https://prtimes.jp/main/html/rd/p/000000149.000096786.html"
-      - "https://prtimes.jp/main/html/rd/p/000000151.000096786.html"
-    abstract_lesson: "Use generic moon, egg-yolk, warm-night cues only; never copy branded menus or product designs."
+      - "https://www.daitora.jp/ic/otukimi"
+      - "https://prtimes.jp/main/html/rd/p/000000237.000008274.html"
+      - "https://nagomi-yoneya.co.jp/item-event/2026-otsukimi/"
+    abstract_lesson: "The dated-event signal is strengthening before the peak. Use only generic moon, round-dumpling, harvest-night and warm-light cues; never copy a retailer's rabbit design, package, exact arrangement or branded product."
   IDEA-009:
     checked_at: "2026-08-26"
     market: JP
