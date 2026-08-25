@@ -1,65 +1,118 @@
 # 24 — Hero Cat Brand Identity
 
-목표: Tiny Cat Kitchen의 고양이와 주방을 매 영상에서 다시 해석하지 않고, 채널 프로필·배너·Shorts가 하나의 세계로 보이게 한다.
+목표: Tiny Cat Kitchen의 고양이 identity는 유지하되, **채널 자산의 full-cat 표현과 Shorts의 first-person paw-only 표현을 분리**한다.
 
-## HERO_CAT_V1 — 고정 주인공
+Shorts framing의 세부 source of truth는 `docs/25_pov_paws_microworld_grammar.md`다.
 
-현재 채널의 기본 hero cat은 다음 외형을 유지한다.
+## HERO_CAT_V1 — 고정 주인공 identity
 
-- 한 마리만 등장
+채널의 기본 hero cat 외형:
+
 - cream fur base
-- soft pale ginger/orange markings on forehead, ears and upper face
+- soft pale ginger/orange markings
 - round amber/dark eyes with clear catchlights
 - small pink nose
-- soft round face, calm curious expression
+- soft round face
 - beige/light-linen apron
 - 실제 고양이 발 구조: human fingers/thumbs 금지
-- 과도하게 아기 고양이처럼 만들거나 매 영상마다 품종/얼굴 비율을 바꾸지 않음
 
-짧은 reference phrase:
+짧은 full-cat reference phrase:
 
 ```text
 HERO_CAT_V1: one cream-and-pale-ginger cat, round amber eyes, pink nose, soft round face, beige linen apron, real feline paws, no human fingers or thumbs
 ```
 
+## Channel assets vs Shorts
+
+### 프로필 / 배너
+
+- HERO_CAT_V1 얼굴/전신을 보여줄 수 있다.
+- 현재 프로필/배너의 따뜻한 miniature Japanese kitchen identity를 유지한다.
+- full-cat portrait는 **브랜드 자산용**이다.
+
+### 기본 Shorts
+
+- `POV_PAWS_MICROWORLD_V1`을 사용한다.
+- camera = true first-person cat POV.
+- 화면에는 cream + pale ginger **앞발 1~2개만** 보인다.
+- 얼굴, 눈, 귀, 머리, 몸통, 꼬리, full body는 보이지 않는다.
+- 앞치마도 화면에 억지로 노출시키지 않는다.
+- 주인공은 고양이 얼굴이 아니라 **앞발과 비교되는 초소형 음식/물체**다.
+
+Shorts용 짧은 paw reference phrase:
+
+```text
+HERO_CAT_V1_PAWS: one or two cream-and-pale-ginger real feline front paws only, entering from the bottom edge in true first-person cat POV; no face, head, torso, full body, human fingers, thumbs or human-like grip
+```
+
 ## KITCHEN_WORLD_V1 — 고정 세계
 
-- cozy miniature Japanese-inspired wooden kitchen
+- cozy miniature Japanese-inspired wooden workbench/kitchen
 - warm honey/cream palette
-- soft natural window light
-- rounded window / warm plaster or wood wall
-- small ceramic cookware and wooden utensils
-- uncluttered counter
-- subtle plant/seasonal accent 허용
+- small ceramic cookware and wooden diorama props
+- soft natural/window light
+- uncluttered composition
 - calm premium healing mood
 
-계절 에피소드에서 장식은 바꿀 수 있지만 구조적 identity는 유지한다.
+중요: Shorts에서는 **주방 전체보다 작업대의 초소형 물체가 우선**이다. 넓은 주방 establishing shot 때문에 물체가 커 보이거나 scale contrast가 약해지면 FAIL이다.
 
-## Continuity priority
+## Continuity priority — Shorts
 
 Flow 생성 전 무료 frame/reference 검수 순서:
 
-1. HERO_CAT_V1 얼굴/털색/눈/코
-2. beige linen apron
-3. feline paw anatomy
-4. KITCHEN_WORLD_V1 lighting/material language
-5. cookware/food scale
-6. episode-specific food/action
+1. true first-person cat POV
+2. front paws only; face/head/body hidden
+3. real feline paw anatomy
+4. hero food/object가 앞발보다 명확하게 작음
+5. miniature cookware/prop scale
+6. KITCHEN_WORLD_V1 lighting/material language
+7. episode-specific food/action
 
-음식이 예쁘지만 cat identity가 다르면 FAIL이다. 작은 음식 디테일보다 채널 캐릭터 연속성을 우선한다.
+음식이 예뻐도 3인칭 full-cat chef shot이면 FAIL이다.
+
+## Paw action rule
+
+고양이 발은 사람 손처럼 도구를 `grip`하지 않는다.
+
+선호:
+- nudge
+- press
+- pat
+- roll
+- steady
+- slide
+- tap
+
+피함:
+- chopsticks/tongs/knife를 손가락처럼 잡기
+- thumb/index-finger pinch
+- human wrist twist
+
+필요한 도구는 넓은 손잡이를 발바닥으로 눌러 움직이거나, 작은 그릇/판을 밀어 간접적으로 조작하는 동작을 우선한다.
 
 ## Prompt rule
 
-각 새 episode의 first generation 또는 새로운 독립 keyframe에는 HERO_CAT_V1과 KITCHEN_WORLD_V1을 명시한다. G2/G3는 직전 실제 usable frame을 First frame으로 넘겨 identity를 이어간다.
+각 새 episode의 G1/독립 keyframe에는 `HERO_CAT_V1_PAWS + POV_PAWS_MICROWORLD_V1 + KITCHEN_WORLD_V1` 의미를 명시한다.
 
-프롬프트를 길게 늘여 동일성을 강제하지 않는다. 핵심 외형 토큰 + 실제 reference frame + sequential frame chain을 함께 사용한다.
+G2/G3/G4는 직전 actual last usable frame을 First frame으로 넘겨 다음을 계승한다.
+- paw fur pattern
+- camera POV
+- workbench position
+- miniature scale
+- food state
+- light/material language
+
+텍스트로 full-cat identity를 반복해 얼굴이 다시 생성되게 하지 않는다.
 
 ## Channel asset rule
 
-프로필·배너·Shorts에서 같은 hero cat을 사용한다. 프로필/배너는 채널 identity reference이며, 이후 다른 털색이나 다른 apron의 고양이를 새 기본 캐릭터로 승격하지 않는다. 의도적으로 다른 캐릭터를 추가하려면 별도의 versioned identity와 세계관 이유가 필요하다.
+프로필·배너는 같은 HERO_CAT_V1의 얼굴을 보여주는 branding reference다. Shorts에서 얼굴이 안 보이는 것은 identity 충돌이 아니라 **의도된 촬영 문법**이다.
 
 ## Versioning
 
-현재 기본 버전: `HERO_CAT_V1` / `KITCHEN_WORLD_V1`.
+현재:
+- character identity: `HERO_CAT_V1`
+- Shorts camera/scale grammar: `POV_PAWS_MICROWORLD_V1`
+- world identity: `KITCHEN_WORLD_V1`
 
-실제 Flow에서 반복적으로 재현이 어려운 특징이 발견되면 외형을 임의 변경하지 말고 production data를 근거로 v2를 제안한다.
+실제 Flow 결과에서 재현성이 낮은 특징이 반복되면 production data를 근거로 version을 올린다.
