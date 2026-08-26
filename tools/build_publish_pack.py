@@ -133,9 +133,14 @@ def build(data: dict[str, Any]) -> str:
         f"- Creator signature: {sig or 'none'}",
         "- Keep this record with the episode so sponsorship/YPP reviews can quickly see the creative premise and authorship layer.",
         "",
-        "## Post-publish data entry",
+        "## Post-publish data entry — do not split learning truth",
         "",
-        "At 24h and 72h, record Studio metrics in analytics/shorts_metrics_v2.csv. Do not judge a winner from raw public views alone.",
+        "At 24h and 72h, enter only REAL YouTube Studio snapshots in `analytics/shorts_metrics_v2.csv`.",
+        "Do not prefill future rows with zeros; zero placeholders are not failed experiments.",
+        "After each real snapshot, also copy the matching horizon metrics into `analytics/learning_ledger.csv` together with the episode's actual Flow credits, rerolls, first-pass/QC, usable-motion, continuity and audio fields.",
+        "`shorts_metrics_v2.csv` is the raw horizon snapshot table; `learning_ledger.csv` is the canonical combined production + performance decision memory used by the continuous learning loop.",
+        "Compare 24h only with 24h and 72h only with 72h; do not judge a winner from raw public views alone.",
+        "See `docs/29_analytics_truth_model.md` before changing this data path.",
     ]
     return "\n".join(lines) + "\n"
 
