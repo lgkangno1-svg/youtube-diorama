@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last handoff update: **2026-08-26 KST**  
-Handoff baseline inspected before this update: `main@9ccbbdfaedb004f056baa5afd86ac4bf43ba4afa`  
+Handoff baseline inspected before this update: `main@599d0e26ead1e962e0f47c0d348aad8e65c1f195`  
 Repository: `lgkangno1-svg/youtube-diorama`
 
 > 이 문서는 **다른 AI/개발자가 이전 대화를 전혀 보지 않아도 Tiny Cat Kitchen을 이어서 개발·운영할 수 있게 하는 인수인계 source of truth**다.
@@ -26,6 +26,7 @@ Tiny Cat Kitchen의 목표는 단순한 `AI 고양이 요리 영상 생성`이 �
 - 최종 길이와 힐링 pacing 결정
 - 업로드 후 24h/72h 성과 학습
 - 다음 영상 후보 재평가
+- 최근 에피소드와 구조적으로 겹치는 아이디어 자동 차단
 
 사용자의 평소 인터페이스는 최대한 단순해야 한다.
 
@@ -62,6 +63,7 @@ Flow에서는 한꺼번에 크레딧을 쓰지 않고 G1부터 순차 생성한�
 - Flow prompt를 매번 새로 쓰지 않아도 됨
 - 생성 전 0-credit preflight로 큰 실패를 미리 차단
 - G1이 틀리면 뒤 generation을 쓰지 않음
+- 최근 5개 구조와 같은 conflict/ending 반복을 자동으로 차단
 - 실제 성과가 쌓이면 runtime / action / hook / credit 전략이 자동으로 더 좋아짐
 
 ---
@@ -157,17 +159,17 @@ Source of truth:
 
 Google Flow UI와 가격은 바뀔 수 있으므로 실제 생성 직전 확인한다.
 
-현재 운영 가정은 2026-08-26 공식 문서 재확인 기준:
+2026-08-26 공식 Google Flow 도움말 재확인 기준:
 
-- Google AI Pro: 1,000 credits / billing cycle
-- Veo 3.1 Lite: 4/6/8s + Extend, non-Ultra 10 credits/generation
-- output_count = 1
-- First+Last frames: Lite에서 4/6/8s 지원
+- Veo 3.1 Lite: 4/6/8s + Extend
+- non-Ultra: 10 credits/generation
+- output_count = 1을 직접 확인
+- First + Last frames: Lite에서 4/6/8s 지원
+- Ingredients/References와 Extend는 8s-only일 수 있음
 - 1080p upscale: Plus/Pro/Ultra 0 credits
+- Gemini Omni Flash 기존 영상 edit는 별도 고비용 경로이므로 G1/G2/G3 생성과 혼동 금지
 
-하지만 **실제 UI 표시값이 최종 source of truth**다.
-
-특히 기존 영상을 열어둔 `수정 사항 설명 / Omni Flash video edit` 화면을 새 Veo generation 화면으로 착각하지 않는다.
+**실제 UI 표시값이 최종 source of truth**다.
 
 ### Progressive Spend
 
@@ -223,8 +225,6 @@ G2는 G1의 실제 마지막 usable frame, G3는 G2, G4는 G3에서 이어간다
 
 실제 Tiny Cat Kitchen 24h/72h retention과 engaged-views/credit 데이터가 H40보다 더 긴 길이를 지지할 때만 실험한다.
 
-장기적으로는 `compact_h30`과 `immersive_h40`을 같은 관측 horizon에서 비교해 채널에 맞는 몰입 길이를 학습한다.
-
 ---
 
 ## 7. 오디오 정책
@@ -254,7 +254,12 @@ Quiet room tone + close tiny ASMR
 
 ## 8. 아이디어 선정 구조
 
-Source of truth: `ideas/episode_backlog.yaml`
+Source of truth:
+
+- `ideas/episode_backlog.yaml`
+- `ideas/novelty_signatures.yaml`
+- `tools/select_next_episode.py`
+- `docs/28_episode_novelty_authenticity_gate.md`
 
 현재 9축 base score:
 
@@ -275,6 +280,28 @@ Production eligibility hard gate:
 - paw-safe action family
 - H30/H40 runtime prior
 - 최근 episode fingerprint와 과도한 중복 없음
+
+### Deterministic recent-episode novelty gate
+
+2026-08-26부터 후보 선택 도구는 최근 5개 `episodes/TK-*.yaml`의 `episode_fingerprint`를 읽는다. 게시 전 `planned/ready` manifest도 이미 pipeline에 들어간 이야기이므로 recent window에 포함한다.
+
+`ideas/novelty_signatures.yaml`의 후보 구조와 비교해 다음을 exact hard-block한다.
+
+- 같은 `conflict_mechanic + ending_mechanic` pair
+- 같은 `hook + conflict + ending` triple
+
+의도적으로 exact comparison만 사용한다. AI fuzzy similarity를 사실처럼 자동 판정하지 않는다. 그보다 넓은 의미 유사성은 새 manifest 생성 전에 ChatGPT가 추가 검토한다.
+
+현재 이 gate의 중요한 효과:
+
+- `IDEA-009`는 이미 만들어진 TK-005 fingerprint와 동일하므로 **미래 후보로 다시 선택되지 않음**. 현재 `NEXT_EPISODE=TK-005`는 기존 production task이므로 변경하지 않는다.
+- `IDEA-002`는 TK-004의 gummy physics tension + measurement proof 구조를 사실상 반복하므로 **최근 window 동안 미래 선택에서 차단**된다. 다시 쓰려면 실제 conflict/resolution을 바꿔야 한다.
+
+### 왜 이 gate가 필요한가
+
+2026-08-26 재확인한 YouTube 공식 channel monetization policy는 repetitive / mass-produced 콘텐츠를 `inauthentic content`로 명확히 다루며, 자동화 도구/템플릿을 사용하더라도 최종 영상에는 original creative vision과 실제 entertainment/educational value가 있어야 한다고 안내한다.
+
+따라서 Tiny Cat Kitchen은 **브랜드 문법은 반복하되 이야기 substance까지 템플릿화하지 않는다.**
 
 ### Seasonal Search Lead
 
@@ -332,6 +359,7 @@ Source of truth:
 - stale evidence refresh 필요
 - 공식 Flow 가격/기능 변화
 - 실제 Tiny Cat Kitchen production/performance data 발생
+- deterministic tool이 문서상 필수 gate를 실제로 시행하지 못하는 gap 발견
 
 목적은 `뉴스 수집`이 아니라 **의사결정 개선**이다.
 
@@ -391,31 +419,32 @@ Manifest: `episodes/TK-005.yaml`
 
 ## 11. 현재 후보 상태 요약
 
-현재 강한 계절 후보:
-
-### IDEA-009 — 12mm 焼きいも
+### 현재 production task — IDEA-009 / TK-005 12mm 焼きいも
 
 - 이미 TK-005로 production-ready
-- strong visual satisfaction / Flow reliability / credit efficiency
+- visual satisfaction / Flow reliability / credit efficiency가 강함
 - broad autumn season
-- 현재 가장 중요한 것은 추가 연구가 아니라 **실제 G1 production result**
+- novelty gate 도입 후에는 **새 future episode로 다시 선택하지 않음**
+- 지금 가장 중요한 것은 추가 연구가 아니라 실제 G1 production result
 
-### IDEA-001 — 8mm 月見だんご
+### 다음 유력 계절 후보 — IDEA-001 8mm 月見だんご
 
-- 일본 relevance와 seasonality 매우 강함
+- 일본 relevance와 seasonality 강함
 - 2026-09-25 十五夜를 향해 선행 window가 커질 후보
 - yolk/customer 같은 복잡한 구조를 버리고 paw-safe roll/slide 형태로 단순화됨
+- recent exact conflict/ending duplicate에는 해당하지 않음
 
-### IDEA-002 — 3mm グミ
+### IDEA-002 3mm グミ
 
-- 9/3 グミの日 타이밍 강함
-- texture/deformation visual payoff 강함
-- deformable-object drift 때문에 Veo reliability는 焼きいも보다 낮음
+- 9/3 グミの日 타이밍과 texture payoff는 강함
+- 하지만 현재 abstract conflict + ending이 TK-004와 동일 계열이 아니라 **exact same pair로 선언되어 deterministic gate에서 차단**
+- 단순 제목/색상 변경으로 우회 금지. 실제 conflict/resolution을 새로 설계한 뒤 signature를 바꿔야 함
 
-### IDEA-006 — 10mm 栗ごはん
+### IDEA-006 10mm 栗ごはん
 
 - 9월 초~가을 recognition 증가
 - steam reveal과 tiny clay-pot worldbuilding 적합
+- recent exact structural duplicate 없음
 
 현재 NEXT_EPISODE를 매시간 뒤집지 않는다. TK-005를 실제로 만들어 production data를 얻는 것이 더 높은 가치다.
 
@@ -425,12 +454,14 @@ Manifest: `episodes/TK-005.yaml`
 
 중요 deterministic tools:
 
-- `tools/select_next_episode.py` — backlog / seasonal timing 기반 후보 확인
+- `tools/select_next_episode.py` — backlog / seasonal timing + **recent-five novelty gate** 기반 후보 확인
+- `ideas/novelty_signatures.yaml` — backlog 후보의 abstract hook/conflict/ending signature
 - `tools/validate_current_standard.py` — stale manifest / POV / runtime 규칙 차단
 - `tools/build_flow_pack.py` — episode manifest → 저토큰 Flow prompt pack
 - `tools/build_healing_edit_plan.py` — runtime/pacing edit plan
 - `tools/score_credit_efficiency.py` — actual production 성과 대비 credits 분석
 - `tools/make_next_short.ps1` — `NEXT_EPISODE`를 읽어 사용자용 bundle 생성
+- `tools/validate_handoff_update.py` — material change에 `PROJECT_HANDOFF.md`가 빠졌는지 로컬에서 검증
 
 자동 bundle 산출물:
 
@@ -482,9 +513,7 @@ engaged views / credit
 subscribers / 100 credits
 ```
 
-단순히 `credits/video`를 낮추는 것이 목적이 아니다.
-
-더 많은 engaged views와 subscriber conversion을 만드는 영상이면 합리적인 H40은 H30보다 우수할 수 있다.
+단순히 `credits/video`를 낮추는 것이 목적이 아니다. 더 많은 engaged views와 subscriber conversion을 만드는 영상이면 합리적인 H40은 H30보다 우수할 수 있다.
 
 ---
 
@@ -503,6 +532,8 @@ subscribers / 100 credits
 - [x] seasonal lead-time scoring
 - [x] seasonal evidence freshness/saturation 정책
 - [x] backlog 9축 scoring
+- [x] 최근 5개 conflict/ending exact-duplicate deterministic selection gate
+- [x] YouTube authenticity/anti-template 운영 원칙 문서화
 - [x] Flow UI generation/edit-mode 혼동 방지 문서
 - [x] production manifest validator
 - [x] deterministic Flow prompt pack
@@ -510,7 +541,7 @@ subscribers / 100 credits
 - [x] credit-efficiency scorer
 - [x] 실제 Flow 실패를 learning ledger에 반영하는 구조
 - [x] TK-005 12mm 焼きいも production-ready manifest
-- [x] PROJECT_HANDOFF 운영 문서 도입
+- [x] PROJECT_HANDOFF 운영 문서
 
 아직 완료되지 않은 핵심:
 
@@ -521,9 +552,10 @@ subscribers / 100 credits
 - [ ] 실제 24h/72h analytics 수집
 - [ ] H30 vs H40 실채널 retention 비교
 - [ ] paw action type별 first-pass success prior 학습
-- [ ] usable motion/credit의 실제 baseline 구축
+- [ ] usable motion/credit 실제 baseline 구축
 - [ ] engaged views/credit / subscribers/credit baseline 구축
 - [ ] season lead timing이 실제 성과에 도움이 되는지 검증
+- [ ] novelty gate가 너무 엄격하거나 느슨한지 실제 episode 누적 후 검증
 
 ---
 
@@ -559,7 +591,7 @@ subscribers / 100 credits
 - STW/APV와 beat별 이탈 가능성 해석
 - engaged views/credit
 - subscribers/100 credits
-- 댓글에서 `귀엽다 / 작다 / 힐링 / 다음 음식 요청` 같은 audience signal 추출
+- 댓글의 tiny/healing/next-food audience signal 추출
 
 한 편 데이터로 과도한 결론을 내리지 않는다.
 
@@ -571,8 +603,6 @@ subscribers / 100 credits
 - immersive_h40 38~46s
 
 을 같은 observation horizon에서 비교한다.
-
-판단은 APV 하나가 아니라 STW + engaged views/credit + subscriber conversion까지 함께 본다.
 
 ### Phase D — Production reliability model
 
@@ -587,24 +617,31 @@ subscribers / 100 credits
 - liquid pour failure rate
 - deformable gummy drift rate
 
-후보 scoring의 `Flow reliability / expected credit efficiency`에 실제 Tiny Cat Kitchen 데이터로 반영한다.
+후보 scoring의 `Flow reliability / expected credit efficiency`에 실제 데이터로 반영한다.
 
 ### Phase E — Seasonal timing learning
 
 현재 8~21일 pre-peak sweet spot은 초기 prior일 뿐이다.
 
-실제 seasonal episode를 통해:
+실제 seasonal episode를 통해 publish date → peak까지 남은 일수와 STW/APV/engaged views/credit/subscriber conversion을 비교한다.
 
-- publish date → peak까지 남은 일수
-- STW/APV
-- engaged views/credit
-- subscriber conversion
+### Phase F — Originality / authenticity learning
 
-을 비교해 우리 채널 고유의 season lead prior를 만든다.
+현재 novelty gate는 exact structural repeat만 fail-closed한다.
 
-### Phase F — 운영 자동화 단순화
+실제 episode가 늘어나면:
 
-장기적으로 사용자 경험을 다음까지 줄이는 것이 목표다.
+- 같은 hook family를 얼마나 자주 반복해도 피로하지 않은지
+- world-state change가 subscriber conversion에 도움이 되는지
+- seasonal 소재만 바꾼 template episode가 실제로 약한지
+
+를 데이터로 검증한다.
+
+fuzzy AI similarity score를 근거 없이 hard gate로 승격하지 않는다.
+
+### Phase G — 운영 자동화 단순화
+
+장기적으로 사용자 경험을 다음까지 줄인다.
 
 ```text
 사용자: 다음 영상 준비해줘
@@ -614,8 +651,6 @@ AI: 다음 후보 선정 + manifest/NEXT_EPISODE 준비 완료
 AI: PASS / EDITABLE / REROLL / STOP
 ```
 
-사용자가 YAML, scoring, research log, Flow prompt engineering을 직접 관리하지 않게 한다.
-
 ---
 
 ## 16. 다음 작업 우선순위
@@ -623,13 +658,13 @@ AI: PASS / EDITABLE / REROLL / STOP
 현재 시점의 우선순위:
 
 1. **TK-005 실제 G1 결과 확보** — 가장 가치가 높음
-2. G1에서 first-person/front-paws-only/tiny-scale 재현성 검증
+2. G1 first-person/front-paws-only/tiny-scale 재현성 검증
 3. 실제 Flow 표시 모델/비용 기록
 4. G2 sequential frame chain 검증
-5. G3/G4에서 prop continuity 검증
+5. G3/G4 prop continuity 검증
 6. 첫 export 길이 38~46s가 실제로 지루하지 않은지 검토
 7. 첫 게시 후 24h/72h 데이터 확보
-8. 그 다음에야 backlog score/runtime prior를 실제 성과로 조정
+8. 그 다음 backlog score/runtime prior/novelty prior를 실제 성과로 조정
 
 현재는 추가 계절 PR 수집보다 **실제 production truth**가 더 중요하다.
 
@@ -670,7 +705,7 @@ Flow 크레딧 사용, paid video generation, YouTube publish는 사용자 명�
 7. `docs/23_minimum_credit_operator_architecture.md` 읽기
 8. `production/NEXT_EPISODE.txt` + 해당 manifest 확인
 9. `analytics/learning_ledger.csv` 확인
-10. `ideas/episode_backlog.yaml` / research evidence 확인
+10. `ideas/episode_backlog.yaml` + `ideas/novelty_signatures.yaml` + research evidence 확인
 11. 다른 AI가 중간에 수정했을 가능성을 전제로 충돌/회귀 위험 확인
 12. 그 다음에만 수정 시작
 
@@ -701,6 +736,8 @@ Flow 크레딧 사용, paid video generation, YouTube publish는 사용자 명�
 - episode manifest 제작 구조 변경
 - backlog score/ranking 의미 있는 변경
 - analytics/learning 규칙 변경
+- candidate selection algorithm 변경
+- originality/novelty gate 변경
 - 새로운 실제 production/performance data
 - tools 동작 변경
 - 중요한 bug fix
@@ -722,6 +759,8 @@ Flow 크레딧 사용, paid video generation, YouTube publish는 사용자 명�
 - paid generation 자동 실행 금지
 - YouTube 자동 publish 금지
 - 경쟁작 exact title/plot/brand/ending 복제 금지
+- food/season/name만 바꾼 동일 conflict+ending 반복 금지
+- novelty signature 이름만 바꿔 gate 우회 금지
 - full-cat third-person으로 회귀 금지
 - 60초를 채우기 위한 padding 금지
 - 좋은 영상의 오디오만 문제라고 영상 reroll 금지
@@ -741,6 +780,7 @@ Flow 크레딧 사용, paid video generation, YouTube publish는 사용자 명�
 ```text
 아이디어 조사
 → 일본 타이밍 판단
+→ recent-episode novelty gate
 → paw-only/tiny-scale production-safe manifest
 → 0-credit frame preflight
 → progressive Flow generation
@@ -757,7 +797,8 @@ Flow 크레딧 사용, paid video generation, YouTube publish는 사용자 명�
 - usable motion / credit 상승
 - engaged views / credit 상승
 - subscribers / credit 상승
-- 사용자의 수동 프롬프트 작업 감소
+- 사용자 수동 프롬프트 작업 감소
+- 동일 template story 반복 감소
 
 가 나타나는 것이 최종 성공 기준이다.
 
@@ -765,10 +806,20 @@ Flow 크레딧 사용, paid video generation, YouTube publish는 사용자 명�
 
 ## 22. Change log
 
+### 2026-08-26 — Deterministic recent-episode novelty gate
+
+- 운영 문서에는 최근 5개 fingerprint 중복 제거가 있었지만 실제 `tools/select_next_episode.py`는 이를 자동 수행하지 않고 사람에게 확인을 넘기고 있던 gap을 발견.
+- `ideas/novelty_signatures.yaml`을 추가해 backlog 후보의 abstract hook/conflict/ending mechanics를 명시.
+- selector가 최근 5개 episode manifest의 `episode_fingerprint`를 읽고 동일 conflict+ending pair 또는 동일 hook+conflict+ending triple을 hard-block하도록 변경.
+- 계획/ready manifest도 recent window에 포함해 아직 게시되지 않은 production pipeline story와의 중복도 방지.
+- 현재 결과상 IDEA-009는 TK-005의 future repeat이므로 재선택 차단, IDEA-002는 TK-004와 동일 구조라 recent window에서 차단. 현재 NEXT_EPISODE TK-005 자체는 변경 없음.
+- `docs/28_episode_novelty_authenticity_gate.md`에 현재 YouTube 공식 inauthentic/repetitive content 정책과 Tiny Cat Kitchen용 anti-template 해석을 기록.
+- Flow 공식 가격/기능은 2026-08-26 재확인했고 기존 Veo 3.1 Lite progressive-spend 가정을 바꿀 근거 없음.
+
 ### 2026-08-26 — Handoff persistence introduced
 
 - `PROJECT_HANDOFF.md`를 프로젝트 최상위 인수인계 source of truth로 도입.
 - 현재 POV paws-only / tiny-scale / adaptive H30-H40 / sequential-frame / seasonal-learning 구조를 한 문서에서 복구 가능하게 정리.
 - 현재 NEXT_EPISODE TK-005와 실제 `POV-PREFLIGHT-001` 실패 학습 상태 기록.
 - 앞으로 material repo update와 handoff update를 같은 PR에 포함하는 규칙 도입.
-- GitHub Actions에 의존하지 않는 handoff-sync 검증을 추가하는 방향을 운영 규칙으로 고정.
+- GitHub Actions에 의존하지 않는 handoff-sync 검증을 추가.
