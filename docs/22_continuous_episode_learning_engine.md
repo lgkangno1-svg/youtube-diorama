@@ -7,6 +7,7 @@ Source of truth:
 - operator/credits: `docs/23_minimum_credit_operator_architecture.md`
 - character/world: `docs/24_hero_cat_brand_identity.md`
 - Shorts framing/scale: `docs/25_pov_paws_microworld_grammar.md`
+- research update gate: `docs/27_research_evidence_saturation_gate.md`
 - candidates: `ideas/episode_backlog.yaml`
 - learning: `analytics/learning_ledger.csv`
 
@@ -21,6 +22,36 @@ Source of truth:
 6. 근거가 있을 때만 backlog/docs/tools/manifests 갱신
 
 의미 있는 새 근거가 없으면 repo를 바꾸지 않는다.
+
+### 1.1 Evidence saturation / no-churn gate
+
+정기 연구의 목적은 `새 링크 수집`이 아니라 **의사결정 상태가 바뀌는 새 정보**를 찾는 것이다.
+
+같은 후보에 대해 이미 다음 중 2개 이상이 현재 freshness window 안에 있으면 `seasonal evidence saturated`로 본다.
+- behavioral demand: 방문/투표/예약/검색/판매 등 실제 행동 신호
+- independent nationwide activation: 서로 다른 전국 단위 사업자/채널의 활성화
+- current preference/demand survey: 표본과 대상이 명시된 현재 조사
+- culturally dated activation: 실제 예약/판매/행사 시작으로 달력 이벤트가 행동 단계에 들어감
+
+saturated 상태에서 **동일 종류의 추가 상품 출시/PR/매장 확대**만 발견되면 기본적으로 commit하지 않는다.
+
+새 commit을 허용하는 조건은 최소 하나다.
+- candidate score 또는 ranking이 실제로 바뀜
+- NEXT_EPISODE 선택/발행 타이밍이 바뀜
+- evidence class가 바뀜: supply/recognition → behavioral demand 등
+- 기존 근거와 모순되는 신호가 생김
+- 새 production mechanic이 도출되고 Flow reliability/retention 가설에 영향을 줌
+- 기존 evidence가 stale해져 freshness를 갱신해야 함
+- 공식 Flow 가격/기능이 바뀜
+- 실제 Tiny Cat Kitchen 24h/72h production/performance 데이터가 새로 생김
+
+다음은 **repo 변경 사유가 아니다.**
+- 이미 강한 고구마 근거가 있는데 또 다른 카페가 고구마 메뉴를 발표
+- 이미 전국 月見 activation이 확인됐는데 또 다른 브랜드가 月見 상품을 출시
+- 같은 texture story를 반복하는 gummy PR이 하나 더 나옴
+- 점수/순위/manifest/production timing에 아무 영향이 없는 홍보성 기사 추가
+
+`research/benchmark_log.csv`는 증거 아카이브가 아니라 **의사결정 메모리**다. 반복 신호는 기존 `seasonal_evidence.yaml`의 source list를 늘리는 것조차 필요하지 않으면 그대로 둔다.
 
 ## 2. Backlog scoring
 
@@ -113,11 +144,12 @@ G4는 단순 runtime padding이면 금지한다. 48~60초는 실제 channel rete
 
 생성 직전 official Flow docs + 실제 UI를 확인한다.
 
-현재 2026-08-25 운영 기준:
+현재 2026-08-26 재확인 기준:
 - Google AI Pro: 1,000 credits / billing cycle
 - Veo 3.1 Lite 4/6/8s + Extend: non-Ultra 10 credits/generation
 - output_count=1
 - 1080p upscale: Plus/Pro/Ultra 0 credits
+- First + Last frames: Veo 3.1 Lite에서 4/6/8s 지원
 
 진행:
 
