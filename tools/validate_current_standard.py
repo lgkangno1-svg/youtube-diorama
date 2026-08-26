@@ -10,6 +10,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 EPISODES = ROOT / "episodes"
+CURRENT_NON_ULTRA_LITE_CREDITS_PER_GENERATION = 10
 
 
 def load_episode(episode_id: str) -> dict[str, Any]:
@@ -17,6 +18,13 @@ def load_episode(episode_id: str) -> dict[str, Any]:
     if not path.exists():
         raise SystemExit(f"Missing episode manifest: {path}")
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def to_int(value: Any, *, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def validate(data: dict[str, Any]) -> list[str]:
@@ -55,27 +63,79 @@ def validate(data: dict[str, Any]) -> list[str]:
 
     if flow.get("primary_model") != "veo-3.1-lite":
         errors.append("flow_strategy.primary_model must be veo-3.1-lite")
-    if int(flow.get("output_count", 0) or 0) != 1:
+    if to_int(flow.get("output_count")) != 1:
         errors.append("flow_strategy.output_count must be 1")
 
-    max_gens = int(flow.get("max_lite_generations_first_pass", 0) or 0)
+    if not isinstance(scenes, list) or not scenes:
+        errors.append("manifest must contain at least one production scene")
+        scenes = []
+
+    max_gens = to_int(flow.get("max_lite_generations_first_pass"))
+    declared_budget = to_int(flow.get("non_ultra_credit_budget_first_pass"), default=-1)
     runtime_mode = str(runtime.get("mode") or "compact_h30")
-    if max_gens > 4:
+    scene_count = len(scenes)
+
+    if max_gens <= 0:
+        errors.append("flow_strategy.max_lite_generations_first_pass must be a positive integer")
+    elif max_gens > 4:
         errors.append("first-pass Lite generations must be <=4")
-    if len(scenes) > 4:
+
+    if scene_count > 4:
         errors.append("manifest must contain at most 4 first-pass production scenes")
 
-    if max_gens == 4 or len(scenes) == 4:
-        if runtime_mode != "immersive_h40":
-            errors.append("4-generation first pass requires runtime_strategy.mode=immersive_h40")
-        if int(runtime.get("minimum_distinct_motion_beats", 0) or 0) < 4:
+    # Spend plan must describe the exact manifest being prepared. A stale value here
+    # can make the operator stop too early or spend a scene that was not intended.
+    if max_gens > 0 and max_gens != scene_count:
+        errors.append(
+            "flow_strategy.max_lite_generations_first_pass must equal the number of manifest scenes "
+            f"({max_gens} declared vs {scene_count} scenes)"
+        )
+
+    if max_gens > 0:
+        expected_budget = max_gens * CURRENT_NON_ULTRA_LITE_CREDITS_PER_GENERATION
+        if declared_budget != expected_budget:
+            errors.append(
+                "flow_strategy.non_ultra_credit_budget_first_pass must match the current Lite first-pass ceiling "
+                f"({expected_budget} for {max_gens} generations at "
+                f"{CURRENT_NON_ULTRA_LITE_CREDITS_PER_GENERATION} credits/generation; declared {declared_budget})"
+            )
+
+    if runtime_mode == "compact_h30":
+        if scene_count != 3 or max_gens != 3:
+            errors.append("compact_h30 must declare exactly 3 scenes and 3 first-pass Lite generations")
+    elif runtime_mode == "immersive_h40":
+        if scene_count != 4 or max_gens != 4:
+            errors.append("immersive_h40 must declare exactly 4 scenes and 4 first-pass Lite generations")
+        if to_int(runtime.get("minimum_distinct_motion_beats")) < 4:
             errors.append("immersive_h40 requires minimum_distinct_motion_beats >=4")
         if not str(runtime.get("fourth_beat_value") or "").strip():
             errors.append("immersive_h40 requires a documented fourth_beat_value; G4 cannot be padding")
+    elif scene_count == 4 or max_gens == 4:
+        # Unknown/custom runtime modes are allowed, but a 4-generation plan still needs
+        # an explicit reason for the fourth spend.
+        if not str(runtime.get("fourth_beat_value") or "").strip():
+            errors.append("a 4-generation custom runtime requires a documented fourth_beat_value")
 
+    allowed_generation_types = {"first_plus_last", "extend"}
     for i, scene in enumerate(scenes, 1):
-        if int(scene.get("generation_seconds", 0) or 0) != 8:
-            errors.append(f"G{i} generation_seconds must be 8")
+        expected_id = f"G{i}"
+        if str(scene.get("id") or "") != expected_id:
+            errors.append(f"scene {i} id must be {expected_id}")
+
+        generation_type = str(scene.get("generation_type") or "first_plus_last")
+        if generation_type not in allowed_generation_types:
+            errors.append(f"{expected_id} generation_type must be first_plus_last or extend")
+
+        if to_int(scene.get("generation_seconds")) != 8:
+            errors.append(f"{expected_id} generation_seconds must be 8")
+
+        if generation_type == "first_plus_last":
+            if not str(scene.get("start_frame") or "").strip():
+                errors.append(f"{expected_id} first_plus_last requires start_frame")
+            if not str(scene.get("end_frame") or "").strip():
+                errors.append(f"{expected_id} first_plus_last requires end_frame")
+        elif generation_type == "extend" and not str(scene.get("source_scene") or "").strip():
+            errors.append(f"{expected_id} extend requires source_scene")
 
     expected_starts = {
         2: "ACTUAL_LAST_USABLE_FRAME_G1",
@@ -83,8 +143,11 @@ def validate(data: dict[str, Any]) -> list[str]:
         4: "ACTUAL_LAST_USABLE_FRAME_G3",
     }
     for index, expected in expected_starts.items():
-        if len(scenes) >= index and str(scenes[index - 1].get("start_frame", "")) != expected:
-            errors.append(f"G{index} must start from {expected}")
+        if len(scenes) >= index:
+            scene = scenes[index - 1]
+            if str(scene.get("generation_type") or "first_plus_last") == "first_plus_last":
+                if str(scene.get("start_frame") or "") != expected:
+                    errors.append(f"G{index} must start from {expected}")
 
     serialized = yaml.safe_dump(data, allow_unicode=True).lower()
     for legacy_token in (
