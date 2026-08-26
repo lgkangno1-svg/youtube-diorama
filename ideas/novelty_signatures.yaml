@@ -1,4 +1,4 @@
-updated_at: 2026-08-26
+updated_at: 2026-08-27
 schema_version: 1
 purpose: deterministic_recent_episode_structure_guard
 rules:
@@ -43,3 +43,7 @@ signatures:
     hook_mechanic: paw_to_object_impossible_scale_contrast
     conflict_mechanic: slow_skin_crack
     ending_mechanic: quiet_world_resolution
+  IDEA-010:
+    hook_mechanic: new_rice_micro_scale_reveal
+    conflict_mechanic: single_press_mold_shape_reveal
+    ending_mechanic: dawn_breakfast_shelf_resolution
