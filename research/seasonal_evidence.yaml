@@ -1,4 +1,4 @@
-updated_at: 2026-08-26
+updated_at: 2026-08-27
 default_max_age_days: 14
 evidence:
   IDEA-001:
@@ -42,3 +42,12 @@ evidence:
       - "https://prtimes.jp/main/html/rd/p/000000359.000110949.html"
       - "https://prtimes.jp/main/html/rd/p/000000194.000107337.html"
     abstract_lesson: "The early-September chestnut window is now visibly active across Japanese dining and sweets categories. Keep IDEA-006 as a secondary seasonal candidate after TK-005: use only generic chestnut, steam, tiny-clay-pot and warm-autumn cues, never branded menu styling or product shapes. Do not raise audience-demand scores from launch announcements alone."
+  IDEA-010:
+    checked_at: "2026-08-27"
+    market: JP
+    signal: "New-rice/onigiri relevance is supported by both category demand and actual 2026 rice reservation behavior. The Onigiri Society's 2026 trend analysis is based partly on responses from four major convenience-store chains and describes onigiri as an expanding everyday staple, while Pal System reported 2026 reserved-rice registrations from 202,437 people and 305,710 registered units. Komeri is actively taking 2026 new-rice reservations through 2026-08-31 for sequential delivery from early September. This is stronger than a product-launch signal because it includes direct reservation behavior, though it still does not prove Shorts performance."
+    sources:
+      - "https://www.onigiri.or.jp/archives/6576"
+      - "https://information.pal-system.co.jp/press/260619-reservation-rice/"
+      - "https://www.komeri.com/contents/syunya/season/rice/yoyaku.html"
+    abstract_lesson: "A generic new-rice salt onigiri is timely, culturally legible and globally understandable without copying any retailer. For Veo reliability, avoid finger-shaped hand molding and seaweed wrapping; use one tiny triangular mold, one broad paw press, one slide-away reveal, visible rice gloss/steam and a quiet dawn breakfast resolution. Treat the current data as category/season demand evidence, not a promise that this episode will outperform."
