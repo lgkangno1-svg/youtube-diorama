@@ -30,12 +30,11 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host ""
 Write-Host "PROGRESSIVE FLOW SPEND" -ForegroundColor Yellow
-Write-Host "A. Approve free reference/keyframe images first."
-Write-Host "B. Generate G1 only (8s Lite, output count 1). Stop if identity/scale is wrong."
-Write-Host "C. Save G1's actual last usable frame in Flow and use it as G2 First frame."
-Write-Host "D. Generate G2 only after G1 passes."
-Write-Host "E. Save G2's actual last usable frame and use it as G3 First frame."
-Write-Host "F. Generate G3 only if the final Short still needs the payoff/resolution motion."
+Write-Host "A. Approve the free reference/keyframe images first."
+Write-Host "B. Generate G1 only (Veo 3.1 Lite, output count 1, current displayed cost verified). Stop if POV/identity/scale/anatomy is wrong."
+Write-Host "C. After each PASS, save that scene's actual last usable frame when the Flow pack requires it for the next First frame."
+Write-Host "D. Continue one scene at a time. Never spend G2 before G1 PASS or G3 before G2 PASS."
+Write-Host "E. If the manifest/runtime is compact_h30, normally finish at G3. If it is immersive_h40, G4 is allowed only after G3 PASS and only for its documented independent world-resolution beat."
+Write-Host "F. generated/${EpisodeId}_flow_pack.md and ${EpisodeId}_bundle.md are the episode-specific source of truth for scene count, frame inputs, and runtime intent."
 Write-Host ""
-Write-Host "Default ceiling: H30 = three 8-second Veo 3.1 Lite generations." -ForegroundColor Green
-Write-Host "Do not spend the next 10 credits just because they are available."
+Write-Host "Do not force every episode into H30 or H40. Follow the current manifest and stop rather than pad." -ForegroundColor Green
