@@ -140,6 +140,14 @@ def validate(data: dict[str, Any]) -> list[str]:
         if to_int(scene.get("generation_seconds")) != 8:
             errors.append(f"{expected_id} generation_seconds must be 8")
 
+        # A paid scene without a concrete motion instruction or a guard can still
+        # produce a syntactically valid Flow Pack, but it leaves Veo to invent the
+        # action/constraints and creates avoidable reroll risk. Fail before credits.
+        if not str(scene.get("action") or "").strip():
+            errors.append(f"{expected_id} action must be non-empty before paid generation")
+        if not str(scene.get("action_guard") or "").strip():
+            errors.append(f"{expected_id} action_guard must be non-empty before paid generation")
+
         if generation_type == "first_plus_last":
             start_frame = str(scene.get("start_frame") or "").strip()
             end_frame = str(scene.get("end_frame") or "").strip()
