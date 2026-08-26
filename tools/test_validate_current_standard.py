@@ -32,6 +32,12 @@ def base_manifest() -> dict:
             "non_ultra_credit_budget_first_pass": 30,
             "narration_policy": "none_by_default",
         },
+        "keyframes": {
+            "KF0_OPEN": "approved opening frame",
+            "KF1_TARGET": "approved first target",
+            "KF2_TARGET": "approved second target",
+            "KF3_TARGET": "approved final target",
+        },
         "scenes": [
             {
                 "id": "G1",
@@ -85,6 +91,7 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
                 "end_frame": "KF4_TARGET",
             }
         )
+        data["keyframes"]["KF4_TARGET"] = "approved fourth target"
         data["flow_strategy"]["max_lite_generations_first_pass"] = 4
         data["flow_strategy"]["non_ultra_credit_budget_first_pass"] = 40
         errors = validate(data)
@@ -107,6 +114,21 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         errors = validate(data)
         self.assertIn("scene 2 id must be G2", errors)
         self.assertIn("G2 first_plus_last requires end_frame", errors)
+
+    def test_referenced_keyframe_must_exist(self) -> None:
+        data = base_manifest()
+        data["scenes"][1]["end_frame"] = "KF2_CRCK"
+        errors = validate(data)
+        self.assertIn(
+            "G2 end_frame references undefined keyframe KF2_CRCK; define it in manifest.keyframes before preparing Flow files",
+            errors,
+        )
+
+    def test_keyframe_prompt_must_not_be_empty(self) -> None:
+        data = base_manifest()
+        data["keyframes"]["KF2_TARGET"] = ""
+        errors = validate(data)
+        self.assertIn("keyframe KF2_TARGET must contain a non-empty prompt", errors)
 
 
 if __name__ == "__main__":

@@ -34,6 +34,7 @@ def validate(data: dict[str, Any]) -> list[str]:
     runtime = data.get("runtime_strategy") or {}
     flow = data.get("flow_strategy") or {}
     scenes = data.get("scenes") or []
+    keyframes = data.get("keyframes") or {}
 
     if brand.get("hero_cat") != "HERO_CAT_V1":
         errors.append("brand_identity.hero_cat must be HERO_CAT_V1")
@@ -65,6 +66,16 @@ def validate(data: dict[str, Any]) -> list[str]:
         errors.append("flow_strategy.primary_model must be veo-3.1-lite")
     if to_int(flow.get("output_count")) != 1:
         errors.append("flow_strategy.output_count must be 1")
+
+    if not isinstance(keyframes, dict) or not keyframes:
+        errors.append("manifest must define non-empty keyframes for approved free First/Last frame targets")
+        keyframes = {}
+    else:
+        for keyframe_name, keyframe_prompt in keyframes.items():
+            if not str(keyframe_name or "").startswith("KF"):
+                errors.append(f"keyframe name must start with KF: {keyframe_name}")
+            if not str(keyframe_prompt or "").strip():
+                errors.append(f"keyframe {keyframe_name} must contain a non-empty prompt")
 
     if not isinstance(scenes, list) or not scenes:
         errors.append("manifest must contain at least one production scene")
@@ -130,10 +141,23 @@ def validate(data: dict[str, Any]) -> list[str]:
             errors.append(f"{expected_id} generation_seconds must be 8")
 
         if generation_type == "first_plus_last":
-            if not str(scene.get("start_frame") or "").strip():
+            start_frame = str(scene.get("start_frame") or "").strip()
+            end_frame = str(scene.get("end_frame") or "").strip()
+            if not start_frame:
                 errors.append(f"{expected_id} first_plus_last requires start_frame")
-            if not str(scene.get("end_frame") or "").strip():
+            if not end_frame:
                 errors.append(f"{expected_id} first_plus_last requires end_frame")
+
+            # Any planned KF token shown in the generated Flow Pack must resolve to a
+            # real approved free keyframe in this manifest. Otherwise a typo such as
+            # KF2_CRCK can pass preparation and only fail when the operator is ready to
+            # spend credits.
+            for role, frame_token in (("start_frame", start_frame), ("end_frame", end_frame)):
+                if frame_token.startswith("KF") and frame_token not in keyframes:
+                    errors.append(
+                        f"{expected_id} {role} references undefined keyframe {frame_token}; "
+                        "define it in manifest.keyframes before preparing Flow files"
+                    )
         elif generation_type == "extend" and not str(scene.get("source_scene") or "").strip():
             errors.append(f"{expected_id} extend requires source_scene")
 
