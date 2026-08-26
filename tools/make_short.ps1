@@ -25,6 +25,8 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host ""
 Write-Host "NEXT:" -ForegroundColor Green
 Write-Host "1. Open generated/${EpisodeId}_bundle.md"
-Write-Host "2. Approve the keyframes/contact sheet before spending Flow credits."
-Write-Host "3. Follow generated/${EpisodeId}_flow_pack.md and aim for three 8-second Lite generations (H30)."
-Write-Host "4. Do not reroll a whole episode for one bad shot."
+Write-Host "2. Approve the free keyframes/contact sheet before spending Flow credits."
+Write-Host "3. Follow generated/${EpisodeId}_flow_pack.md scene by scene; do not assume every episode is H30/three generations."
+Write-Host "4. Generate only the next scene allowed by the manifest/runtime gate, and only after the previous scene passes QC."
+Write-Host "5. Save the previous scene's actual last usable frame whenever the Flow pack requires it for the next First frame."
+Write-Host "6. Do not reroll a whole episode for one bad shot or add/drop a scene merely to hit a target length."

@@ -33,6 +33,31 @@ def load_manifest(path: Path) -> dict[str, Any]:
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
 
 
+def runtime_guidance(data: dict[str, Any]) -> str:
+    """Return operator guidance that respects the manifest's runtime policy."""
+    runtime = data.get("runtime_strategy", {}) or {}
+    mode = str(runtime.get("mode") or "adaptive")
+    scenes = data.get("scenes", []) or []
+
+    if mode == "compact_h30":
+        return (
+            "- Runtime mode: `compact_h30`. Normally finish after G3 when the tactile journey is complete; "
+            "do not add a G4 merely to make the Short longer."
+        )
+    if mode == "immersive_h40":
+        fourth_value = str(runtime.get("fourth_beat_value") or "independent world-resolution beat")
+        return (
+            "- Runtime mode: `immersive_h40`. G4 is part of the current plan only after G3 PASS and only while "
+            f"its documented independent value remains real (`{fourth_value}`). Do not drop it merely to force H30, "
+            "and do not keep it if real footage turns it into padding."
+        )
+
+    return (
+        f"- Runtime mode: `{mode}` with {len(scenes)} planned scene(s). Follow the manifest/Flow pack scene count; "
+        "do not assume a fixed H30 or H40 length."
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("manifest", type=Path)
@@ -76,6 +101,9 @@ def main() -> int:
     signature = data.get("creator_signature", {}).get("signature_line", "")
     strategy = data.get("flow_strategy", {}) or {}
     post = data.get("post_production", {}) or {}
+    runtime = data.get("runtime_strategy", {}) or {}
+    runtime_mode = runtime.get("mode", "adaptive")
+    target_runtime = post.get("preferred_final_runtime_seconds") or runtime.get("target_final_runtime_seconds") or []
     planned = int(strategy.get("max_lite_generations_first_pass") or len(data.get("scenes", [])) or 4)
     non_ultra = int(strategy.get("non_ultra_credit_budget_first_pass") or planned * 10)
     ultra = int(strategy.get("ultra_credit_budget_first_pass") or planned * 5)
@@ -83,6 +111,12 @@ def main() -> int:
     pacing = strategy.get("pacing", "controlled")
     narration_policy = strategy.get("narration_policy", post.get("narration_default", "none_by_default"))
     motion_density = int(post.get("target_motion_density_pct_min", 0) or 0)
+    if isinstance(target_runtime, (list, tuple)) and len(target_runtime) == 2:
+        runtime_target_text = f"{target_runtime[0]}–{target_runtime[1]}s"
+    elif target_runtime:
+        runtime_target_text = str(target_runtime)
+    else:
+        runtime_target_text = "manifest-defined"
 
     bundle_index.write_text(
         "\n".join(
@@ -96,6 +130,8 @@ def main() -> int:
                 f"- Title: {title}",
                 f"- Hook: {hook}",
                 f"- Creator signature: {signature or 'none'}",
+                f"- Runtime mode: {runtime_mode}",
+                f"- Preferred final runtime: {runtime_target_text}",
                 f"- Pacing: {pacing}",
                 f"- Narration policy: {narration_policy}",
                 f"- Flow pack: `{flow_pack.relative_to(root)}`",
@@ -109,7 +145,7 @@ def main() -> int:
                 "",
                 f"- Publish pack: `{publish_pack.relative_to(root)}`",
                 f"- Keep moving-footage density at or above {motion_density}% when specified; calm does not mean static.",
-                "- Do not pad the Short just to hit 40 seconds; accept a strong 30–36 second cut.",
+                runtime_guidance(data),
                 "- Check first 0.5–1.0s readability and cat/tool/scale continuity.",
                 "- Check that the final pace still feels calm after editing; do not create urgency with unnecessary cuts.",
                 "- Default to no narration. If voice is used, record it in post and keep it episode-specific.",
