@@ -1,4 +1,4 @@
-updated_at: 2026-08-26
+updated_at: 2026-08-27
 scoring:
   benchmark_evidence: 10
   japan_relevance: 10
@@ -248,3 +248,32 @@ candidates:
     trend_window: null
     narration_recommendation: none
     status: candidate
+  - id: IDEA-010
+    working_title_ja: "猫の前足で作る、8mmの新米塩むすび。"
+    premise: "True first-person cat POV. A tiny triangular rice mold holding glossy just-cooked new rice sits between two front paws; one paw presses the broad flat mold lid once, the mold is slid away to reveal one 8mm salt onigiri with visible steam and individual rice grains, then the tiny wooden board is nudged into a quiet dawn breakfast shelf."
+    visual_grammar: POV_PAWS_MICROWORLD_V1
+    hero_scale: "8mm; <=0.30 paw width"
+    paw_action_family: [press, slide, nudge]
+    runtime_prior: compact_h30
+    benchmark_mechanic: [new_rice_season, familiar_japanese_food, single_press_shape_reveal, steam_and_rice_gloss_payoff]
+    benchmark_evidence: 18
+    japan_relevance: 20
+    healing_fit: 20
+    visual_satisfaction: 18
+    flow_reliability: 19
+    originality: 16
+    worldbuilding: 18
+    audience_demand: 18
+    expected_credit_efficiency: 19
+    trend_window: "2026-08-27..2026-10-15"
+    seasonality:
+      type: broad_food_season
+      label_ja: "新米・おにぎり"
+      peak_start: "2026-09-01"
+      peak_end: "2026-10-15"
+      lead_days: 21
+      tail_days: 7
+      searchability: 18
+    narration_recommendation: none
+    status: priority_candidate
+    production_note: "Current evidence combines year-2026 onigiri demand/format signals with actual 2026 rice reservation behavior and active new-rice preorder/delivery timing. Keep the food generic and unbranded. Use one broad mold press and one slide/reveal instead of fingertip shaping, seaweed wrapping, or precise pinching. This is a future candidate only; do not replace the already-prepared TK-005 production task mid-run."
