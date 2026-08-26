@@ -13,12 +13,13 @@ evidence:
   IDEA-009:
     checked_at: "2026-08-26"
     market: JP
-    signal: "Sweet-potato/yakiimo relevance is supported by live autumn retail launches, a current preference survey, and behavioral event attendance: Summer Satsumaimo Expo 2026 drew about 28,000 visitors across four days and 207 entries."
+    signal: "Sweet-potato/yakiimo relevance is supported by live autumn retail launches, a current preference survey, behavioral event attendance, and a newly announced nationwide Starbucks Japan sweet-potato campaign starting 2026-09-02. The category is moving from niche/seasonal evidence into broad mainstream autumn visibility before September fully begins."
     sources:
       - "https://prtimes.jp/main/html/rd/p/000002701.000002360.html"
       - "https://prtimes.jp/main/html/rd/p/000001892.000030525.html"
       - "https://prtimes.jp/main/html/rd/p/000000193.000047899.html"
-    abstract_lesson: "Interest is active before September, but production should stay generic and low-complexity: one tiny whole sweet potato, slow heat, skin crack, steam and golden-center reveal; never copy event vendors or winning menus."
+      - "https://prtimes.jp/main/html/rd/p/000000262.000033194.html"
+    abstract_lesson: "Interest is rising into a broad early-September mainstream window. Prefer publishing a generic yakiimo episode before or around the first national September launches, while keeping production low-complexity: one tiny whole sweet potato, slow heat, skin crack, steam and golden-center reveal. Never copy a branded beverage, package, menu design or campaign wording."
   IDEA-002:
     checked_at: "2026-08-25"
     market: JP
