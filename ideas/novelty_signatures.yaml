@@ -1,0 +1,45 @@
+updated_at: 2026-08-26
+schema_version: 1
+purpose: deterministic_recent_episode_structure_guard
+rules:
+  recent_episode_window: 5
+  hard_block_same_conflict_and_ending_pair: true
+  hard_block_same_hook_conflict_ending_triple: true
+  note: "This file describes abstract mechanics only. It must not encode another creator's exact title, plot, branded product, packaging, or ending."
+signatures:
+  IDEA-001:
+    hook_mechanic: seasonal_scale_rounding
+    conflict_mechanic: tiny_dumpling_rounding_precision
+    ending_mechanic: moon_window_serving_resolution
+  IDEA-002:
+    hook_mechanic: scale_plus_physics_question
+    conflict_mechanic: progressive_tension_near_snap
+    ending_mechanic: proof_resolution_with_measurement
+  IDEA-003:
+    hook_mechanic: rainy_micro_stall_scale_reveal
+    conflict_mechanic: weather_ambience_serving_control
+    ending_mechanic: awning_steam_service_resolution
+  IDEA-004:
+    hook_mechanic: one_drop_numeric_constraint
+    conflict_mechanic: fragile_single_fold_precision
+    ending_mechanic: tiny_pan_forward_reveal
+  IDEA-005:
+    hook_mechanic: after_hours_color_transformation
+    conflict_mechanic: tiny_liquid_fill_control
+    ending_mechanic: quiet_window_serving_resolution
+  IDEA-006:
+    hook_mechanic: tiny_claypot_seasonal_reveal
+    conflict_mechanic: lid_and_steam_control
+    ending_mechanic: chestnut_rice_bowl_slide_resolution
+  IDEA-007:
+    hook_mechanic: progressive_micro_jelly_color_question
+    conflict_mechanic: sequential_display_selection
+    ending_mechanic: moon_yellow_display_resolution
+  IDEA-008:
+    hook_mechanic: after_hours_tiny_bakery_scale_reveal
+    conflict_mechanic: dough_to_crust_transformation
+    ending_mechanic: tomorrow_serving_niche_resolution
+  IDEA-009:
+    hook_mechanic: paw_to_object_impossible_scale_contrast
+    conflict_mechanic: slow_skin_crack
+    ending_mechanic: quiet_world_resolution
