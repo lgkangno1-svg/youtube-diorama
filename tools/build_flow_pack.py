@@ -72,6 +72,38 @@ def scale_clause(data: dict[str, Any]) -> str:
     return "; ".join(parts) + "."
 
 
+def frame_input_instruction(frame_name: Any, *, role: str) -> str:
+    """Turn manifest frame tokens into explicit operator input instructions.
+
+    The manifest intentionally uses symbolic ACTUAL_LAST_USABLE_FRAME_Gn tokens so
+    planned continuity never pretends to know the real generated frame. The Flow
+    pack should translate those tokens into an action the operator can perform.
+    """
+    token = str(frame_name or "").strip()
+    if not token:
+        return f"{role}: not specified in manifest — STOP and repair the manifest before spending credits."
+
+    prefix = "ACTUAL_LAST_USABLE_FRAME_"
+    if token.startswith(prefix):
+        source_scene = token[len(prefix) :]
+        return (
+            f"{role}: upload the ACTUAL saved last usable frame from {source_scene}. "
+            "Do not substitute a planned keyframe or regenerate the previous scene just to create a cleaner bridge."
+        )
+
+    if token.startswith("KF"):
+        return f"{role}: use the approved FREE target/reference keyframe `{token}` from this pack."
+
+    return f"{role}: use the manifest-specified frame source `{token}` after visually confirming it is the intended approved input."
+
+
+def next_scene_uses_actual_frame(scenes: list[dict[str, Any]], index: int, scene_id: str) -> bool:
+    if index + 1 >= len(scenes):
+        return False
+    next_start = str((scenes[index + 1] or {}).get("start_frame") or "")
+    return next_start == f"ACTUAL_LAST_USABLE_FRAME_{scene_id}"
+
+
 def build(data: dict[str, Any]) -> str:
     episode_id = data["episode_id"]
     refs = ", ".join(data.get("references", [])) or "HERO_CAT_V1_PAWS, POV_PAWS_MICROWORLD_V1, KITCHEN_WORLD_V1"
@@ -119,6 +151,13 @@ def build(data: dict[str, Any]) -> str:
         "- A beautiful third-person full-cat chef shot is a FAIL for this channel's default Shorts grammar.",
         "- Keep First+Last continuity shots on Lite; do not spend the next generation until the previous one passes QC.",
         "",
+        "## Sequential-frame operator rule",
+        "",
+        "- A token like `ACTUAL_LAST_USABLE_FRAME_G1` is NOT an image to generate. It means: after G1 passes QC, save the real last usable frame from that generated clip and upload that saved image as the next scene's First frame.",
+        "- Never replace an actual-frame token with the prettier planned target keyframe. Planned keyframes define destinations; actual saved frames carry continuity forward.",
+        "- If the previous scene did not PASS, do not create its continuity frame for the purpose of unlocking the next spend. Fix/reroll only the failed scene first.",
+        "- When a next scene depends on the current scene's actual frame, save it immediately after PASS with a clear local filename such as `G1_last_usable.png`.",
+        "",
         "## Production-card approval",
         "",
         f"- Title: {data.get('title', '')}",
@@ -144,7 +183,7 @@ def build(data: dict[str, Any]) -> str:
 
     lines += [f"## {len(scenes)} video generations", ""]
 
-    for scene in scenes:
+    for index, scene in enumerate(scenes):
         scene_id = scene.get("id", "G")
         generation_type = humanize(scene.get("generation_type") or "first plus last")
         action = humanize(scene.get("action"))
@@ -162,6 +201,9 @@ def build(data: dict[str, Any]) -> str:
             lines += [
                 f"### {scene_id}: EXTEND {source_scene} ({seconds}s operation)",
                 "",
+                f"- Source clip: use the QC-PASS output from `{source_scene}` only.",
+                "- Spend gate: do not extend a failed or merely planned scene.",
+                "",
                 "```text",
                 f"Continue seamlessly from the supplied source clip. Action: {action}. Guard: {guard}. {pacing_clause}{cut_clause} "
                 f"{scale} {LOCK} {POV_STYLE} No dialogue. No music. Keep only tiny close ASMR appropriate to the visible action.",
@@ -174,6 +216,12 @@ def build(data: dict[str, Any]) -> str:
             lines += [
                 f"### {scene_id}: {start} → {end} ({seconds}s)",
                 "",
+                "**Operator inputs before Generate**",
+                "",
+                f"- {frame_input_instruction(start, role='First frame')}",
+                f"- {frame_input_instruction(end, role='Last frame')}",
+                "- Re-check: Veo 3.1 Lite / 9:16 / output 1 / displayed cost / correct new-video generation mode.",
+                "",
                 "```text",
                 f"Animate naturally from the supplied first frame to the supplied last frame in {seconds} seconds. Action: {action}. Guard: {guard}. "
                 f"{pacing_clause}{cut_clause} {scale} {LOCK} {POV_STYLE} "
@@ -181,6 +229,15 @@ def build(data: dict[str, Any]) -> str:
                 "```",
                 "",
             ]
+            if next_scene_uses_actual_frame(scenes, index, str(scene_id)):
+                lines += [
+                    f"**After {scene_id} PASS**",
+                    "",
+                    f"- Save the actual last usable frame from {scene_id} now; the next scene requires it as First frame.",
+                    f"- Suggested local filename: `{scene_id}_last_usable.png`.",
+                    f"- Do not generate the next scene until this saved frame has been visually checked for POV, scale, paw anatomy, prop state and camera continuity.",
+                    "",
+                ]
 
     lines += [
         "## QC shorthand",
@@ -192,6 +249,7 @@ def build(data: dict[str, Any]) -> str:
         "- CAMERA FAIL: third-person chef composition",
         "- PADDING FAIL: extra generation adds duration but no independent beat",
         "- UI MODE FAIL: existing-video edit/Omni Flash edit was mistaken for a new Veo Lite scene",
+        "- FRAME CHAIN FAIL: next scene used a planned keyframe or wrong still instead of the previous PASS scene's actual saved last usable frame",
         "",
         "## Failure escalation",
         "",
@@ -201,6 +259,7 @@ def build(data: dict[str, Any]) -> str:
         "4. Never generate G2/G3/G4 proactively before the previous generation passes.",
         "5. Do not buy G4 merely to reach a target duration; use it only for a distinct world-resolution or tactile payoff beat.",
         "6. If Flow opens an existing-video edit mode or Omni Flash video edit, return to new-video generation and re-check model/mode/cost before spending.",
+        "7. If the required previous-scene actual frame was not saved, recover it from the PASS clip before continuing; do not substitute the planned target frame.",
     ]
     return "\n".join(lines) + "\n"
 
