@@ -28,9 +28,12 @@ evidence:
       - "https://www.family.co.jp/company/news_releases/2026/20260821_01.html"
     abstract_lesson: "Borrow only the sensory-question mechanic; do not reproduce product shapes, names or branded endings."
   IDEA-006:
-    checked_at: "2026-08-25"
+    checked_at: "2026-08-26"
     market: JP
-    signal: "Sweet-potato and chestnut autumn-sweets rollouts are appearing in Japanese retail ahead of September."
+    signal: "Chestnut is moving into a concrete early-September Japanese autumn-food window. On 2026-08-26 multiple independent food businesses announced September 1 chestnut launches, including an exact 栗ご飯 seasonal menu plus separate chestnut sweets/bakery products. This is breadth-of-season evidence, not proof of demand magnitude."
     sources:
-      - "https://prtimes.jp/main/html/rd/p/000000087.000037893.html"
-    abstract_lesson: "Chestnut remains a valid seasonal ingredient, but prioritize simple steam/reveal actions over multi-step preparation."
+      - "https://prtimes.jp/main/html/rd/p/000000505.000019495.html"
+      - "https://prtimes.jp/main/html/rd/p/000000083.000143487.html"
+      - "https://prtimes.jp/main/html/rd/p/000000359.000110949.html"
+      - "https://prtimes.jp/main/html/rd/p/000000194.000107337.html"
+    abstract_lesson: "The early-September chestnut window is now visibly active across Japanese dining and sweets categories. Keep IDEA-006 as a secondary seasonal candidate after TK-005: use only generic chestnut, steam, tiny-clay-pot and warm-autumn cues, never branded menu styling or product shapes. Do not raise audience-demand scores from launch announcements alone."
