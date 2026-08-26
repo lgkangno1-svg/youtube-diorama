@@ -1,9 +1,9 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-27 KST**  
-Baseline: `main@46acf51806ce7df89183c30354e8a548d1885d14`
+Baseline inspected before this change: `main@95c65b7991327840138bc8abfe486a2b0485e00c`
 
-This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn this file.
+This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer should be able to continue from this repository without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
 ## Mission
 
@@ -13,7 +13,7 @@ Build a Japanese-target Shorts operating system, not merely an AI-cat generator.
 다음 영상 준비해줘
 ```
 
-The system should research current Japanese/global signals, choose a novelty-safe episode, prepare the manifest and `production/NEXT_EPISODE.txt`, generate deterministic local operator packs, and learn from production + 24h/72h YouTube results. The user runs:
+The system researches current Japanese/global signals, chooses a novelty-safe episode, prepares the manifest and `production/NEXT_EPISODE.txt`, generates deterministic local operator packs, and learns from production plus 24h/72h YouTube results. The user runs:
 
 ```powershell
 ./tools/make_next_short.ps1
@@ -29,7 +29,7 @@ Default visual grammar is `POV_PAWS_MICROWORLD_V1`:
 - true first-person cat POV
 - only cream + pale-ginger front paws visible near the lower edge
 - no cat face/head/body/full-cat reveal
-- hero food/object normally 5–20mm and no more than 0.50 of one visible paw width
+- hero food/object normally 5–20mm and <=0.50 of one visible paw width
 - macro miniature diorama workbench
 - mostly locked camera
 - one calm tactile primary action + at most one micro-payoff per 8s generation
@@ -43,13 +43,13 @@ The core appeal is not showing a cute cat face. It is making the viewer feel lik
 
 Canonical docs: `docs/23_minimum_credit_operator_architecture.md`, `docs/26_flow_ui_mode_preflight.md`.
 
-Official Google Flow help rechecked 2026-08-27:
+Official Google Flow help rechecked **2026-08-27**:
 - Veo 3.1 Lite 4s/6s/8s + Extend: non-Ultra 10 credits/generation
 - First + Last frames: Lite supports 4s/6s/8s
 - output count = 1
 - 1080p upscaling: 0 credits for Plus/Pro/Ultra
-- some Ingredients/References and Extend modes can be 8s-only
-- the actual Flow UI model/mode/output-count/displayed cost is the generation-time source of truth
+- Ingredients/References can be 8s-only
+- actual Flow UI model/mode/output-count/displayed cost is the generation-time source of truth
 
 Do not confuse an existing-video edit / Omni Flash edit screen with standard new-video generation.
 
@@ -96,23 +96,25 @@ Sequential continuity uses the real previous PASS frame, not the prettier planne
 - novelty/authenticity gate against recent repeated hook/conflict/ending fingerprints
 - seasonal evidence saturation/no-churn gate
 - manifest scene-count/runtime/credit consistency validation
-- local regression tests for runtime, frame chain, novelty, and manifest consistency
+- keyframe-reference integrity: planned `KF*` tokens must exist and contain non-empty prompts
+- **scene-action integrity: every paid G scene must have a non-empty `action` and `action_guard` before operator files are prepared**
+- local regression tests for runtime, frame chain, novelty, manifest consistency, keyframes, and scene-action instructions
 
-## New in this change — Keyframe Reference Integrity Gate
+## Latest change — Scene Action Integrity Gate
 
 Problem found before TK-005 production:
-- `tools/validate_current_standard.py` checked that a first+last scene had non-empty `start_frame` / `end_frame`, but it did not confirm that a planned `KF*` token actually existed in the manifest's `keyframes:` map.
-- A typo such as `KF2_CRCK` could therefore pass preparation while `build_flow_pack.py` presented it as an approved free target/reference frame.
-- That creates operator confusion and can cause an improvised replacement frame, continuity drift, or an avoidable reroll.
+- `tools/validate_current_standard.py` validated scene count, frame inputs, runtime and credit ceilings but did not require `action` or `action_guard` text.
+- A malformed future manifest could therefore pass preparation and produce a Flow Pack containing effectively `Action: . Guard: .`.
+- That delegates the critical motion and safety constraints to Veo, increasing POV/scale/anatomy drift and avoidable reroll risk.
 
 Fix:
-- episode manifest must contain a non-empty `keyframes` map
-- each keyframe prompt must be non-empty
-- every planned `KF*` used as a First/Last frame must resolve to an actual keyframe entry
-- undefined KF references fail closed before production files are prepared
-- `tools/test_validate_current_standard.py` now covers undefined references and empty keyframe prompts
+- every G scene now requires a non-empty `action`
+- every G scene now requires a non-empty `action_guard`
+- this applies before any paid generation, including first+last and Extend scenes
+- regression tests cover empty action and whitespace-only guard
+- existing test fixtures now model real production scenes with explicit action/guard text
 
-This gate uses no Flow credits.
+This gate uses 0 Flow credits and does not change TK-005's story, runtime, or credit budget.
 
 ## Research / idea policy
 
@@ -128,7 +130,7 @@ Current candidate state:
 - IDEA-010 8mm 新米塩むすび is a future candidate backed by current rice-reservation behavior
 - IDEA-002 gummy is blocked against a recent equivalent conflict/ending structure
 
-Fresh 2026-08-27 research did not justify another research/backlog commit: Flow assumptions are unchanged; new autumn retail/event signals do not change existing evidence class/ranking; current Japanese AI-cat popularity still supports character/worldbuilding, which is already in the production prior.
+Fresh 2026-08-27 research does **not** justify another research/backlog change: Flow assumptions are unchanged and additional autumn retail signals do not change current evidence class, candidate ranking, or NEXT_EPISODE.
 
 ## Current production state
 
@@ -149,20 +151,21 @@ Beats:
 3. same tray slides away; residual heat opens the existing crack and reveals golden center
 4. same tray slides into the tiny serving niche; paws withdraw; steam remains
 
-Continuity rules:
+Continuity and action rules:
 - same roasting tray G1–G4
 - no surprise new cookware
 - no direct pinch/grab of the sweet potato
 - G2 First = actual last usable frame from G1
 - G3 First = actual last usable frame from G2
 - G4 First = actual last usable frame from G3
-- all planned KF references must resolve before `make_next_short.ps1` prepares the Flow pack
+- all planned KF references must resolve before preparation
+- every G1–G4 scene already has explicit `action` and `action_guard`, so TK-005 is compatible with the new gate
 
 The highest-value next real-world step is still **generate TK-005 G1 only and QC it**. Automation must not spend that credit for the user.
 
 ## Production learning available so far
 
-`analytics/learning_ledger.csv` currently contains a real preflight failure showing:
+`analytics/learning_ledger.csv` currently contains one real preflight failure showing:
 - third-person/full-cat framing
 - body visible
 - scale too large
@@ -174,7 +177,7 @@ Hard response:
 - hero object <=0.50 paw width
 - prefer nudge/press/slide family
 
-There is not yet enough real 24h/72h public performance data. Never learn from placeholder zeroes as if they were real performance.
+There is not yet enough real 24h/72h public performance data. Never learn from placeholder zeroes as real performance.
 
 Long-term KPIs:
 
@@ -201,7 +204,7 @@ At 24h/72h record Stayed to watch, APV, engaged views, subscribers, comments, fi
 Compare compact_h30 vs immersive_h40 on APV, engaged views/credit, subscribers/100 credits, and beat drop-off.
 
 ### Phase D — operator simplification
-Keep reducing manual judgment so `다음 영상 준비해줘` remains sufficient. Update UI/tooling only when actual Flow behavior or production evidence changes.
+Keep reducing manual judgment so `다음 영상 준비해줘` remains sufficient. Update tooling only when actual Flow behavior or production evidence changes.
 
 ### Phase E — worldbuilding expansion
 Only after performance evidence supports it, expand tiny-stall, rainy-shop, after-hours bakery, seasonal ritual, and other distinct worlds without repeating the same story fingerprint.
@@ -241,6 +244,7 @@ Stale chat or automation wording never overrides newer merged repository state.
 - no third-person/full-cat regression
 - no substitute planned frame for an actual previous PASS frame
 - no undefined/missing KF improvisation at production time
+- **no paid scene with blank action or blank action_guard**
 - no next-scene spend after previous-scene failure
 - no scene-count/runtime/credit mismatch
 - no padding G4 merely to hit a duration
@@ -254,7 +258,7 @@ Stale chat or automation wording never overrides newer merged repository state.
 current research
 → scored + novelty-safe candidate
 → POV/tiny-scale production-safe manifest
-→ spend/runtime/keyframe consistency PASS
+→ spend/runtime/keyframe/action consistency PASS
 → free frame preflight
 → progressive Flow generation
 → actual-frame continuity chain
@@ -268,27 +272,28 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-27 — Keyframe reference integrity gate
-Baseline `main@46acf51806ce7df89183c30354e8a548d1885d14`.
+### 2026-08-27 — Scene action integrity gate
+Baseline `main@95c65b7991327840138bc8abfe486a2b0485e00c`.
 
 Changed:
-- fail closed when manifest keyframes are missing/empty
-- fail closed when planned `KF*` First/Last references are undefined
-- add regression coverage for undefined keyframe and empty keyframe prompt
+- require non-empty `action` for every paid scene
+- require non-empty `action_guard` for every paid scene
+- add regression coverage and realistic action-bearing test fixtures
 - synchronize this handoff
 
 Verified assumptions:
-- current TK-005 KF0–KF4 structure is compatible with the new validation model
-- current official Flow pricing/features are unchanged as of 2026-08-27
-- fresh research did not justify candidate ranking, NEXT_EPISODE, or research-log changes
+- current TK-005 G1–G4 all provide action + action_guard and remain compatible
+- official Flow pricing/features remain unchanged on 2026-08-27
+- no fresh research justified ranking/NEXT_EPISODE changes
 
 Unchanged:
 - NEXT_EPISODE = TK-005
-- TK-005 story/runtime
+- TK-005 story/runtime/40-credit first-pass ceiling
 - candidate ranking
 - no credits spent, no paid generation, no publishing
 
 ### Earlier 2026-08-27 work
+- keyframe-reference integrity gate
 - manifest spend consistency fail-closed gate
 - runtime-aware operator guidance
 - explicit Flow First/Last frame mapping
