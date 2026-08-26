@@ -23,6 +23,7 @@
 - `docs/23_minimum_credit_operator_architecture.md` — 최소 조작/크레딧 구조
 - `docs/24_hero_cat_brand_identity.md` — 고양이/주방 identity
 - `docs/25_pov_paws_microworld_grammar.md` — **Shorts 1인칭 앞발-only / 초소형 scale 문법**
+- `docs/26_flow_ui_mode_preflight.md` — **Flow 새 생성 vs 기존 영상 수정 상태 / 모델·길이·비용 preflight**
 - `research/benchmark_log.csv` — 성공 메커니즘 기억
 - `ideas/episode_backlog.yaml` — 후보와 점수
 - `analytics/learning_ledger.csv` — 실제 제작비/성과/학습
@@ -101,14 +102,17 @@ python tools/select_next_episode.py --top 3
 생성 직전 실제 UI에서 확인:
 
 ```text
+새 영상 generation 상태
 Veo 3.1 Lite
 9:16
-8 seconds
+8 seconds 또는 현재 mode가 8s-only임을 확인
 output count = 1
-표시 비용 = 10 credits / generation (현재 UI가 그렇게 보일 때)
+표시 비용 = 현재 공식표/실제 UI와 일치
 ```
 
-UI가 다르면 생성하지 말고 모델/비용을 다시 확인한다.
+**기존 영상을 열어둔 수정 화면은 G1/G2/G3 생성 화면이 아니다.** `수정 사항 설명` 계열 입력창이나 `Omni Flash` video-edit 상태가 보이면 먼저 standard 새 동영상 generation 화면으로 돌아간다. 현재 공식 Flow 문서상 Omni Flash video edit는 Veo Lite 생성보다 훨씬 비싸므로, 이를 10-credit G scene으로 착각하지 않는다.
+
+4s/6s/8s selector가 안 보인다고 바로 오류로 판단하지 않는다. Veo Lite의 Ingredients/References-to-Video와 Extend는 8s-only일 수 있고, 기존 영상 edit 상태에서도 UI가 다르게 보일 수 있다. **duration selector 자체보다 active model + generation mode + output count + displayed cost 확인을 우선한다.** 자세한 절차는 `docs/26_flow_ui_mode_preflight.md`.
 
 ## Runtime / credit 선택
 
@@ -233,7 +237,7 @@ subscribers / 100 credits
 ```text
 1. ChatGPT: "다음 영상 준비해줘"
 2. PowerShell: ./tools/make_next_short.ps1
-3. Flow: G1만 생성
+3. Flow: 새 동영상 generation 상태인지 확인 → G1만 생성
 4. ChatGPT: "G1 만들었어. 봐줘"
 5. PASS일 때만 G2 → G3 → 필요하면 G4
 6. 업로드 후 Studio 수치/스크린샷 공유
