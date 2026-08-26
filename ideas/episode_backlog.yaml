@@ -187,7 +187,7 @@ candidates:
     paw_action_family: [steady, slide]
     runtime_prior: compact_h30
     benchmark_mechanic: [familiar_japanese_food, steam_payoff, seasonal_worldbuilding]
-    benchmark_evidence: 15
+    benchmark_evidence: 17
     japan_relevance: 18
     healing_fit: 20
     visual_satisfaction: 18
@@ -207,6 +207,7 @@ candidates:
       searchability: 14
     narration_recommendation: none
     status: candidate
+    production_note: "2026-08-26 multiple Japanese businesses announced September-1 chestnut launches, including an exact seasonal 栗ご飯 menu. Treat this as stronger timing/recognition evidence, not proof of demand magnitude. Keep the Flow-safe tiny clay-pot steam reveal and never copy a retailer's dish styling, garnish, package or branded presentation."
   - id: IDEA-007
     working_title_ja: "最後の3mmゼリーだけ、月の色。"
     premise: "True first-person cat POV. Four 3mm translucent jellies sit on a thumbnail-sized display tile; one paw taps each tile edge in sequence and the final jelly catches warm moon-yellow light, becoming the tiny display piece."
