@@ -3,6 +3,7 @@
 목표: **벤치마크 → 시즌 선행 신호 → POV paw-only 아이디어 → 저실패 Flow 제작 → 24h/72h 성과 → 다음 episode**가 한 저장소에서 누적되게 한다.
 
 Source of truth:
+- handoff/current progress: `PROJECT_HANDOFF.md`
 - production: `CURRENT_STANDARD.md`
 - operator/credits: `docs/23_minimum_credit_operator_architecture.md`
 - character/world: `docs/24_hero_cat_brand_identity.md`
@@ -10,6 +11,19 @@ Source of truth:
 - research update gate: `docs/27_research_evidence_saturation_gate.md`
 - candidates: `ideas/episode_backlog.yaml`
 - learning: `analytics/learning_ledger.csv`
+
+## 0. Before every loop — recover current state first
+
+이전 assistant/개발자의 기억을 최신 상태라고 가정하지 않는다.
+
+매 실행 시작 시:
+1. 최신 `main` SHA와 최근 commits/PR 확인
+2. `PROJECT_HANDOFF.md` 확인
+3. START_HERE / CURRENT_STANDARD / NEXT_EPISODE / recent manifest / analytics를 교차 확인
+4. 다른 AI/개발자가 중간에 수정한 변경, 충돌, 회귀 위험 확인
+5. 그 다음에만 연구 또는 수정 시작
+
+Material repository change가 생기면 **같은 branch/PR에서 `PROJECT_HANDOFF.md`도 반드시 갱신**한다. NO-OP 연구 회차는 handoff를 억지로 건드리지 않는다.
 
 ## 1. Research loop
 
@@ -20,6 +34,7 @@ Source of truth:
 4. Flow 공식 가격/기능 재확인
 5. 실제 Tiny Cat Kitchen production failures와 24h/72h performance 확인
 6. 근거가 있을 때만 backlog/docs/tools/manifests 갱신
+7. **repo를 수정했다면 같은 변경 안에서 PROJECT_HANDOFF.md의 현재 상태/다음 우선순위/change log 갱신**
 
 의미 있는 새 근거가 없으면 repo를 바꾸지 않는다.
 
@@ -113,6 +128,7 @@ ChatGPT 처리:
 6. H30 vs immersive H40 결정
 7. episode manifest 생성/수정
 8. `production/NEXT_EPISODE.txt` 갱신
+9. material 변경이 있으면 `PROJECT_HANDOFF.md` 현재 상태/플랜 동기화
 
 ## 5. Runtime learning — H30 vs H40
 
@@ -217,3 +233,34 @@ subscribers / 100 credits
 최종 목표:
 
 > **시청자가 고양이의 앞발이 된 듯한 시점에서 믿기 어려울 만큼 작은 세계를 조심스럽게 만드는 감각에 빠져드는 Shorts를 가장 적은 실패 generation으로 만든다.**
+
+## 10. Handoff persistence / completion gate
+
+`PROJECT_HANDOFF.md`는 일회성 보고서가 아니라 지속적인 인수인계 상태다.
+
+Material change 예:
+- CURRENT_STANDARD/production mechanics 변경
+- NEXT_EPISODE 또는 manifest 변경
+- backlog score/ranking 의미 있는 변경
+- research evidence가 의사결정을 바꿈
+- analytics/learning rule 또는 실제 production/performance data 변경
+- tools 동작 변경
+- Flow 공식 가격/기능 assumption 변경
+- 운영 인터페이스 변경
+
+위 변화가 있으면 같은 branch/PR에서 handoff의 다음을 갱신한다.
+- 현재 완료 상태
+- 현재 제작 상태
+- 중요한 결정/실패/학습
+- 다음 작업 우선순위
+- change log
+
+로컬에서 가능하면 merge 전에:
+
+```powershell
+python tools/validate_handoff_update.py --base origin/main
+```
+
+을 실행한다. GitHub Actions minutes는 이 gate의 전제조건이 아니다.
+
+**repo가 바뀌었는데 handoff가 바뀌지 않은 material PR은 완료로 간주하지 않는다.**

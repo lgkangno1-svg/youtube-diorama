@@ -2,6 +2,15 @@
 
 목표: 사용자가 매번 주제·대본·Flow 프롬프트를 고민하지 않고 **한 문장 → 준비 완료 → Flow에서 필요한 generation만 순차 생성 → 24h/72h 학습**을 반복한다.
 
+## 작업 시작 전 가장 먼저
+
+다른 AI/개발자가 중간에 수정했을 수 있으므로 이전 대화 기억을 최신 상태라고 가정하지 않는다.
+
+1. 최신 `main` SHA와 최근 PR/commit 확인
+2. **`PROJECT_HANDOFF.md`를 먼저 읽어 현재 개발 의도·완료 상태·NEXT 작업을 복구**
+3. 아래 source of truth를 교차 확인
+4. 충돌/회귀 위험을 확인한 뒤에만 수정 시작
+
 ## 사용자가 평소 말할 것
 
 ```text
@@ -18,12 +27,14 @@
 
 ## Source of truth
 
+- `PROJECT_HANDOFF.md` — **개발 의도 / 목표 / 현재 완료 상태 / 앞으로의 플랜 / 인수인계 change log**
 - `CURRENT_STANDARD.md` — 최신 production 기준
 - `docs/22_continuous_episode_learning_engine.md` — 연구/학습 루프
 - `docs/23_minimum_credit_operator_architecture.md` — 최소 조작/크레딧 구조
 - `docs/24_hero_cat_brand_identity.md` — 고양이/주방 identity
 - `docs/25_pov_paws_microworld_grammar.md` — **Shorts 1인칭 앞발-only / 초소형 scale 문법**
 - `docs/26_flow_ui_mode_preflight.md` — **Flow 새 생성 vs 기존 영상 수정 상태 / 모델·길이·비용 preflight**
+- `docs/27_research_evidence_saturation_gate.md` — research no-churn / evidence saturation
 - `research/benchmark_log.csv` — 성공 메커니즘 기억
 - `ideas/episode_backlog.yaml` — 후보와 점수
 - `analytics/learning_ledger.csv` — 실제 제작비/성과/학습
@@ -62,6 +73,7 @@
 - narration 필요 여부
 - episode manifest 생성/수정
 - `production/NEXT_EPISODE.txt` 갱신
+- **material repo 변경이 있으면 `PROJECT_HANDOFF.md`도 같은 branch/PR에서 갱신**
 
 후보만 확인:
 
@@ -231,6 +243,27 @@ subscribers / 100 credits
 ```
 
 특히 `30~36s compact_h30`과 `38~46s immersive_h40`을 비교해 실제 채널에 맞는 몰입 길이를 학습한다.
+
+## Handoff persistence gate
+
+repo를 실제로 수정하는 모든 material 작업은 `PROJECT_HANDOFF.md`를 같은 branch/PR에서 갱신해야 완료로 본다.
+
+로컬 검증:
+
+```powershell
+python tools/validate_handoff_update.py --base origin/main
+```
+
+이 검사는 GitHub Actions를 필요로 하지 않는다.
+
+최소 갱신 대상:
+- 현재 개발 완료 상태
+- 현재 제작 상태 / NEXT_EPISODE
+- 새로 확정된 중요한 결정/실패/학습
+- 다음 작업 우선순위
+- change log
+
+의미 있는 개선이 없어 repo를 NO-OP으로 유지한 회차는 handoff도 억지로 수정하지 않는다.
 
 # 가장 간단한 실제 사용법
 
