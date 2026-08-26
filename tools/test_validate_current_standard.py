@@ -45,6 +45,8 @@ def base_manifest() -> dict:
                 "generation_seconds": 8,
                 "start_frame": "KF0_OPEN",
                 "end_frame": "KF1_TARGET",
+                "action": "one paw nudges the tiny tray a few millimeters",
+                "action_guard": "front paws only; preserve tiny scale; no gripping",
             },
             {
                 "id": "G2",
@@ -52,6 +54,8 @@ def base_manifest() -> dict:
                 "generation_seconds": 8,
                 "start_frame": "ACTUAL_LAST_USABLE_FRAME_G1",
                 "end_frame": "KF2_TARGET",
+                "action": "one paw steadies the tray while the surface changes slowly",
+                "action_guard": "same POV and scale; one calm action; no tool grip",
             },
             {
                 "id": "G3",
@@ -59,6 +63,8 @@ def base_manifest() -> dict:
                 "generation_seconds": 8,
                 "start_frame": "ACTUAL_LAST_USABLE_FRAME_G2",
                 "end_frame": "KF3_TARGET",
+                "action": "one paw slides the finished tray into the serving position",
+                "action_guard": "same tray and camera; no new prop; no full cat",
             },
         ],
     }
@@ -89,6 +95,8 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
                 "generation_seconds": 8,
                 "start_frame": "ACTUAL_LAST_USABLE_FRAME_G3",
                 "end_frame": "KF4_TARGET",
+                "action": "one paw slides the tray into a quiet final niche",
+                "action_guard": "same tray and POV; no padding or new cookware",
             }
         )
         data["keyframes"]["KF4_TARGET"] = "approved fourth target"
@@ -129,6 +137,18 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         data["keyframes"]["KF2_TARGET"] = ""
         errors = validate(data)
         self.assertIn("keyframe KF2_TARGET must contain a non-empty prompt", errors)
+
+    def test_scene_action_must_not_be_empty(self) -> None:
+        data = base_manifest()
+        data["scenes"][0]["action"] = ""
+        errors = validate(data)
+        self.assertIn("G1 action must be non-empty before paid generation", errors)
+
+    def test_scene_action_guard_must_not_be_empty(self) -> None:
+        data = base_manifest()
+        data["scenes"][2]["action_guard"] = "  "
+        errors = validate(data)
+        self.assertIn("G3 action_guard must be non-empty before paid generation", errors)
 
 
 if __name__ == "__main__":
