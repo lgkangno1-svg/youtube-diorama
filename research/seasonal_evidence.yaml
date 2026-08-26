@@ -4,12 +4,14 @@ evidence:
   IDEA-001:
     checked_at: "2026-08-26"
     market: JP
-    signal: "月見 / 中秋 seasonal activity is now moving from general late-August commercialization into explicit 2026-09-25 十五夜 reservation and limited-sale windows across multiple Japanese traditional-food retailers."
+    signal: "月見 / 中秋 seasonal activity has now moved beyond traditional-food reservation windows into nationwide mass-market activation. KFC began nationwide limited 月見 sales and TV advertising on 2026-08-26, while McDonald's announced an eight-item nationwide 月見 lineup for 2026-09-02. This is strong recognition/visibility evidence, not direct proof that a specific Tiny Cat Kitchen concept will perform."
     sources:
       - "https://www.daitora.jp/ic/otukimi"
       - "https://prtimes.jp/main/html/rd/p/000000237.000008274.html"
       - "https://nagomi-yoneya.co.jp/item-event/2026-otsukimi/"
-    abstract_lesson: "The dated-event signal is strengthening before the peak. Use only generic moon, round-dumpling, harvest-night and warm-light cues; never copy a retailer's rabbit design, package, exact arrangement or branded product."
+      - "https://japan.kfc.co.jp/news_release/8167"
+      - "https://www.zaikei.co.jp/releases/3583487/"
+    abstract_lesson: "The dated-event signal has entered a broad national visibility phase well before the September 25 peak. Keep IDEA-001 highly recognizable but generic: use only moon, round-dumpling, harvest-night and warm-light cues. Never copy a chain's burger, egg presentation, rabbit design, package, campaign wording or branded arrangement, and do not inflate audience-demand scores from promotional supply alone."
   IDEA-009:
     checked_at: "2026-08-26"
     market: JP
