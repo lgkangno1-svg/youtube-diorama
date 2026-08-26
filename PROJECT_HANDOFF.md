@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last handoff update: **2026-08-27 KST**  
-Work-start baseline inspected for this update: `main@3301e8ced2c97e35630ad2914bb499848d0a0ebc`  
+Work-start baseline inspected for this update: `main@d85cb29c94f76cc9c1f8c1d0efbe406b7e452e34`  
 Repository: `lgkangno1-svg/youtube-diorama`
 
 > 이 문서는 이전 대화를 모르는 다른 AI/개발자도 Tiny Cat Kitchen을 바로 이어서 운영·개선할 수 있게 하는 인수인계 source of truth다.
@@ -12,7 +12,7 @@ Repository: `lgkangno1-svg/youtube-diorama`
 
 ## 1. 프로젝트 개발 의도
 
-Tiny Cat Kitchen은 단순한 `AI 고양이 요리 영상 생성기`가 아니다. 목표는 사용자가 매번 아이디어, 일본 트렌드, 대본, Flow 프롬프트, 장면 길이, 실패 리스크, 크레딧 효율, 업로드 후 학습까지 직접 관리하지 않아도 되는 **일본 타깃 Shorts 운영체제**를 만드는 것이다.
+Tiny Cat Kitchen은 단순한 `AI 고양이 요리 영상 생성기`가 아니다. 사용자가 매번 아이디어, 일본 트렌드, Flow 프롬프트, 장면 길이, 실패 리스크, 크레딧 효율, 업로드 후 학습까지 직접 관리하지 않아도 되는 **일본 타깃 Shorts 운영체제**를 만드는 것이 목표다.
 
 사용자의 정상 인터페이스는 가능한 한 아래 한 문장에 가까워야 한다.
 
@@ -22,17 +22,17 @@ Tiny Cat Kitchen은 단순한 `AI 고양이 요리 영상 생성기`가 아니�
 
 이 요청을 받으면 시스템이:
 
-1. 최신 일본/글로벌 AI-cat, miniature cooking, ASMR, relaxing-food, adjacent Shorts를 조사
-2. 일본 시즌/문화/음식/소셜 신호를 확인
-3. 경쟁작은 복제하지 않고 성공 메커니즘만 추출
+1. 최신 일본/글로벌 AI-cat, miniature cooking, ASMR, relaxing-food, adjacent Shorts 조사
+2. 일본 시즌/문화/음식/소셜 신호 확인
+3. 경쟁작의 exact title/plot/brand/ending을 복제하지 않고 성공 메커니즘만 추출
 4. production/analytics history 확인
-5. 후보를 Japan relevance, healing fit, visual satisfaction, Veo reliability, originality, worldbuilding, audience demand, expected usable-quality-per-credit 관점에서 재평가
+5. 후보를 Japan relevance, healing fit, visual satisfaction, Veo reliability, originality, worldbuilding, audience demand, expected usable-quality-per-credit로 재평가
 6. 최근 episode fingerprint와 구조 중복 차단
 7. 다음 episode manifest 생성/수정
 8. `production/NEXT_EPISODE.txt` 갱신
-9. 사용자가 로컬에서 `./tools/make_next_short.ps1`만 실행하면 되는 상태로 준비
+9. 사용자가 `./tools/make_next_short.ps1`만 실행하면 되는 상태로 준비
 
-까지 담당하는 것이 목표다.
+까지 담당한다.
 
 Flow 크레딧 사용, paid video generation, YouTube publish는 사용자 명시 행동 없이 자동으로 하지 않는다.
 
@@ -52,16 +52,13 @@ Flow 크레딧 사용, paid video generation, YouTube publish는 사용자 명�
 
 ### 운영자 경험
 
-사용자는:
-
-- 아이디어를 매번 새로 고르지 않아도 됨
+- 아이디어를 매번 직접 고르지 않아도 됨
 - episode 번호를 외우지 않아도 됨
 - Flow prompt를 직접 조립하지 않아도 됨
 - 생성 전에 0-credit frame/reference preflight로 큰 실패를 차단
 - G1이 실패하면 G2/G3/G4 크레딧을 쓰지 않음
-- 실제 업로드 데이터가 쌓일수록 runtime/action/hook/seasonality/credit prior가 개선됨
-
-이어야 한다.
+- 실제 결과가 쌓일수록 runtime/action/hook/seasonality/credit prior 개선
+- generated Flow Pack이 실제 UI에서 어떤 First/Last frame을 넣어야 하는지 장면별로 알려줌
 
 ---
 
@@ -146,6 +143,7 @@ Source of truth:
 - `docs/23_minimum_credit_operator_architecture.md`
 - `docs/26_flow_ui_mode_preflight.md`
 - `CURRENT_STANDARD.md`
+- `tools/build_flow_pack.py`
 
 ### 2026-08-27 공식 Google Flow 도움말 재확인 결과
 
@@ -153,12 +151,17 @@ Source of truth:
 
 - Google AI Pro monthly credits: 1,000
 - Veo 3.1 Lite 4s / 6s / 8s + Extend: non-Ultra 10 credits per generation
-- output count는 1로 직접 확인
+- output count = 1을 실제 UI에서 확인
 - First + Last frames는 Lite에서 4/6/8s 지원
 - Ingredients/References 또는 Extend는 mode에 따라 8s-only일 수 있음
 - 1080p upscale은 Plus/Pro/Ultra에서 0 credits
 - 실제 Flow UI 표시 비용이 최종 source of truth
-- 기존 영상의 `수정 사항 설명` / Omni Flash video edit 화면은 새 Veo G1/G2/G3 generation 화면과 구분
+- 기존 영상의 `수정 사항 설명` / Omni Flash video edit 화면은 새 Veo generation 화면과 구분
+
+공식 확인 source:
+
+- Google Flow credit help
+- Google Flow models & supported features
 
 ### Progressive Spend
 
@@ -176,7 +179,7 @@ FREE keyframe/reference preflight
 
 G2/G3/G4를 미리 생성하지 않는다.
 
-### Sequential Frame Chain
+### Sequential Frame Chain — 핵심 운영 규칙
 
 ```text
 G1
@@ -188,6 +191,38 @@ G3 First frame
 G4 First frame only when justified
 ```
 
+중요한 구분:
+
+- `KF1_WARM`, `KF2_CRACK` 같은 무료 planned keyframe = **목표 상태 / Last frame destination**
+- `ACTUAL_LAST_USABLE_FRAME_G1` = **G1이 실제로 생성된 뒤 QC PASS한 영상에서 저장한 실제 마지막 usable frame**
+
+둘은 같은 것이 아니다.
+
+**planned target keyframe을 actual previous frame 대신 다음 First frame에 넣지 않는다.** 그렇게 하면 paw 위치, 카메라, 음식 상태, tray 위치 등이 순간이동할 수 있고 continuity reroll 비용이 증가한다.
+
+이번 2026-08-27 개선에서 `tools/build_flow_pack.py`가 이 구분을 generated Flow Pack 안에서 장면별로 명시하도록 변경됐다.
+
+예:
+
+```text
+G1 First frame → approved FREE KF0_OPEN
+G1 Last frame  → approved FREE KF1_WARM
+G1 PASS 후     → 실제 G1 마지막 usable frame을 G1_last_usable.png로 저장
+G2 First frame → 그 실제 G1_last_usable.png 업로드
+G2 Last frame  → approved FREE KF2_CRACK
+```
+
+이제 generated pack은:
+
+- 각 scene의 First frame source
+- 각 scene의 Last frame source
+- previous actual frame token의 의미
+- PASS 후 바로 저장해야 하는 실제 frame filename 예시
+- 잘못된 planned-frame substitution 금지
+- `FRAME CHAIN FAIL` QC shorthand
+
+를 출력한다.
+
 목적:
 
 - 같은 first-person camera 유지
@@ -195,6 +230,7 @@ G4 First frame only when justified
 - hero-object scale 유지
 - food/cookware state continuity 유지
 - lighting/workbench consistency 유지
+- 잘못된 frame source로 인한 10-credit reroll 감소
 
 ---
 
@@ -300,7 +336,7 @@ Source of truth:
 - `research/benchmark_log.csv`
 - `docs/27_research_evidence_saturation_gate.md`
 
-계절 후보는 base score를 덮어쓰지 않고 fresh Japanese evidence가 있을 때만 bounded seasonal boost 최대 +8을 받는다.
+계절 후보는 fresh Japanese evidence가 있을 때만 bounded seasonal boost 최대 +8을 받는다.
 
 초기 timing prior:
 
@@ -332,21 +368,17 @@ Source of truth:
 
 ---
 
-## 10. 2026-08-27 신규 연구 결정 — IDEA-010 新米塩むすび
+## 10. 현재 계절/후보 연구 상태
 
-이번 회차에서는 기존 고구마/月見의 동일 종류 홍보 신호는 evidence saturation 때문에 추가하지 않았다.
+### IDEA-010 — 新米塩むすび
 
-대신 기존 backlog에 없던 **新米 + おにぎり**가 독립적인 현재 수요/행동 근거를 갖고 있어 신규 후보로 추가했다.
+2026-08-27 추가된 future candidate.
 
-### 근거
+근거 유형:
 
-1. 일반사단법인 오니기리협회의 2026 trend analysis는 주요 편의점 4사 응답과 2025 연간 인기/구매 경향을 바탕으로, 오니기리가 일상 주식으로 역할을 넓히고 있다고 정리.
-2. Pal System은 2026년산 `予約登録米`에 **202,437명 / 305,710점** 등록을 보고. 단순 신상품 PR이 아니라 실제 예약 행동 데이터.
-3. Komeri는 2026년산 신미 조기예약을 8월 31일까지 받고 9월 초부터 순차 인도 예정. 즉 신미 seasonal timing이 실제 구매/배송 단계에 진입.
-
-이 근거는 **Shorts 성과를 보장하지 않는다.** 다만 일본 relevance + seasonal timing + 실제 rice demand를 함께 뒷받침하므로 backlog candidate로 추가할 만큼은 강하다.
-
-### IDEA-010 설계
+- 일본 onigiri category의 현재 일상식 수요/트렌드
+- 2026 예약쌀 실제 registration behavior
+- 9월 초 신미 배송/판매 timing
 
 Working title:
 
@@ -354,22 +386,17 @@ Working title:
 猫の前足で作る、8mmの新米塩むすび。
 ```
 
-Production mechanic:
+Flow-safe mechanic:
 
 - true first-person POV
 - 8mm new-rice salt onigiri
-- tiny triangular mold 사용
+- tiny triangular mold
 - broad paw press 1회
-- mold를 slide-away해서 shape reveal
+- mold slide-away → shape reveal
 - glossy individual rice grains + faint steam payoff
 - tiny wooden board를 dawn breakfast shelf로 nudge
 
-의도:
-
-- 사람 손가락처럼 직접 삼각형을 빚는 위험 회피
-- 김 감싸기/핀칭/정교한 garnish 금지
-- 한 scene 한 primary action 원칙 유지
-- `compact_h30` 우선
+직접 손처럼 삼각형을 빚거나 김을 정교하게 감싸는 동작은 피한다.
 
 Novelty signature:
 
@@ -379,9 +406,11 @@ conflict: single_press_mold_shape_reveal
 ending: dawn_breakfast_shelf_resolution
 ```
 
-기존 recent-five exact conflict/ending과 다른 구조다.
+현재 NEXT_EPISODE를 교체하지 않는다.
 
-중요: **현재 NEXT_EPISODE TK-005를 중간에 교체하지 않는다.** IDEA-010은 TK-005 이후 future selection pool을 개선하기 위한 후보다.
+### 포화된 근거
+
+고구마 / 月見 / gummy 일부 후보는 이미 same-class 홍보 신호를 더 쌓을 필요가 없는 상태다. 새 evidence class나 실제 행동/성과 변화가 없으면 repo churn 금지.
 
 ---
 
@@ -414,11 +443,42 @@ Continuity rules:
 - paw가 고구마를 집거나 pinch하지 않음
 - G3 reveal은 passive residual-heat transformation
 
-### 현재 실제 production learning
+### TK-005 actual frame workflow
 
-`analytics/learning_ledger.csv`에는 `POV-PREFLIGHT-001`이 기록되어 있다.
+G1:
 
-관찰 실패:
+```text
+First = KF0_OPEN
+Last  = KF1_WARM
+PASS → save G1 actual last usable frame
+```
+
+G2:
+
+```text
+First = actual saved last usable frame from G1
+Last  = KF2_CRACK
+PASS → save G2 actual last usable frame
+```
+
+G3:
+
+```text
+First = actual saved last usable frame from G2
+Last  = KF3_OPEN
+PASS → save G3 actual last usable frame
+```
+
+G4 only if still justified:
+
+```text
+First = actual saved last usable frame from G3
+Last  = KF4_SERVE
+```
+
+### 현재 actual production learning
+
+`analytics/learning_ledger.csv`의 `POV-PREFLIGHT-001`에서 관찰된 실패:
 
 - third-person full cat
 - body visible
@@ -443,16 +503,16 @@ Continuity rules:
 - production-ready
 - sweet-potato seasonal/behavior evidence 충분
 - high visual satisfaction / Flow reliability / credit efficiency
-- novelty gate상 future repeat은 막히지만 현재 이미 준비된 production task는 진행
-- 지금 가장 가치 있는 다음 행동은 추가 뉴스 수집이 아니라 실제 G1 생성/QC
+- novelty gate상 future repeat은 막히지만 현재 준비된 production task는 진행
+- 지금 가장 가치 있는 다음 행동은 실제 G1 생성/QC
 
 ### IDEA-010 — 新米塩むすび
 
-- 2026-08-27 신규 priority candidate
-- onigiri category evidence + 실제 2026 rice reservation behavior + early-September new-rice delivery timing
+- priority future candidate
+- actual rice reservation behavior + early-September new-rice timing
 - compact H30
-- one mold press + slide reveal로 Flow-safe하게 설계
-- TK-005 완료 후 future selection에서 강한 후보
+- one mold press + slide reveal
+- recent exact duplicate 아님
 
 ### IDEA-001 — 8mm 月見だんご
 
@@ -470,8 +530,8 @@ Continuity rules:
 ### IDEA-002 — 3mm グミ
 
 - 9/3 timing/texture interest는 좋음
-- 하지만 현재 conflict+ending signature가 TK-004와 겹쳐 future selection 차단
-- 단순 제목/색 변경으로 gate 우회 금지
+- 현재 conflict+ending signature가 TK-004와 겹쳐 future selection 차단
+- 제목/색만 바꿔 gate 우회 금지
 
 ---
 
@@ -481,7 +541,8 @@ Continuity rules:
 - `tools/test_select_next_episode.py` — selector regression tests
 - `ideas/novelty_signatures.yaml` — candidate hook/conflict/ending signatures
 - `tools/validate_current_standard.py` — stale manifest / POV / runtime rules validation
-- `tools/build_flow_pack.py` — manifest → Flow prompt pack
+- `tools/build_flow_pack.py` — manifest → Flow prompt pack + **scene별 explicit First/Last frame operator map**
+- `tools/test_build_flow_pack.py` — actual-frame token / free keyframe / fail-closed / save-gate regression tests
 - `tools/build_healing_edit_plan.py` — runtime/pacing edit plan
 - `tools/build_publish_pack.py` — publish metadata pack
 - `tools/score_credit_efficiency.py` — actual production 성과 대비 credits 분석
@@ -549,7 +610,9 @@ Placeholder 0을 실제 실패 데이터처럼 학습하지 않는다.
 - [x] paw-safe action grammar
 - [x] H30/H40 adaptive runtime
 - [x] Progressive Spend
-- [x] sequential actual-frame chaining
+- [x] sequential actual-frame chaining policy
+- [x] generated Flow Pack의 explicit First/Last frame operator map
+- [x] actual-frame token regression tests
 - [x] no narration / no generated music 기본 정책
 - [x] seasonal lead-time scoring
 - [x] evidence freshness/saturation gate
@@ -568,7 +631,7 @@ Placeholder 0을 실제 실패 데이터처럼 학습하지 않는다.
 아직 미완료:
 
 - [ ] TK-005 실제 새 POV G1 생성/QC
-- [ ] G1→G2→G3→조건부 G4 continuity 검증
+- [ ] G1→G2→G3→조건부 G4 real continuity 검증
 - [ ] final export 실제 편집 검증
 - [ ] 첫 YouTube 게시
 - [ ] 실제 24h/72h analytics
@@ -589,11 +652,12 @@ Placeholder 0을 실제 실패 데이터처럼 학습하지 않는다.
 
 1. TK-005 G1 실제 생성
 2. POV/SCALE/ANATOMY/CAMERA/PROP QC
-3. PASS일 때만 G2
-4. actual last usable frame chaining 검증
-5. G3 완결성 확인
-6. G4는 독립 world-resolution 가치가 있을 때만 생성
-7. actual credits / rerolls / usable seconds 기록
+3. PASS 직후 실제 last usable frame 저장
+4. generated Flow Pack의 explicit frame map대로 G2 First frame 연결
+5. G2 PASS 후 actual frame 저장 → G3 연결
+6. G3 완결성 확인
+7. G4는 독립 world-resolution 가치가 있을 때만 생성
+8. actual credits / rerolls / usable seconds 기록
 
 ### Phase B — First published Shorts learning
 
@@ -623,6 +687,7 @@ Placeholder 0을 실제 실패 데이터처럼 학습하지 않는다.
 사용자: 다음 영상 준비해줘
 AI: 후보 조사/선택 + manifest + NEXT_EPISODE 준비
 사용자: ./tools/make_next_short.ps1
+Flow Pack: 각 scene에 First/Last frame source와 PASS 후 저장 동작까지 표시
 사용자: G1 만들었어. 봐줘
 AI: PASS / EDITABLE / REROLL / STOP
 ```
@@ -634,12 +699,13 @@ AI: PASS / EDITABLE / REROLL / STOP
 1. **TK-005 실제 G1 결과 확보**
 2. first-person/front-paws-only/tiny-scale 재현성 검증
 3. 실제 Flow 표시 model/cost 기록
-4. G2 sequential frame chain 검증
-5. G3/G4 prop continuity 검증
-6. first export 38~46s pacing 검토
-7. 첫 게시 후 24h/72h data 확보
-8. 그 다음 actual data로 backlog/runtime/credit/novelty prior 조정
-9. TK-005 완료 후 IDEA-010 / IDEA-001 등 future candidate를 그 시점의 current Japanese evidence로 다시 비교
+4. G1 PASS 후 실제 last usable frame 저장 여부 확인
+5. G2 First frame에 planned KF가 아니라 G1 actual frame이 실제로 들어갔는지 검증
+6. G3/G4 prop continuity 검증
+7. first export 38~46s pacing 검토
+8. 첫 게시 후 24h/72h data 확보
+9. 그 다음 actual data로 backlog/runtime/credit/novelty prior 조정
+10. TK-005 완료 후 IDEA-010 / IDEA-001 등 future candidate를 current Japanese evidence로 재비교
 
 현재는 TK-005를 중간에 바꾸는 것보다 production truth 확보가 더 중요하다.
 
@@ -649,15 +715,17 @@ AI: PASS / EDITABLE / REROLL / STOP
 
 현재 필요한 실제 행동:
 
-1. Flow에서 새 video generation 상태인지 확인
-2. TK-005 G1만 생성
-3. 결과 영상/스크린샷을 ChatGPT에 전달
+1. 로컬에서 `./tools/make_next_short.ps1` 실행
+2. generated `TK-005_flow_pack.md` 확인
+3. Flow에서 NEW VIDEO GENERATION + Veo 3.1 Lite + 9:16 + output 1 + 표시 cost 확인
+4. **G1만 생성**
+5. 결과 영상/스크린샷을 ChatGPT에 전달
 
 ```text
 G1 만들었어. 봐줘
 ```
 
-그 뒤 ChatGPT가 다음 spend 여부를 판단한다.
+G1이 PASS하면 generated Flow Pack 안내대로 실제 마지막 usable frame을 저장한 뒤에만 G2로 진행한다.
 
 ---
 
@@ -674,7 +742,8 @@ G1 만들었어. 봐줘
 9. `analytics/learning_ledger.csv`
 10. `ideas/episode_backlog.yaml` + `ideas/novelty_signatures.yaml`
 11. `research/seasonal_evidence.yaml` + benchmark log
-12. concurrent changes/회귀 위험 확인 후 수정 시작
+12. core tools와 tests 확인
+13. concurrent changes/회귀 위험 확인 후 수정 시작
 
 최신 GitHub 상태를 이전 assistant memory보다 우선한다.
 
@@ -722,6 +791,8 @@ python tools/validate_handoff_update.py --base origin/main
 - food/season 이름만 바꾼 동일 conflict+ending 반복 금지
 - novelty signature rename으로 gate 우회 금지
 - full-cat third-person 회귀 금지
+- planned target keyframe을 actual previous-scene frame으로 위장해 continuity 진행 금지
+- previous scene FAIL 상태에서 next generation spend 금지
 - 60초 padding 금지
 - audio-only 문제 때문에 좋은 영상 reroll 금지
 - same-class seasonal PR churn 금지
@@ -740,6 +811,7 @@ current benchmark/JP signal research
 → paw-only/tiny-scale production-safe manifest
 → 0-credit frame preflight
 → progressive Flow generation
+→ actual-last-frame continuity chain
 → continuity QC
 → low-friction edit/export
 → upload
@@ -753,36 +825,59 @@ current benchmark/JP signal research
 - usable motion/credit 상승
 - engaged views/credit 상승
 - subscribers/credit 상승
-- 사용자 수동 prompt 작업 감소
+- 사용자 수동 prompt/frame-source 판단 감소
+- continuity reroll 감소
 - template story 반복 감소
 
 가 실제 데이터로 보여야 한다.
 
 ---
 
-## 23. Change log
+## 23. Handoff change log
 
-### 2026-08-27 — New-rice/onigiri future candidate
+### 2026-08-27 — Explicit Flow frame-input map
 
-- 최신 main `3301e8ce...`와 handoff/operating docs를 먼저 재확인.
-- 기존 고구마/月見의 same-class promotional news는 saturation gate에 따라 추가하지 않음.
-- 2026 onigiri category evidence + Pal System 2026 reserved-rice registrations(202,437명 / 305,710점) + Komeri early-September new-rice delivery window를 독립적인 current demand/timing signal로 채택.
-- `IDEA-010 猫の前足で作る、8mmの新米塩むすび。` 추가.
-- human-like hand molding을 피하기 위해 triangular mold + one broad press + slide-away reveal로 production mechanic 설계.
-- novelty signature를 recent-five exact conflict/ending과 다르게 등록.
-- 현재 `NEXT_EPISODE=TK-005`는 변경하지 않음. 새 후보는 TK-005 이후 future selection pool 개선용.
-- Google Flow 공식 credit/features 재확인 결과 기존 Veo 3.1 Lite Progressive Spend 가정 변경 없음.
+Baseline inspected: `main@d85cb29c94f76cc9c1f8c1d0efbe406b7e452e34`.
 
-### 2026-08-26 — Deterministic recent-episode novelty gate
+Problem found:
 
-- 문서상 recent fingerprint 중복 제거 규칙과 실제 selector 사이 gap 수정.
-- `ideas/novelty_signatures.yaml` 도입.
-- 동일 conflict+ending pair 또는 hook+conflict+ending triple hard-block.
-- IDEA-009 future repeat 및 IDEA-002/TK-004 구조 반복 차단.
-- YouTube repetitive/mass-produced anti-template 원칙 문서화.
+- manifest와 문서는 sequential actual-frame chaining을 요구했지만 generated Flow Pack은 `ACTUAL_LAST_USABLE_FRAME_G1` 같은 symbolic token을 그대로 보여주어, 실제 Flow에서 어떤 이미지를 First frame에 넣어야 하는지 초보 운영자가 혼동할 수 있었음.
+- planned target keyframe을 previous actual frame 대신 사용하면 camera/paw/food/tray continuity가 깨지고 reroll cost가 늘어날 수 있음.
 
-### 2026-08-26 — Handoff persistence introduced
+Changes:
 
-- `PROJECT_HANDOFF.md`를 root source of truth로 도입.
-- material update와 handoff update를 동일 PR에서 처리하는 규칙 추가.
-- `tools/validate_handoff_update.py` 추가.
+- `tools/build_flow_pack.py`가 symbolic frame token을 explicit operator action으로 변환
+- scene별 First frame / Last frame input 안내 추가
+- PASS 후 actual last usable frame 즉시 저장 안내 및 filename 예시 추가
+- next scene이 actual frame을 요구하면 visual continuity 확인 전 다음 spend 금지
+- `FRAME CHAIN FAIL` QC shorthand 추가
+- `tools/test_build_flow_pack.py` 신규 추가로 actual token, free KF, missing-frame fail-closed, sequential save gate를 회귀 테스트
+
+Unchanged:
+
+- NEXT_EPISODE = TK-005
+- TK-005 story/runtime/manifest
+- Flow cost assumptions
+- candidate scores/ranking
+- no paid generation / no publish
+
+Next highest-value action remains: **사용자가 TK-005 G1을 실제 생성해 production truth를 확보하는 것.**
+
+### 2026-08-27 — New-rice onigiri candidate
+
+- IDEA-010 `8mm 新米塩むすび` 추가
+- actual rice reservation behavior + early-September new-rice timing 반영
+- triangular mold + one broad paw press + slide-away reveal로 human-like shaping 회피
+- NEXT_EPISODE TK-005 유지
+
+### 2026-08-26 — Deterministic novelty gate
+
+- recent-five fingerprint exact conflict+ending / hook+conflict+ending repeat 차단
+- IDEA-009 future repeat, IDEA-002 recent gummy structure repeat 차단
+- current TK-005 task 유지
+
+### 2026-08-26 — Persistent handoff protocol
+
+- root `PROJECT_HANDOFF.md`를 프로젝트 인수인계 source of truth로 추가
+- material repo change와 같은 PR에서 handoff 갱신 의무화
+- `tools/validate_handoff_update.py` 추가
