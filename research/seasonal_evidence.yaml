@@ -24,12 +24,14 @@ evidence:
       - "https://prtimes.jp/main/html/rd/p/000000568.000020545.html"
     abstract_lesson: "The early-September sweet-potato ramp is broad across independent national chains, so TK-005 remains well timed. Keep the creative abstraction generic and Flow-safe: one tiny whole yakiimo, slow heat, skin crack, steam and golden-center reveal. Do not copy beverage formats, toppings, regional variants, campaign language, packaging or branded visuals, and do not raise audience-demand scores from launch breadth alone."
   IDEA-002:
-    checked_at: "2026-08-25"
+    checked_at: "2026-08-26"
     market: JP
-    signal: "FamilyMart's nationwide Gummy Day texture campaign is live ahead of 2026-09-03."
+    signal: "Gummy Day activation is now broad across multiple independent Japanese channels rather than a single retailer. FamilyMart's nationwide texture campaign is live, Seven-Eleven is rolling out seven Gummy Day products nationwide from 2026-08-21, and Kaneka announced a 2026-09-01 aerated gummy with a fruit-jelly center that explicitly makes texture contrast the product story. This strengthens sensory/texture relevance before 2026-09-03, but it is recognition/supply evidence rather than proof that a gummy Short will outperform."
     sources:
       - "https://www.family.co.jp/company/news_releases/2026/20260821_01.html"
-    abstract_lesson: "Borrow only the sensory-question mechanic; do not reproduce product shapes, names or branded endings."
+      - "https://prtimes.jp/main/html/rd/p/000001128.000155396.html"
+      - "https://prtimes.jp/main/html/rd/p/000000097.000085592.html"
+    abstract_lesson: "The useful mechanic is a visible texture question with a tiny object whose deformation can be understood without narration. Keep IDEA-002 generic and Flow-safe: one 3mm translucent gummy, one fixed plate edge, one press/slide stretch and release. Do not copy product colors, shapes, fillings, package design, campaign wording or branded endings, and do not raise audience-demand scores from launch breadth alone."
   IDEA-006:
     checked_at: "2026-08-26"
     market: JP
