@@ -73,12 +73,7 @@ def scale_clause(data: dict[str, Any]) -> str:
 
 
 def frame_input_instruction(frame_name: Any, *, role: str) -> str:
-    """Turn manifest frame tokens into explicit operator input instructions.
-
-    The manifest intentionally uses symbolic ACTUAL_LAST_USABLE_FRAME_Gn tokens so
-    planned continuity never pretends to know the real generated frame. The Flow
-    pack should translate those tokens into an action the operator can perform.
-    """
+    """Turn manifest frame tokens into explicit operator input instructions."""
     token = str(frame_name or "").strip()
     if not token:
         return f"{role}: not specified in manifest — STOP and repair the manifest before spending credits."
@@ -123,6 +118,14 @@ def build(data: dict[str, Any]) -> str:
         f"# {episode_id} — Flow Pack",
         "",
         "> Deterministic prompt pack. No LLM rewrite, Flow generation, or upload is performed here.",
+        "",
+        "## Gate A — FREE keyframe preflight before any paid video generation",
+        "",
+        "- In Flow image generation, prefer `Nano Banana 2 Lite` while the current UI still marks it as available at no charge.",
+        "- Before generating each planned keyframe, verify the active image model and displayed cost. Gate A is only a 0-credit preflight when the UI actually shows 0 credits / no charge.",
+        "- If the selected image model shows a non-zero cost, STOP rather than assuming the keyframe is free; switch back to the no-charge image option or re-check current official Flow model/cost guidance.",
+        f"- Create/approve only the {len(kfs)} planned keyframes needed by this manifest; do not make decorative alternatives just because image generation is free.",
+        "- Reject a free frame before video spend if POV, paw-only anatomy, tiny scale, fixed-prop layout, or premise is structurally wrong.",
         "",
         "## Flow UI preflight — do this before every paid generation",
         "",
