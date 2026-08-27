@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**  
-Baseline inspected before this change: `main@2f637bd740d5e38c80dab99b304325b308741939`
+Baseline inspected before this change: `main@875d19c7375db93979fa2ded47b3440754fd3e0f`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -71,6 +71,7 @@ Official Google Flow Help rechecked **2026-08-28**:
 - First + Last frames remain supported for the current Lite workflow
 - output count = 1
 - 1080p upscaling = 0 credits for Plus/Pro/Ultra
+- Nano Banana 2 Lite remains described as a no-charge image-generation/editing option; actual UI displayed cost remains the source of truth
 - actual Flow UI active model/mode/output count/displayed cost is the generation-time source of truth
 - Omni Flash is a different/higher-cost path; do not confuse existing-video edit mode with standard new-video generation
 
@@ -178,24 +179,25 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - bundle-level current-standard validation
 - local handoff-update guard
 - regression tests for core production invariants
-- **planned keyframe scene-order gate: for all-First+Last manifests, G1 must start at the first ordered KF and every G scene must end at the next ordered KF; extra decorative KFs are rejected**
+- **numeric planned-keyframe sequence gate: all-First+Last manifests must define one unique contiguous `KF0..KFn` numeric sequence; G1 starts at KF0 and Gi ends at KFi regardless of YAML mapping order**
 
-## Latest fix — planned keyframe scene-order gate
+## Latest fix — numeric planned-keyframe sequence semantics
 
 Problem found on **2026-08-28**:
-- existing validation correctly rejected undefined `KF*` tokens
-- however, a scene could still point to a **defined but wrong** target KF and pass; e.g. G2 could accidentally end at `KF3_OPEN` instead of `KF2_CRACK`
-- Gate A builds KFs sequentially, so this mismatch could make the paid Flow pack interpolate toward the wrong state even though every referenced KF exists
-- that creates avoidable continuity drift and reroll risk per credit
+- the prior scene-order guard used YAML mapping insertion order to decide which planned KF was KF0/KF1/KF2...
+- insertion order is formatting/presentation detail and can change during a harmless manual edit or formatter pass
+- therefore the exact same semantic keyframe set could either fail validation after reordering or, worse, make a reordered map redefine the paid target sequence
+- names such as `KF2_CRACK` already carry an explicit semantic index, so insertion order should never outrank that number
 
 Fix:
-- when every paid scene uses `first_plus_last`, require exactly one opening KF + one ordered target KF per scene
-- require G1 start = first planned KF
-- require G1/G2/G3/G4 end frames to follow manifest keyframe insertion order exactly
-- reject unused decorative extra KFs in this all-First+Last production mode
-- add regression coverage against current TK-005 plus wrong-defined-target / wrong-G1-start / extra-KF mutations
+- require every production keyframe name to begin with `KF<number>`
+- parse the numeric index and reject duplicate numeric indices such as `KF2_CRACK` + `KF2_ALT`
+- for all-First+Last manifests require the exact contiguous sequence `KF0..KF<scene_count>` with no holes or extras
+- require G1 start to resolve to numeric KF0 and Gi end to numeric KFi
+- allow harmless YAML mapping reordering without changing production semantics
+- add regression coverage for reordered mappings, malformed names, duplicate indices and missing/extra indices
 
-This is a 0-credit safety improvement. It does not change TK-005 story, runtime, generation count, budget or candidate ranking.
+This is a 0-credit fail-closed improvement. It does not change TK-005 story, runtime, generation count, budget or candidate ranking.
 
 ## Research / idea policy
 
@@ -267,6 +269,7 @@ Continuity/action rules:
 - G2/G3/G4 First = Flow-native actual saved frame from previous PASS clip
 - explicit action + action_guard in every G scene
 - literal zero-cut constraint in generated prompt
+- numeric KF semantics are fixed by `KF0..KF4`, not YAML mapping order
 
 Highest-value next real-world step remains **approve TK-005 KF0→KF4 in real Flow, then generate G1 only and QC it.** Automation must not spend that credit.
 
@@ -353,9 +356,10 @@ Expand distinct worlds only after performance evidence, without repeating recent
 - no paid G1 before full planned KF chain PASS
 - no independent fresh-generation KF1+ when prior approved KF can anchor continuity
 - no planned KF substituted for previous actual PASS frame
-- no defined-but-wrong ordered KF destination
-- no unused decorative KF in all-First+Last manifests
-- no undefined KF improvisation
+- no undefined/malformed KF improvisation
+- no duplicate KF numeric index
+- no missing/non-contiguous KF0..KFn sequence in all-First+Last manifests
+- no YAML mapping reorder changing the semantic planned-KF sequence
 - no blank action/action_guard
 - no silent loss of zero-cut constraint
 - no next-scene spend after previous-scene failure
@@ -385,18 +389,19 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-28 — planned keyframe scene-order fail-closed gate
-Baseline `main@2f637bd740d5e38c80dab99b304325b308741939`.
+### 2026-08-28 — numeric planned-keyframe sequence gate
+Baseline `main@875d19c7375db93979fa2ded47b3440754fd3e0f`.
 
 Changed:
-- reject defined-but-wrong planned KF destinations
-- enforce exactly opening KF + one ordered target per First+Last scene
-- enforce G1 starts at first ordered KF
-- add focused TK-005 regression tests
+- stop using YAML insertion order as planned-KF semantics
+- require unique numeric `KF0..KFn` indices for all-First+Last manifests
+- make Gi target numeric KFi deterministically
+- tolerate harmless mapping reordering while rejecting duplicate/missing/malformed indices
+- add focused regression tests
 - synchronize this handoff
 
 Verified assumptions:
-- TK-005 already follows `KF0_OPEN → KF1_WARM → KF2_CRACK → KF3_OPEN → KF4_SERVE`
+- TK-005 already uses contiguous `KF0_OPEN → KF1_WARM → KF2_CRACK → KF3_OPEN → KF4_SERVE`
 - official Flow pricing/features remain unchanged on 2026-08-28
 - current Japanese autumn evidence does not justify ranking/NEXT_EPISODE changes
 
@@ -408,6 +413,7 @@ Unchanged:
 - no paid generation or publishing
 
 ### Earlier 2026-08-28 work
+- planned keyframe scene-order fail-closed gate
 - START_HERE synchronized with full planned KF chain
 - development executor policy synchronized with AGENTS.md
 - CURRENT_STANDARD planned-keyframe synchronization
@@ -418,5 +424,3 @@ Unchanged:
 - zero-cut prompt preservation
 - scene-action/keyframe/spend integrity gates
 - runtime-aware operator guidance
-- IDEA-010 new-rice onigiri candidate
-- deterministic novelty/authenticity gate
