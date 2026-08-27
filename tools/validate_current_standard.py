@@ -30,9 +30,29 @@ def to_int(value: Any, *, default: int = 0) -> int:
         return default
 
 
+def to_float(value: Any, *, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def keyframe_index(name: str) -> int | None:
     match = KEYFRAME_INDEX_RE.match(name)
     return int(match.group(1)) if match else None
+
+
+def explicit_editorial_hold_seconds(data: dict[str, Any], max_static: float) -> float:
+    """Count only explicitly declared editorial holds; never assume padding exists."""
+    editorial = data.get("editorial_seconds") or {}
+    if not isinstance(editorial, dict):
+        return 0.0
+    total = 0.0
+    for value in editorial.values():
+        seconds = to_float(value, default=0.0)
+        if seconds > 0:
+            total += seconds
+    return min(total, max(0.0, max_static))
 
 
 def validate(data: dict[str, Any]) -> list[str]:
@@ -41,6 +61,7 @@ def validate(data: dict[str, Any]) -> list[str]:
     camera = data.get("camera_grammar") or {}
     runtime = data.get("runtime_strategy") or {}
     flow = data.get("flow_strategy") or {}
+    post = data.get("post_production") or {}
     scenes = data.get("scenes") or []
     keyframes = data.get("keyframes") or {}
 
@@ -75,9 +96,6 @@ def validate(data: dict[str, Any]) -> list[str]:
     if to_int(flow.get("output_count")) != 1:
         errors.append("flow_strategy.output_count must be 1")
 
-    # Calm long-take pacing is a production invariant, not just prompt copy.
-    # Require an explicit cut ceiling so a future manifest cannot silently omit
-    # the constraint, and reject >1 cut/8s before any paid Flow generation.
     raw_max_cuts = flow.get("max_visual_cuts_per_8s_generation")
     if raw_max_cuts is None:
         errors.append("flow_strategy.max_visual_cuts_per_8s_generation must be explicitly declared (0 or 1)")
@@ -229,6 +247,43 @@ def validate(data: dict[str, Any]) -> list[str]:
         elif generation_type == "extend" and not str(scene.get("source_scene") or "").strip():
             errors.append(f"{expected_id} extend requires source_scene")
 
+    # Runtime feasibility is a no-padding invariant. H30/H40 denote the current
+    # 30/40-credit first-pass ceilings, not guaranteed 30/40-second final lengths.
+    # Only generated motion, allowed natural slowdown, and explicitly declared
+    # editorial holds may contribute to the maximum target runtime.
+    if scenes:
+        raw_motion = sum(max(0.0, to_float((scene or {}).get("generation_seconds"), default=0.0)) for scene in scenes)
+        speed_range = post.get("preferred_playback_speed_range", [1.0, 1.0])
+        min_speed = 1.0
+        if isinstance(speed_range, list) and len(speed_range) >= 1:
+            min_speed = to_float(speed_range[0], default=1.0)
+        if min_speed <= 0 or min_speed > 1.0:
+            errors.append("post_production.preferred_playback_speed_range minimum must be >0 and <=1.0")
+            min_speed = 1.0
+        max_static = max(0.0, to_float(post.get("max_total_static_hold_seconds"), default=0.0))
+        explicit_holds = explicit_editorial_hold_seconds(data, max_static)
+        feasible_max = (raw_motion / min_speed if min_speed > 0 else raw_motion) + explicit_holds
+
+        preferred_runtime = runtime.get("target_final_runtime_seconds") or post.get("preferred_final_runtime_seconds")
+        if isinstance(preferred_runtime, list) and len(preferred_runtime) == 2:
+            target_min = to_float(preferred_runtime[0], default=0.0)
+            target_max = to_float(preferred_runtime[1], default=0.0)
+            if target_min <= 0 or target_max < target_min:
+                errors.append("final runtime target must be a positive [min,max] range")
+            elif target_min > feasible_max + 0.05:
+                errors.append(
+                    "final runtime target is infeasible without padding: "
+                    f"minimum {target_min:.1f}s exceeds feasible ~{feasible_max:.1f}s from generated motion, "
+                    "allowed slowdown, and explicitly declared holds"
+                )
+
+        length_target = to_float(data.get("length_target_seconds"), default=0.0)
+        if length_target > feasible_max + 0.05:
+            errors.append(
+                "length_target_seconds is infeasible without padding: "
+                f"{length_target:.1f}s exceeds feasible ~{feasible_max:.1f}s"
+            )
+
     expected_starts = {
         2: "ACTUAL_LAST_USABLE_FRAME_G1",
         3: "ACTUAL_LAST_USABLE_FRAME_G2",
@@ -241,11 +296,6 @@ def validate(data: dict[str, Any]) -> list[str]:
                 if str(scene.get("start_frame") or "") != expected:
                     errors.append(f"G{index} must start from {expected}")
 
-    # For an all-First+Last manifest, KF numbers are the durable semantic sequence.
-    # YAML mapping insertion order is presentation detail and can change during a
-    # manual edit or formatter pass. Derive the chain from KF0..KFn numeric indices
-    # so harmless reordering does not change meaning, while duplicate/missing/extra
-    # indices fail before any paid generation.
     all_first_plus_last = bool(scenes) and all(
         str((scene or {}).get("generation_type") or "first_plus_last") == "first_plus_last"
         for scene in scenes
