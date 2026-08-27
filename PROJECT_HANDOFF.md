@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**  
-Baseline inspected before this change: `main@875d19c7375db93979fa2ded47b3440754fd3e0f`
+Baseline inspected before this change: `main@3ecece44258ebbab7abc0e49645d9e5a39e2ca85`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -11,8 +11,8 @@ This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`.
 
 - repository development is performed directly by the active Chat/Codex session
 - do not delegate coding/planning/debugging/refactoring/review/test repair/architecture/repository exploration to OpenCode Go
-- latest merged repository state overrides stale chat or automation wording
 - inspect latest main SHA + recent commits/PRs before every change
+- latest merged repository state overrides stale chat or automation wording
 
 ## Mission
 
@@ -24,14 +24,7 @@ Normal user interface:
 다음 영상 준비해줘
 ```
 
-System responsibilities:
-- research current Japanese/global AI-cat, miniature cooking, ASMR, relaxing-food and adjacent signals
-- identify timely but novelty-safe episode candidates
-- score ideas for Japan relevance, healing fit, visual satisfaction, Veo reliability, originality, worldbuilding, audience demand and expected usable-quality-per-credit
-- maintain episode manifest + `production/NEXT_EPISODE.txt`
-- generate deterministic local Flow/edit/publish packs
-- minimize paid-generation failure with no-charge/free preflight where the live UI supports it
-- learn from real production plus 24h/72h YouTube metrics
+The system should research current Japanese/global AI-cat, miniature cooking, ASMR, relaxing-food and adjacent signals, choose a novelty-safe episode, prepare the episode manifest and `production/NEXT_EPISODE.txt`, generate deterministic local operator packs, minimize paid-generation failures, and learn from actual Flow production plus 24h/72h YouTube results.
 
 User local entrypoint:
 
@@ -56,7 +49,7 @@ Default grammar: `POV_PAWS_MICROWORLD_V1`.
 - no human fingers/thumbs/human-like gripping
 - no rapid montage / no third-person chef framing
 
-Core appeal: viewer feels like the cat handling an impossibly tiny world. Scale contrast + tactile calm matter more than showing a cat face.
+Core appeal: the viewer feels like the cat handling an impossibly tiny world. Scale contrast + tactile calm matter more than showing a cat face.
 
 Canonical identity docs:
 - `CURRENT_STANDARD.md`
@@ -70,10 +63,9 @@ Official Google Flow Help rechecked **2026-08-28**:
 - Veo 3.1 Lite 4s/6s/8s + Extend: non-Ultra 10 credits/generation
 - First + Last frames remain supported for the current Lite workflow
 - output count = 1
-- 1080p upscaling = 0 credits for Plus/Pro/Ultra
-- Nano Banana 2 Lite remains described as a no-charge image-generation/editing option; actual UI displayed cost remains the source of truth
 - actual Flow UI active model/mode/output count/displayed cost is the generation-time source of truth
-- Omni Flash is a different/higher-cost path; do not confuse existing-video edit mode with standard new-video generation
+
+Do not confuse an existing-video edit / Omni Flash edit screen with standard new-video generation.
 
 Canonical operator docs:
 - `docs/23_minimum_credit_operator_architecture.md`
@@ -85,9 +77,7 @@ Canonical operator docs:
 Mandatory before paid G1:
 
 ```text
-Flow image generation/editing
-→ verify active image model + displayed cost
-→ use no-charge path only when UI confirms it
+verify image model + displayed cost in Flow
 → create KF0 master visual anchor
 → QC POV / paws / scale / camera / fixed props / lighting
 → derive KF1 from approved KF0
@@ -97,19 +87,7 @@ Flow image generation/editing
 → only then generate G1
 ```
 
-KF1+ must not be independent fresh text-to-image lottery tickets when the prior approved KF can anchor continuity.
-
-Preserve across the planned chain:
-- paw fur/anatomy
-- first-person camera/lens
-- hero-object scale
-- workbench geometry
-- fixed props
-- lighting/material language
-
-Only intended food/material state changes.
-
-QC shorthand: `KEYFRAME DRIFT FAIL`.
+KF1+ should not become independent fresh text-to-image lottery tickets when a previous approved KF can anchor continuity.
 
 Important distinction:
 - planned KF = approved scene destination / target state
@@ -160,16 +138,16 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 
 ## Deterministic safeguards already built
 
-- latest-main / recent-PR / `AGENTS.md` / handoff-first work-start order
+- latest-main / recent-PR / handoff-first work-start order
 - POV paw-only + tiny-scale hard gates
 - Flow generation-vs-edit UI preflight
-- no-charge image-model/cost preflight
 - planned KF0→KFn continuity chain
+- numeric KF0..KFn sequence semantics independent of YAML mapping order
 - manifest-aware H30/H40 guidance
 - scene-count/generation-count/credit-budget consistency validation
 - keyframe map/reference integrity
 - non-empty action/action_guard for every paid scene
-- explicit zero-cut preservation
+- explicit zero-cut prompt preservation
 - actual-last-frame First-frame mapping
 - Flow native Save frame bridge instructions
 - progressive-spend PASS dependency validation
@@ -179,25 +157,24 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - bundle-level current-standard validation
 - local handoff-update guard
 - regression tests for core production invariants
-- **numeric planned-keyframe sequence gate: all-First+Last manifests must define one unique contiguous `KF0..KFn` numeric sequence; G1 starts at KF0 and Gi ends at KFi regardless of YAML mapping order**
+- **long-take manifest guard: every production manifest must explicitly declare 0 or 1 visual cuts per 8-second generation and exactly one preferred primary action; values above 1 fail before paid generation**
 
-## Latest fix — numeric planned-keyframe sequence semantics
+## Latest fix — long-take manifest drift guard
 
 Problem found on **2026-08-28**:
-- the prior scene-order guard used YAML mapping insertion order to decide which planned KF was KF0/KF1/KF2...
-- insertion order is formatting/presentation detail and can change during a harmless manual edit or formatter pass
-- therefore the exact same semantic keyframe set could either fail validation after reordering or, worse, make a reordered map redefine the paid target sequence
-- names such as `KF2_CRACK` already carry an explicit semantic index, so insertion order should never outrank that number
+- the Flow Pack renderer correctly preserved `max_visual_cuts_per_8s_generation: 0`, but the current-standard validator did not require the field itself
+- a future manifest could omit the cut ceiling entirely or set it to `2+`, and still pass validation
+- the validator also did not require `preferred_action_count_per_generation: 1`, even though one primary action per 8s clip is a core reliability/relaxation rule
+- this would allow rapid pacing or multi-action scene drift to survive until a paid Veo generation
 
 Fix:
-- require every production keyframe name to begin with `KF<number>`
-- parse the numeric index and reject duplicate numeric indices such as `KF2_CRACK` + `KF2_ALT`
-- for all-First+Last manifests require the exact contiguous sequence `KF0..KF<scene_count>` with no holes or extras
-- require G1 start to resolve to numeric KF0 and Gi end to numeric KFi
-- allow harmless YAML mapping reordering without changing production semantics
-- add regression coverage for reordered mappings, malformed names, duplicate indices and missing/extra indices
+- require `flow_strategy.max_visual_cuts_per_8s_generation` to be explicitly present
+- permit only integer `0` or `1`; `0` remains preferred for TK-005 and the default long-take style, while `1` leaves a narrow non-montage exception
+- require `flow_strategy.preferred_action_count_per_generation: 1`
+- reject missing, malformed, negative, or 2+ cut limits before preparation
+- add focused regression coverage for missing cut limits, rapid-cut manifests, the 1-cut exception, and multi-action drift
 
-This is a 0-credit fail-closed improvement. It does not change TK-005 story, runtime, generation count, budget or candidate ranking.
+This is a 0-credit fail-closed improvement. It does not change TK-005 story, runtime, generation count, budget, or candidate ranking.
 
 ## Research / idea policy
 
@@ -215,8 +192,8 @@ Evidence saturation rule: do not keep committing same-class seasonal retail/PR s
 
 2026-08-28 research check:
 - official Flow pricing/features remain unchanged for the current Lite workflow
-- current Japanese sweet-potato/autumn signals continue to support the already-selected yakiimo timing but are same-class evidence already represented
-- no newly found adjacent content signal changes candidate rank, production mechanic or NEXT_EPISODE
+- current Japanese sweet-potato/month-viewing/autumn retail signals are same-class evidence already represented in the repository
+- a Japanese miniature/fantasy ASMR reference with strong historical views was reviewed, but its useful mechanic (micro-world reveal / sensory texture) is already represented in the project; no candidate rank or production mechanic changes are justified
 - research/backlog files intentionally remain unchanged this run
 
 Current candidate state:
@@ -261,15 +238,16 @@ Beats:
 Continuity/action rules:
 - same roasting tray G1–G4
 - same fixed tabletop warmer KF0–KF4
-- same serving niche upper-right KF0–KF4
+- same serving niche KF0–KF4
 - no surprise new cookware/structure
 - no direct pinch/grab
 - KF0 = master planned anchor
 - KF1→KF4 = sequential edit/reference derivations from previous approved planned KF
-- G2/G3/G4 First = Flow-native actual saved frame from previous PASS clip
+- G2/G3/G4 First = actual saved frame from previous PASS clip
 - explicit action + action_guard in every G scene
-- literal zero-cut constraint in generated prompt
-- numeric KF semantics are fixed by `KF0..KF4`, not YAML mapping order
+- `max_visual_cuts_per_8s_generation: 0`
+- `preferred_action_count_per_generation: 1`
+- numeric KF semantics are fixed by KF numbers, not YAML mapping order
 
 Highest-value next real-world step remains **approve TK-005 KF0→KF4 in real Flow, then generate G1 only and QC it.** Automation must not spend that credit.
 
@@ -304,7 +282,7 @@ subscribers / 100 credits
 2. create/approve KF0 master anchor using UI-confirmed no-charge image path
 3. derive/approve KF1→KF4 through sequential edit/reference chaining
 4. generate G1 only
-5. QC POV / scale / anatomy / camera / action / zero-cut / fixed-prop continuity
+5. QC POV / scale / anatomy / camera / action / cut count / fixed-prop continuity
 6. on PASS, native Save frame
 7. continue G2 → G3 → justified G4 through progressive gates
 8. record actual credits, rerolls, usable seconds, failure type
@@ -325,7 +303,7 @@ Expand distinct worlds only after performance evidence, without repeating recent
 
 1. real Flow TK-005 KF0→KF4 continuity validation
 2. actual G1 production/QC
-3. real zero-cut long-take behavior
+3. verify real 0-cut long-take behavior
 4. actual saved-frame continuity
 5. actual credits/rerolls/usable motion
 6. first public 24h/72h sample
@@ -347,21 +325,18 @@ Expand distinct worlds only after performance evidence, without repeating recent
 
 ## Safety / invariants
 
-- no OpenCode Go delegation for repository development while `AGENTS.md` forbids it
 - no automatic Flow credit spend
 - no automatic paid generation
 - no automatic YouTube publish
 - no exact competitor copying
 - no third-person/full-cat regression
 - no paid G1 before full planned KF chain PASS
-- no independent fresh-generation KF1+ when prior approved KF can anchor continuity
 - no planned KF substituted for previous actual PASS frame
-- no undefined/malformed KF improvisation
-- no duplicate KF numeric index
-- no missing/non-contiguous KF0..KFn sequence in all-First+Last manifests
-- no YAML mapping reorder changing the semantic planned-KF sequence
+- no undefined/malformed/duplicate KF sequence
 - no blank action/action_guard
-- no silent loss of zero-cut constraint
+- no missing cut ceiling
+- no >1 visual cut per 8s production scene plan
+- no preferred action count other than 1
 - no next-scene spend after previous-scene failure
 - no scene-count/runtime/credit mismatch
 - no padding G4
@@ -385,25 +360,24 @@ current research
 → next prior update
 ```
 
-Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer continuity/camera rerolls, less operator judgment and fewer repeated story fingerprints — not commit count.
+Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer continuity/camera/reroll failures, less operator judgment and fewer repeated story fingerprints — not by commit count.
 
 ## Change log
 
-### 2026-08-28 — numeric planned-keyframe sequence gate
-Baseline `main@875d19c7375db93979fa2ded47b3440754fd3e0f`.
+### 2026-08-28 — long-take manifest drift guard
+Baseline `main@3ecece44258ebbab7abc0e49645d9e5a39e2ca85`.
 
 Changed:
-- stop using YAML insertion order as planned-KF semantics
-- require unique numeric `KF0..KFn` indices for all-First+Last manifests
-- make Gi target numeric KFi deterministically
-- tolerate harmless mapping reordering while rejecting duplicate/missing/malformed indices
-- add focused regression tests
+- require explicit 0/1 visual-cut ceiling in production manifests
+- fail closed on 2+ cuts, missing/malformed values, or multi-action defaults
+- require preferred primary action count = 1
+- add regression coverage
 - synchronize this handoff
 
 Verified assumptions:
-- TK-005 already uses contiguous `KF0_OPEN → KF1_WARM → KF2_CRACK → KF3_OPEN → KF4_SERVE`
+- TK-005 already declares `max_visual_cuts_per_8s_generation: 0` and `preferred_action_count_per_generation: 1`
 - official Flow pricing/features remain unchanged on 2026-08-28
-- current Japanese autumn evidence does not justify ranking/NEXT_EPISODE changes
+- fresh research does not justify ranking/NEXT_EPISODE changes
 
 Unchanged:
 - NEXT_EPISODE = TK-005
@@ -413,14 +387,8 @@ Unchanged:
 - no paid generation or publishing
 
 ### Earlier 2026-08-28 work
-- planned keyframe scene-order fail-closed gate
-- START_HERE synchronized with full planned KF chain
-- development executor policy synchronized with AGENTS.md
-- CURRENT_STANDARD planned-keyframe synchronization
+- numeric planned-keyframe sequence gate
+- planned-keyframe scene-order gate
+- START_HERE / CURRENT_STANDARD synchronization
 - planned keyframe continuity chain
-- no-charge keyframe cost preflight
-- Flow native Save frame bridge
-- TK-005 fixed warmer/niche continuity
-- zero-cut prompt preservation
-- scene-action/keyframe/spend integrity gates
-- runtime-aware operator guidance
+- Flow native Save-frame chain guidance
