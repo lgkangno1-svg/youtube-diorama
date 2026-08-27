@@ -31,6 +31,16 @@ def base_manifest() -> dict:
             "max_lite_generations_first_pass": 3,
             "non_ultra_credit_budget_first_pass": 30,
             "narration_policy": "none_by_default",
+            "progressive_spend_gate": {
+                "g2_requires_g1_pass": True,
+                "g3_requires_g2_pass": True,
+                "stop_if_pov_scale_anatomy_or_premise_fails": True,
+                "reroll_only_structural_failure": True,
+            },
+            "sequential_chain": {
+                "g2_start_source": "save_actual_last_usable_frame_from_G1",
+                "g3_start_source": "save_actual_last_usable_frame_from_G2",
+            },
         },
         "keyframes": {
             "KF0_OPEN": "approved opening frame",
@@ -102,6 +112,8 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         data["keyframes"]["KF4_TARGET"] = "approved fourth target"
         data["flow_strategy"]["max_lite_generations_first_pass"] = 4
         data["flow_strategy"]["non_ultra_credit_budget_first_pass"] = 40
+        data["flow_strategy"]["progressive_spend_gate"]["g4_requires_g3_pass"] = True
+        data["flow_strategy"]["sequential_chain"]["g4_start_source"] = "save_actual_last_usable_frame_from_G3"
         errors = validate(data)
         self.assertIn("compact_h30 must declare exactly 3 scenes and 3 first-pass Lite generations", errors)
 
@@ -149,6 +161,43 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         data["scenes"][2]["action_guard"] = "  "
         errors = validate(data)
         self.assertIn("G3 action_guard must be non-empty before paid generation", errors)
+
+    def test_g2_must_require_g1_pass(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["progressive_spend_gate"]["g2_requires_g1_pass"] = False
+        errors = validate(data)
+        self.assertIn("flow_strategy.progressive_spend_gate.g2_requires_g1_pass must be true", errors)
+
+    def test_structural_failure_stop_gate_is_required(self) -> None:
+        data = base_manifest()
+        del data["flow_strategy"]["progressive_spend_gate"]["stop_if_pov_scale_anatomy_or_premise_fails"]
+        errors = validate(data)
+        self.assertIn(
+            "flow_strategy.progressive_spend_gate.stop_if_pov_scale_anatomy_or_premise_fails must be true",
+            errors,
+        )
+
+    def test_sequential_chain_metadata_must_match_actual_frame_policy(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["sequential_chain"]["g3_start_source"] = "planned_KF2_target"
+        errors = validate(data)
+        self.assertIn(
+            "flow_strategy.sequential_chain.g3_start_source must be save_actual_last_usable_frame_from_G2",
+            errors,
+        )
+
+    def test_extend_scene_does_not_require_saved_still_chain_metadata(self) -> None:
+        data = base_manifest()
+        data["scenes"][1] = {
+            "id": "G2",
+            "generation_type": "extend",
+            "generation_seconds": 8,
+            "source_scene": "G1",
+            "action": "continue the same tiny warming motion",
+            "action_guard": "preserve POV and scale; no camera cut or new prop",
+        }
+        del data["flow_strategy"]["sequential_chain"]["g2_start_source"]
+        self.assertEqual(validate(data), [])
 
 
 if __name__ == "__main__":

@@ -1,19 +1,31 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-27 KST**  
-Baseline inspected before this change: `main@4c61aeb32dcde224730ec18f424923392735bfbf`
+Baseline inspected before this change: `main@6cba79965b589b90f2879d8c8288b05619f2902b`
 
-This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer should be able to continue from the repository without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
+This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer should be able to continue from GitHub without prior chat history. **Every material repository change must update this file in the same branch/PR.** True NO-OP research should not churn it.
 
-## Mission
+## 1. Mission / development intent
 
-Build a Japanese-target Shorts operating system, not merely an AI-cat generator. The normal user interface should remain:
+Build a Japanese-target Shorts operating system, not merely an AI-cat generator. The system should absorb the repetitive work of:
+- current Japanese/global benchmark research
+- Japanese seasonal/cultural/food signal research
+- idea generation and scoring
+- originality/fingerprint checks
+- Veo-safe action design
+- Flow credit/runtime planning
+- deterministic scene prompts
+- character/camera/prop continuity
+- edit/publish packs
+- 24h/72h production and audience learning
+
+The normal user interface should remain:
 
 ```text
 다음 영상 준비해줘
 ```
 
-The system researches current Japanese/global signals, chooses a novelty-safe episode, prepares the manifest and `production/NEXT_EPISODE.txt`, generates deterministic local operator packs, and learns from production plus 24h/72h YouTube results. The user runs:
+The system then researches/selects the next novelty-safe episode, creates/updates its manifest and `production/NEXT_EPISODE.txt`, and leaves local operator files ready for:
 
 ```powershell
 ./tools/make_next_short.ps1
@@ -21,39 +33,87 @@ The system researches current Japanese/global signals, chooses a novelty-safe ep
 
 Never spend Flow credits, generate paid video, or publish to YouTube without explicit user action.
 
-## Channel identity
+## 2. Viewer-facing goal
 
-Canonical docs: `CURRENT_STANDARD.md`, `docs/24_hero_cat_brand_identity.md`, `docs/25_pov_paws_microworld_grammar.md`.
+Tiny Cat Kitchen Shorts should feel like the viewer **is the cat**, not like the viewer is watching a cat chef.
 
-Default visual grammar is `POV_PAWS_MICROWORLD_V1`:
+Core promise:
+
+> True first-person cat POV, only front paws visible, handling food/objects so tiny that the paw-to-object scale contrast itself feels cute and healing.
+
+Initial target market: Japan, especially teen/20s Shorts viewers, while keeping globally readable visual satisfaction and ASMR.
+
+Long-term channel success is not measured by uploads or commits. Optimize:
+
+```text
+usable motion / credit
+engaged views / credit
+subscribers / 100 credits
+```
+
+## 3. Channel identity — do not regress
+
+Canonical docs:
+- `CURRENT_STANDARD.md`
+- `docs/24_hero_cat_brand_identity.md`
+- `docs/25_pov_paws_microworld_grammar.md`
+
+Default grammar: `POV_PAWS_MICROWORLD_V1`
 - true first-person cat POV
-- only cream + pale-ginger front paws visible near the lower edge
-- no cat face/head/body/full-cat reveal
-- hero food/object normally 5–20mm and <=0.50 of one visible paw width
+- only cream + pale-ginger real feline front paws near lower edge
+- no face/head/eyes/ears/body/tail/full cat
+- hero food/object normally 5–20mm
+- hero object visually <=0.50 of one visible paw width, preferably 0.15–0.50
 - macro miniature diorama workbench
-- mostly locked camera
+- mostly locked camera / subtle breathing drift only
 - one calm tactile primary action + at most one micro-payoff per 8s generation
 - preferred paw actions: nudge, press, pat, roll, steady, slide, tap
-- avoid human-like gripping/tool manipulation
-- no rapid montage or third-person chef framing
+- avoid fingers/thumbs/human grip/chopsticks/tongs/knife handling
+- no rapid montage / meme zoom / third-person chef framing
 
-The core appeal is not showing a cute cat face. It is making the viewer feel like the cat while handling an impossibly tiny world.
+Structural FAIL even when visually pretty:
+- full cat or cat face visible
+- third-person cat cooking at a counter
+- food/pan comparable to paw size
+- human fingers/thumbs
+- paw grips tools like a hand
+- wide kitchen shot weakens tiny-scale contrast
 
-## Flow / Veo baseline
+The core attraction is **impossible miniature scale from the cat's own perspective**, not a cute cat face.
 
-Canonical docs: `docs/23_minimum_credit_operator_architecture.md`, `docs/26_flow_ui_mode_preflight.md`.
+## 4. Hero cat / world
+
+### HERO_CAT_V1
+- cream fur base
+- pale ginger markings
+- real feline paw anatomy
+- soft premium/healing tone
+- face may exist in profile/branding assets, but default Shorts show paws only
+
+### KITCHEN_WORLD_V1
+- cozy Japanese-inspired miniature environment
+- warm wood / ceramic / paper / tiny stall / workbench
+- hero object must read before decoration
+- seasonal cues allowed
+- never copy another creator's/branded product's exact package, styling, title, plot, or ending
+
+## 5. Flow / Veo baseline
+
+Canonical docs:
+- `docs/23_minimum_credit_operator_architecture.md`
+- `docs/26_flow_ui_mode_preflight.md`
 
 Official Google Flow help rechecked **2026-08-27**:
 - Veo 3.1 Lite 4s/6s/8s + Extend: non-Ultra 10 credits/generation
 - First + Last frames: Lite supports 4s/6s/8s
-- output count = 1
-- 1080p upscaling: 0 credits for Plus/Pro/Ultra
 - Ingredients/References can be 8s-only
+- output count = 1
+- 1080p upscale: 0 credits for Plus/Pro/Ultra
 - actual Flow UI model/mode/output-count/displayed cost is the generation-time source of truth
 
-Do not confuse an existing-video edit / Omni Flash edit screen with standard new-video generation.
+Do not confuse standard new-video generation with an existing-video `Omni Flash` edit/modify screen.
 
-Progressive Spend:
+## 6. Progressive Spend — mandatory credit-safety rule
 
 ```text
 FREE keyframe/reference preflight
@@ -63,76 +123,172 @@ FREE keyframe/reference preflight
 → G2 only after G1 PASS
 → QC
 → G3 only after G2 PASS
-→ G4 only when immersive_h40 explicitly needs an independent world-resolution beat and G3 PASSed
+→ G4 only if immersive_h40 explicitly needs an independent world-resolution beat AND G3 PASSed
 ```
 
-Sequential continuity uses the real previous PASS frame, not the prettier planned target frame.
+Never proactively generate G2/G3/G4.
 
-## Runtime policy
+Structural failures that stop downstream spend:
+- POV
+- scale
+- anatomy
+- premise/action feasibility
 
-`compact_h30`:
+Reroll only structural failures. If motion is good and audio alone is bad, repair audio in edit instead of buying another generation.
+
+### Latest validator hardening — 2026-08-27
+
+Before this change, `tools/validate_current_standard.py` verified scene count, credits, frames, keyframes, actions and runtime, but **did not verify the manifest's own `progressive_spend_gate` or `sequential_chain` metadata**. A stale or hand-edited manifest could therefore say G2/G3/G4 did not require the previous PASS and still pass preparation.
+
+Now production validation requires, when applicable:
+- `g2_requires_g1_pass: true`
+- `g3_requires_g2_pass: true`
+- `g4_requires_g3_pass: true`
+- `stop_if_pov_scale_anatomy_or_premise_fails: true`
+- `reroll_only_structural_failure: true`
+- G2/G3/G4 sequential-chain metadata must explicitly point to the previous scene's **actual last usable frame**
+
+This makes the manifest, validator, generated operator pack and documented credit policy agree before any paid generation.
+
+## 7. Sequential Frame Chain
+
+Continuity must use real prior outputs:
+
+```text
+G1
+↓ actual last usable frame
+G2 First
+↓ actual last usable frame
+G3 First
+↓ actual last usable frame
+G4 First (immersive_h40 only)
+```
+
+Do **not** substitute the prettier planned target keyframe for the previous PASS scene's real final usable frame.
+
+Continuity priority:
+1. first-person camera position
+2. paw fur/anatomy
+3. hero-object size ratio
+4. cookware/food state
+5. workbench/lighting
+
+The generated Flow Pack already translates symbolic tokens such as `ACTUAL_LAST_USABLE_FRAME_G1` into explicit operator instructions.
+
+## 8. Runtime policy
+
+### compact_h30
 - exactly 3 first-pass Lite scenes
-- 30-credit current first-pass ceiling
+- current first-pass ceiling: 30 credits
+- raw motion 24s
 - final roughly 30–36s
+- use when 3 distinct beats fully complete the tactile journey
 
-`immersive_h40`:
+### immersive_h40
 - exactly 4 first-pass Lite scenes
-- 40-credit current first-pass ceiling
+- current first-pass ceiling: 40 credits
+- raw motion 32s
 - final roughly 38–46s
-- G4 must have independent serving/world-resolution/afterglow value
+- G4 must add independent serving/world-resolution/afterglow value
+- never buy G4 just to pad runtime
 
-48–60s is not the default. Test longer runtimes only after the channel's own retention and engaged-views-per-credit data supports them.
+48–60s is not the default. Test longer runtimes only after real channel retention and engaged-views-per-credit evidence supports them.
 
-## Deterministic production gates already built
+## 9. Audio policy
 
-- source-of-truth ordering from `START_HERE.md`
-- HERO_CAT_V1 / KITCHEN_WORLD_V1
+Default:
+
+```text
+No narration
+No generated music
+Quiet room tone + close tiny tactile ASMR
+```
+
+Good sounds:
+- tiny ceramic click
+- soft wood scrape
+- dough/crumb press
+- subtle tiny sizzle
+- paper rustle
+- faint steam/room ambience
+
+Use a short user-recorded Japanese line only when it materially improves comprehension, character voice, or payoff.
+
+## 10. Deterministic production gates already built
+
+Current safeguards include:
+- source-of-truth work-start order
+- HERO_CAT_V1 / KITCHEN_WORLD_V1 identity
 - POV paw-only + tiny-scale hard gates
 - Flow generation-vs-edit UI preflight
-- Progressive Spend
-- actual-last-frame sequential chaining
-- generated Flow Pack with explicit First/Last operator mapping
-- manifest-aware H30/H40 operator guidance
-- novelty/authenticity gate against recent repeated hook/conflict/ending fingerprints
+- manifest-aware H30/H40 runtime guidance
+- exact scene-count / generation-count / credit-budget consistency
+- 8s scene requirement for current production grammar
+- keyframe map required
+- planned `KF*` references must exist and have non-empty prompts
+- each paid scene must have non-empty `action`
+- each paid scene must have non-empty `action_guard`
+- explicit `max_visual_cuts_per_8s_generation: 0` is preserved literally in generated prompts
+- actual-last-frame First-frame mapping
+- progressive-spend PASS dependencies validated in manifest
+- sequential-chain metadata validated against actual-frame policy
+- novelty/authenticity gate against repeated recent hook/conflict/ending fingerprints
 - seasonal evidence saturation/no-churn gate
-- manifest scene-count/runtime/credit consistency validation
-- keyframe-reference integrity: planned `KF*` tokens must exist and contain non-empty prompts
-- scene-action integrity: every paid G scene must have a non-empty `action` and `action_guard`
-- **explicit zero-cut preservation: when a manifest says `max_visual_cuts_per_8s_generation: 0`, the generated paid prompt now literally says `Maximum visual cuts ...: 0` instead of silently dropping the constraint**
-- local regression tests for runtime, frame chain, novelty, manifest consistency, keyframes, scene-action instructions, and zero-cut prompt rendering
+- local deterministic handoff update guard
+- regression tests for major production invariants
 
-## Latest change — Explicit Zero-Cut Prompt Preservation
+## 11. Research / idea policy
 
-Problem found in `tools/build_flow_pack.py` before TK-005 production:
-- TK-005 declares `max_visual_cuts_per_8s_generation: 0` to enforce calm long-take pacing.
-- The Flow Pack builder used `if max_cuts`, so numeric zero was treated as false and the scene-level cut constraint disappeared from the paid prompt.
-- Global text still discouraged rapid montage, but the strongest deterministic scene-level instruction was missing exactly when the manifest demanded zero cuts.
-- This could increase unnecessary shot changes, continuity drift, and reroll risk per credit.
+Source files:
+- `research/benchmark_log.csv`
+- `research/seasonal_evidence.yaml`
+- `ideas/episode_backlog.yaml`
+- `ideas/novelty_signatures.yaml`
+- `docs/27_research_evidence_saturation_gate.md`
+- `docs/28_episode_novelty_authenticity_gate.md`
 
-Fix:
-- render the cut clause whenever the value is explicitly present, including `0`
-- leave it absent only when the manifest did not specify a cut limit
-- regression coverage proves `0` is rendered and an unset value is not invented
+Score ideas on:
+- benchmark evidence
+- Japan relevance
+- healing fit
+- visual satisfaction
+- Veo reliability
+- originality
+- worldbuilding
+- audience demand
+- expected credit efficiency
 
-This is a 0-credit operator/tooling fix. It does not change TK-005's story, runtime, generation count, or budget.
+Never copy another creator's exact title, plot, branded product/package, or ending. Abstract only:
+- hook mechanic
+- scale contrast
+- tactile action
+- pacing
+- visual payoff
+- seasonal timing
+- worldbuilding mechanic
 
-## Research / idea policy
+### Evidence saturation
 
-Source files: `research/benchmark_log.csv`, `research/seasonal_evidence.yaml`, `ideas/episode_backlog.yaml`, `ideas/novelty_signatures.yaml`, `docs/27_research_evidence_saturation_gate.md`, `docs/28_episode_novelty_authenticity_gate.md`.
+Do not keep committing another same-class seasonal PR/retail signal once a candidate is already sufficiently supported. A new research commit should normally change at least one of:
+- score/rank
+- NEXT_EPISODE
+- publish timing
+- evidence class
+- production mechanic
+- freshness after staleness
+- official Flow assumption
+- actual Tiny Cat Kitchen production/performance learning
 
-Score candidates on benchmark evidence, Japan relevance, healing fit, visual satisfaction, Veo reliability, originality, worldbuilding, audience demand, and expected credit efficiency.
+## 12. Current candidate state
 
-Never copy a competitor's exact title, plot, branded product/package, or ending. Keep only abstract mechanisms: hook, scale contrast, tactile action, pacing, payoff, seasonal timing, and worldbuilding.
+- `IDEA-009` yakiimo → already realized as TK-005 and blocked as a future repeat
+- `IDEA-001` 8mm 月見だんご → priority future candidate
+- `IDEA-010` 8mm 新米塩むすび → future candidate supported by current new-rice reservation/arrival behavior
+- `IDEA-002` gummy → currently blocked against a recent equivalent conflict/ending structure
 
-Current candidate state:
-- IDEA-009 yakiimo is already realized as TK-005 and blocked as a future repeat
-- IDEA-001 8mm 月見だんご remains a priority future candidate
-- IDEA-010 8mm 新米塩むすび is a future candidate backed by current rice-reservation behavior
-- IDEA-002 gummy is blocked against a recent equivalent conflict/ending structure
+Fresh 2026-08-27 review does **not** justify another ranking/research-log change. New-rice arrivals are continuing, but this is the same already-recorded evidence class; autumn/yakiimo retail signals are saturated. Official Flow assumptions remain unchanged.
 
-Fresh 2026-08-27 research does **not** justify another research/backlog change: official Flow assumptions are unchanged and newly found autumn retail/adjacent content signals do not change evidence class, candidate ranking, production timing, or NEXT_EPISODE.
-
-## Current production state
+## 13. Current production state
 
 `production/NEXT_EPISODE.txt` = **TK-005**
 
@@ -143,30 +299,33 @@ Title:
 ```
 
 Manifest: `episodes/TK-005.yaml`  
-Runtime: `immersive_h40`
+Runtime: `immersive_h40`  
+Current first-pass ceiling: 4 Lite generations / 40 credits
 
 Beats:
-1. impossible-scale reveal: 12mm purple sweet potato beside paws
+1. impossible-scale reveal — 12mm purple sweet potato beside paws
 2. slow roast / skin crack
-3. same tray slides away; residual heat opens the existing crack and reveals golden center
-4. same tray slides into the tiny serving niche; paws withdraw; steam remains
+3. same tray slides away; residual heat widens the existing crack and reveals golden center
+4. same tray slides into the miniature serving niche; paws withdraw; steam remains
 
-Continuity and action rules:
+Continuity/action rules:
 - same roasting tray G1–G4
 - no surprise new cookware
 - no direct pinch/grab of the sweet potato
 - G2 First = actual last usable frame from G1
 - G3 First = actual last usable frame from G2
 - G4 First = actual last usable frame from G3
-- all planned KF references must resolve before preparation
-- every G1–G4 scene has explicit `action` and `action_guard`
-- `max_visual_cuts_per_8s_generation: 0` must remain literal in generated G prompts
+- all planned KF references resolve before preparation
+- G1–G4 each have explicit action + action_guard
+- `max_visual_cuts_per_8s_generation: 0` remains literal in generated scene prompts
+- progressive spend metadata currently declares all required PASS gates
+- sequential-chain metadata currently declares G2/G3/G4 actual-frame sources correctly
 
-The highest-value next real-world step remains **generate TK-005 G1 only and QC it**. Automation must not spend that credit for the user.
+The highest-value next real-world step remains: **generate TK-005 G1 only and QC it.** Automation must not spend that credit for the user.
 
-## Production learning available so far
+## 14. Production learning available so far
 
-`analytics/learning_ledger.csv` currently contains one real preflight failure showing:
+`analytics/learning_ledger.csv` currently contains one real preflight failure:
 - third-person/full-cat framing
 - body visible
 - scale too large
@@ -176,52 +335,61 @@ Hard response:
 - true first-person camera
 - front paws only
 - hero object <=0.50 paw width
-- prefer nudge/press/slide family
+- prefer nudge/press/slide over gripping
 
-There is not yet enough real 24h/72h public performance data. Never learn from placeholder zeroes as real performance.
+There is not yet enough real public 24h/72h performance data. Never treat placeholder zeroes as observations.
 
-Long-term KPIs:
+Metrics to record when available:
+- actual Flow credits
+- rerolls
+- G1/G2/G3/G4 first-pass success
+- usable motion seconds
+- POV/scale/anatomy failures
+- continuity issues
+- failed action type
+- narration/audio replacement
+- final runtime
+- 24h/72h Stayed to watch
+- APV
+- engaged views
+- subscribers
+- comments
 
-```text
-usable motion / credit
-engaged views / credit
-subscribers / 100 credits
-```
-
-## Roadmap
+## 15. Roadmap
 
 ### Phase A — TK-005 production truth
 1. approve free opening/target frames
-2. generate G1 only
-3. QC POV / scale / anatomy / camera / action / unwanted cuts
-4. on PASS, save actual last usable frame
-5. continue G2 → G3 → justified G4 only through progressive gates
-6. record actual credits, rerolls, usable seconds, failure type
+2. run local preparation/validation
+3. generate G1 only
+4. QC POV / scale / anatomy / camera / action / zero-cut behavior
+5. on PASS, save actual last usable frame
+6. continue G2 → G3 → justified G4 only through progressive gates
+7. record actual credits/rerolls/usable seconds/failure type
 
 ### Phase B — first public Shorts learning
-At 24h/72h record Stayed to watch, APV, engaged views, subscribers, comments, final runtime, credits, rerolls.
+At 24h/72h record retention and engagement metrics plus production cost.
 
 ### Phase C — runtime learning
-Compare compact_h30 vs immersive_h40 on APV, engaged views/credit, subscribers/100 credits, and beat drop-off.
+Compare compact_h30 vs immersive_h40 using APV, engaged views/credit, subscribers/100 credits and beat drop-off.
 
 ### Phase D — operator simplification
-Keep reducing manual judgment so `다음 영상 준비해줘` remains sufficient. Update tooling only when actual Flow behavior or production evidence changes.
+Keep reducing manual judgment so `다음 영상 준비해줘` remains sufficient. Only add tooling where actual Flow behavior or production evidence shows a real operator risk.
 
 ### Phase E — worldbuilding expansion
-Only after performance evidence supports it, expand tiny-stall, rainy-shop, after-hours bakery, seasonal ritual, and other distinct worlds without repeating the same story fingerprint.
+After performance evidence exists, expand tiny stalls, rainy shop, after-hours bakery, seasonal rituals and other worlds while keeping story fingerprints distinct.
 
-## Next priorities
+## 16. Next priorities
 
 1. TK-005 actual G1 production/QC data
-2. confirm true zero-cut long-take behavior in the real Flow output
-3. verify actual-last-usable-frame continuity in practice
+2. verify zero-cut long-take behavior in real Flow output
+3. verify actual-last-frame continuity in practice
 4. record actual credits/rerolls/usable motion
 5. obtain first public 24h/72h sample
 6. only then re-weight runtime/action/idea priors
 
 More same-class retail PR collection is not a priority.
 
-## Work-start order
+## 17. Work-start order
 
 Always inspect in this order:
 1. latest main SHA
@@ -235,33 +403,35 @@ Always inspect in this order:
 9. current episode manifest
 10. research/backlog/learning ledger
 
-Stale chat or automation wording never overrides newer merged repository state.
+Newer merged repository state beats stale chat/automation wording.
 
-## Safety / invariants
+## 18. Safety / invariants
 
 - no automatic Flow credit spend
 - no automatic paid generation
 - no automatic YouTube publish
 - no exact competitor copying
 - no third-person/full-cat regression
-- no substitute planned frame for an actual previous PASS frame
-- no undefined/missing KF improvisation at production time
-- no paid scene with blank action or blank action_guard
-- no silent loss of an explicit `0`-cut scene constraint
-- no next-scene spend after previous-scene failure
+- no human fingers/thumbs/tool grip regression
+- no undefined/missing KF improvisation
+- no blank paid-scene action/action_guard
+- no next-scene spend before previous PASS
+- no stale progressive-spend gate metadata
+- no stale sequential-chain metadata
+- no planned target frame substituted for previous actual PASS frame
 - no scene-count/runtime/credit mismatch
-- no padding G4 merely to hit a duration
-- no reroll of good motion for audio-only defects
-- no placeholder analytics treated as real observations
+- no padding G4
+- no reroll of good motion for audio-only defect
+- no placeholder analytics treated as real data
 - do not modify Cali or unrelated repositories
 
-## Definition of Done
+## 19. Definition of Done
 
 ```text
 current research
 → scored + novelty-safe candidate
 → POV/tiny-scale production-safe manifest
-→ spend/runtime/keyframe/action/cut consistency PASS
+→ spend/runtime/keyframe/action/cut/progressive-chain validation PASS
 → free frame preflight
 → progressive Flow generation
 → actual-frame continuity chain
@@ -271,34 +441,39 @@ current research
 → next episode prior update
 ```
 
-Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer continuity/camera rerolls, less operator judgment, and fewer repeated story fingerprints — not by commit count.
+## 20. Change log
 
-## Change log
+### 2026-08-27 — Progressive-spend manifest integrity gate
+Baseline: `main@6cba79965b589b90f2879d8c8288b05619f2902b`.
 
-### 2026-08-27 — Explicit zero-cut Flow prompt preservation
-Baseline `main@4c61aeb32dcde224730ec18f424923392735bfbf`.
+Problem:
+- manifest validator did not verify `progressive_spend_gate` or `sequential_chain` metadata
+- a stale/hand-edited manifest could conflict with the documented no-downstream-spend policy and still pass local preparation
 
 Changed:
-- fix truthiness bug that dropped `max_visual_cuts_per_8s_generation: 0`
-- paid scene prompts now explicitly preserve a declared zero-cut constraint
-- add regression coverage for explicit zero and unset cut limit
+- validate G2/G3/G4 previous-PASS requirements when those scenes exist
+- require structural-failure stop gate
+- require reroll-only-structural-failure gate
+- validate G2/G3/G4 actual-last-frame sequential-chain metadata
+- add regression coverage
 - synchronize this handoff
 
-Verified assumptions:
-- TK-005 already declares zero cuts and directly benefits from the fix
-- official Flow pricing/features remain unchanged on 2026-08-27
-- fresh research did not justify ranking/NEXT_EPISODE changes
+Verified:
+- TK-005 already declares the required gates and chain sources, so no episode/story/runtime/budget change is needed
+- official Google Flow pricing/features remain unchanged on 2026-08-27
+- fresh research does not justify candidate ranking/NEXT_EPISODE changes
 
 Unchanged:
 - NEXT_EPISODE = TK-005
-- TK-005 story/runtime/40-credit first-pass ceiling
-- candidate ranking
-- no credits spent, no paid generation, no publishing
+- immersive_h40 / 40-credit first-pass ceiling
+- no paid generation
+- no YouTube publishing
 
 ### Earlier 2026-08-27 work
+- explicit zero-cut Flow prompt preservation
 - scene-action integrity gate
 - keyframe-reference integrity gate
-- manifest spend consistency fail-closed gate
+- manifest scene-count/runtime/credit consistency gate
 - runtime-aware operator guidance
 - explicit Flow First/Last frame mapping
 - IDEA-010 new-rice onigiri candidate
