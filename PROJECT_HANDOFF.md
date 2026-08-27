@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-27 KST**  
-Baseline inspected before this change: `main@28f8bdfd004c52ccfe4307adb2ef1603f25f5aec`
+Baseline inspected before this change: `main@eab9cc1b304a74e26d45906b33467b625ffdba05`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -52,6 +52,7 @@ Official Google Flow help rechecked **2026-08-27**:
 - output count = 1
 - 1080p upscaling = 0 credits for Plus/Pro/Ultra
 - actual Flow UI active model/mode/output count/displayed cost remains final generation-time truth
+- Flow can save a paused generated-video frame directly into the project with the native `Save frame` action; that saved frame can then be used as an ingredient, start frame, or end frame
 
 Do not confuse an existing-video edit / Omni Flash modify screen with standard new-video generation.
 
@@ -65,14 +66,14 @@ Canonical operator docs:
 FREE keyframe/reference preflight
 → G1 only
 → QC
-→ save actual last usable frame
+→ save actual last usable frame with Flow native Save frame
 → G2 only after G1 PASS
 → QC
 → G3 only after G2 PASS
 → G4 only if immersive_h40 explicitly needs an independent world-resolution beat and G3 PASSed
 ```
 
-Sequential continuity always uses the real previous PASS frame as the next First frame. Never substitute a prettier planned target frame.
+Sequential continuity always uses the real previous PASS frame as the next First frame. Never substitute a prettier planned target frame. Prefer Flow's native saved project frame over browser screenshots, screen captures, downloaded/re-encoded stills, or recreated frames.
 
 ## Runtime policy
 
@@ -113,6 +114,7 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - non-empty action/action_guard for every paid scene
 - explicit zero-cut preservation in generated prompts
 - actual-last-frame First-frame mapping
+- **native Flow `Save frame` bridge instructions for every sequential PASS scene**
 - progressive-spend PASS dependency validation
 - sequential-chain metadata validation
 - novelty/authenticity gate against repeated recent hook/conflict/ending fingerprints
@@ -121,24 +123,22 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - local handoff update guard
 - regression tests for core production invariants
 
-## Latest material change — full TK-005 static-prop continuity
+## Latest material change — native Flow frame bridge
 
-The previous change correctly made the G1 heat source exist from the opening frame, but a second semantic review found continuity gaps later in the same manifest:
+Official Flow documentation confirms a generated clip can be opened, paused on a frame, and that exact frame can be saved into the project with `Save frame`, after which it can be reused as a start/end frame.
 
-- `KF2_CRACK` did not explicitly preserve the warmer.
-- `KF3_OPEN` referred to heat indirectly but did not lock the same warmer position.
-- `KF4_SERVE` introduced the serving niche even though prior planned keyframes did not explicitly show it.
+Before this change the generated Flow Pack only said to “save the actual last usable frame” and suggested a local PNG filename. That left room for an operator to use a browser screenshot, screen capture, downloaded/re-encoded still, or reconstructed target frame. Those alternatives can change pixels/crop/compression/state and undermine the purpose of sequential continuity.
 
-With First+Last generation, that could still cause a paid scene to invent, delete, duplicate, or reposition major static props.
+Fix in `tools/build_flow_pack.py`:
+- after a scene PASS, explicitly instruct: open the PASS clip → pause on exact last usable frame → hover → click native `Save frame`
+- use that saved Flow project asset as the next First frame
+- screenshots/re-encoded/recreated stills are now explicitly discouraged when native Save frame is available
+- `FRAME CHAIN FAIL` includes using the wrong non-native bridge asset
+- recovery instruction reopens the PASS clip and saves the correct frame rather than rerolling or substituting a planned target
 
-Fix:
-- the same tabletop warmer now remains explicit from KF0 through KF4
-- one small serving niche is already visible at the far upper-right edge from KF0 onward
-- G1–G3 keep both static props fixed while only the tray/food state changes
-- G4 slides the same tray into that already-visible niche instead of creating a new stall structure at the end
-- G2/G3/G4 guards explicitly preserve these props
+Regression coverage in `tools/test_build_flow_pack.py` now requires these instructions to remain present.
 
-This change does **not** alter the episode concept, runtime, scene count, title, candidate rank, or credit ceiling. It only reduces avoidable continuity invention before the first paid G1.
+This is a 0-credit operator/tooling improvement. It changes no episode story, runtime, ranking, generation count, or spend ceiling.
 
 ## Research / idea policy
 
@@ -162,7 +162,7 @@ Current candidate state:
 - `IDEA-010` 8mm 新米塩むすび → future candidate supported by current rice-reservation/arrival behavior
 - `IDEA-002` gummy → currently blocked against a recent equivalent conflict/ending structure
 
-Fresh 2026-08-27 research did not justify ranking, evidence-class, or NEXT_EPISODE changes. Official Flow assumptions remain unchanged.
+Fresh 2026-08-27 research still does not justify ranking, evidence-class, or NEXT_EPISODE changes. Same-class Tsukimi/autumn retail announcements are saturated and are not recorded merely to create commits.
 
 ## Current production state
 
@@ -190,9 +190,9 @@ Continuity/action rules:
 - same small serving niche remains visible at the upper-right KF0–KF4
 - no surprise new cookware/shelf/stall structure
 - no direct pinch/grab of sweet potato
-- G2 First = actual last usable frame from G1
-- G3 First = actual last usable frame from G2
-- G4 First = actual last usable frame from G3
+- G2 First = Flow-native saved actual last usable frame from G1 PASS
+- G3 First = Flow-native saved actual last usable frame from G2 PASS
+- G4 First = Flow-native saved actual last usable frame from G3 PASS
 - all planned KF references resolve before preparation
 - every G scene has explicit action + action_guard
 - zero-cut constraint remains literal in generated prompts
@@ -230,7 +230,7 @@ subscribers / 100 credits
 2. run local preparation/validation
 3. generate G1 only
 4. QC POV / scale / anatomy / camera / action / zero-cut behavior / warmer+niche continuity
-5. on PASS, save actual last usable frame
+5. on PASS, use Flow native `Save frame` on the exact last usable frame
 6. continue G2 → G3 → justified G4 only through progressive gates
 7. record credits/rerolls/usable seconds/failure type
 
@@ -251,7 +251,7 @@ After performance evidence exists, expand distinct tiny stalls, rainy shops, aft
 1. TK-005 actual G1 production/QC data
 2. confirm warmer + distant serving niche + tray + paw + camera layout survives G1
 3. verify zero-cut long-take behavior in real Flow output
-4. verify actual-last-frame continuity in practice
+4. verify native Save frame → next First frame continuity in practice
 5. record actual credits/rerolls/usable motion
 6. obtain first public 24h/72h sample
 7. only then re-weight runtime/action/idea priors
@@ -287,6 +287,7 @@ Newer merged repository state overrides stale chat or automation wording.
 - no next-scene spend before previous PASS
 - no stale progressive-spend or sequential-chain metadata
 - no planned target frame substituted for previous actual PASS frame
+- prefer Flow native saved actual frame over screenshot/re-encoded/recreated bridge assets
 - no scene-count/runtime/credit mismatch
 - no major static prop appearing or disappearing mid-generation when it can be fixed in planned frames
 - no padding G4
@@ -304,7 +305,7 @@ current research
 → spend/runtime/keyframe/action/cut/chain validation PASS
 → free frame preflight
 → progressive Flow generation
-→ actual-frame continuity chain
+→ native Save frame actual-frame continuity chain
 → edit/export
 → upload
 → 24h/72h learning
@@ -315,24 +316,27 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-27 — Full TK-005 static-prop continuity
-Baseline `main@28f8bdfd004c52ccfe4307adb2ef1603f25f5aec`.
+### 2026-08-27 — Native Flow Save-frame bridge
+Baseline `main@eab9cc1b304a74e26d45906b33467b625ffdba05`.
 
 Changed:
-- preserve the same warmer explicitly through every planned keyframe
-- pre-establish the serving niche from KF0 rather than introducing it only at the G4 endpoint
-- preserve both props in G1–G4 action guards
+- convert ambiguous “save last usable frame” guidance into Flow-native `Save frame` steps
+- require that native saved project asset as the preferred next-scene First frame
+- discourage screenshot/re-encoded/recreated continuity stills
+- add regression assertions for the native bridge instructions
 - synchronize this handoff
 
 Verified:
+- official Flow documentation explicitly supports saving a paused video frame to the project and reusing it as start/end frame
+- Veo 3.1 Lite 4/6/8s pricing and First+Last support remain unchanged on 2026-08-27
 - NEXT_EPISODE remains TK-005
 - immersive_h40 and 40-credit first-pass ceiling unchanged
-- official Flow pricing/features unchanged on 2026-08-27
-- fresh research did not justify ranking/evidence changes
+- fresh seasonal research does not justify candidate/ranking changes
 
 No Flow credits spent, no paid generation, no publishing.
 
 ### Earlier 2026-08-27 work
+- full TK-005 warmer + serving-niche static-prop continuity
 - G1 warmer continuity fix
 - bundle-level current-standard validation
 - progressive-spend/sequential-chain manifest validation

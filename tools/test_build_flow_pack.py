@@ -9,8 +9,9 @@ from build_flow_pack import build, frame_input_instruction
 class FlowFrameInputMapTests(unittest.TestCase):
     def test_actual_frame_token_becomes_explicit_operator_instruction(self) -> None:
         text = frame_input_instruction("ACTUAL_LAST_USABLE_FRAME_G1", role="First frame")
-        self.assertIn("ACTUAL saved last usable frame from G1", text)
+        self.assertIn("Flow's native `Save frame` action", text)
         self.assertIn("Do not substitute a planned keyframe", text)
+        self.assertIn("browser screenshot", text)
 
     def test_keyframe_token_remains_free_reference(self) -> None:
         text = frame_input_instruction("KF2_CRACK", role="Last frame")
@@ -64,9 +65,12 @@ class FlowFrameInputMapTests(unittest.TestCase):
 
         self.assertIn("Sequential-frame operator rule", output)
         self.assertIn("First frame: use the approved FREE target/reference keyframe `KF0_OPEN`", output)
-        self.assertIn("First frame: upload the ACTUAL saved last usable frame from G1", output)
+        self.assertIn("First frame: use the ACTUAL frame saved from the QC-PASS G1 clip with Flow's native `Save frame` action", output)
         self.assertIn("After G1 PASS", output)
-        self.assertIn("G1_last_usable.png", output)
+        self.assertIn("pause on the exact last usable frame", output)
+        self.assertIn("click `Save frame`", output)
+        self.assertIn("G1_last_usable", output)
+        self.assertIn("Do not use a screenshot/re-encoded still", output)
         self.assertIn("FRAME CHAIN FAIL", output)
         self.assertIn("Maximum visual cuts in this 8s generation: 0.", output)
 
