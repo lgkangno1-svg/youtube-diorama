@@ -31,6 +31,8 @@ def base_manifest() -> dict:
             "max_lite_generations_first_pass": 3,
             "non_ultra_credit_budget_first_pass": 30,
             "narration_policy": "none_by_default",
+            "max_visual_cuts_per_8s_generation": 0,
+            "preferred_action_count_per_generation": 1,
             "progressive_spend_gate": {
                 "g2_requires_g1_pass": True,
                 "g3_requires_g2_pass": True,
@@ -83,6 +85,35 @@ def base_manifest() -> dict:
 class ManifestSpendConsistencyTests(unittest.TestCase):
     def test_valid_compact_h30_passes(self) -> None:
         self.assertEqual(validate(base_manifest()), [])
+
+    def test_long_take_cut_limit_must_be_declared(self) -> None:
+        data = base_manifest()
+        del data["flow_strategy"]["max_visual_cuts_per_8s_generation"]
+        errors = validate(data)
+        self.assertIn(
+            "flow_strategy.max_visual_cuts_per_8s_generation must be explicitly declared (0 or 1)",
+            errors,
+        )
+
+    def test_rapid_cut_manifest_fails_closed(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["max_visual_cuts_per_8s_generation"] = 2
+        errors = validate(data)
+        self.assertIn(
+            "flow_strategy.max_visual_cuts_per_8s_generation must be 0 or 1 for calm long-take pacing",
+            errors,
+        )
+
+    def test_one_cut_is_allowed_for_non_montage_exception(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["max_visual_cuts_per_8s_generation"] = 1
+        self.assertEqual(validate(data), [])
+
+    def test_preferred_action_count_must_remain_one(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["preferred_action_count_per_generation"] = 2
+        errors = validate(data)
+        self.assertIn("flow_strategy.preferred_action_count_per_generation must be 1", errors)
 
     def test_declared_generation_count_must_match_scenes(self) -> None:
         data = base_manifest()
