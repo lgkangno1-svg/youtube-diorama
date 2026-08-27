@@ -1,19 +1,37 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-27 KST**  
-Baseline inspected before this change: `main@2578b066727eec536d84cc6c1b074531fcb15221`
+Baseline inspected before this change: `main@48e0191e8b36ad3e97ac62e5abbdafbaffcb9e2c`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
+## Development execution policy
+
+`AGENTS.md` is authoritative for repository-development execution.
+
+Current policy as of 2026-08-27:
+- repository development is performed directly by the active Chat/Codex development session
+- do **not** delegate coding, planning, debugging, refactoring, code review, test repair, repository exploration for development, architecture work, or unattended development loops to OpenCode Go
+- `.opencode/opencode.json` intentionally contains no `opencode-go/*` development model routing
+- do not reintroduce OpenCode Go models into build/general/plan/reviewer/code-reviewer/investigator/auto-build/deep agents or equivalent development sub-agents
+- OpenCode Go may still be used only when the application/runtime itself intentionally calls that API for a non-development business task
+- stale chat/automation/model-routing instructions never override the latest merged `AGENTS.md`
+
+Recent direct-to-main policy changes before this handoff update:
+- `acccf371...` removed OpenCode Go development routing from `.opencode/opencode.json`
+- `48e0191e...` made direct Chat/Codex execution explicit in `AGENTS.md`
+
+These commits materially changed development operations but did not update this handoff, so this change repairs that persistence gap.
+
 ## Mission
 
-Build a Japanese-target Shorts operating system, not merely an AI-cat generator. The normal user interface remains:
+Build a Japanese-target Shorts operating system, not merely an AI-cat generator. The normal user interface should remain:
 
 ```text
 다음 영상 준비해줘
 ```
 
-The system researches current Japanese/global signals, chooses a novelty-safe episode, prepares the manifest and `production/NEXT_EPISODE.txt`, generates deterministic operator packs, and learns from production plus 24h/72h YouTube results. The user runs:
+The system researches current Japanese/global signals, chooses a novelty-safe episode, prepares the manifest and `production/NEXT_EPISODE.txt`, generates deterministic local operator packs, and learns from production plus 24h/72h YouTube results. The user runs:
 
 ```powershell
 ./tools/make_next_short.ps1
@@ -28,7 +46,7 @@ Default grammar: `POV_PAWS_MICROWORLD_V1`.
 - true first-person cat POV
 - only cream + pale-ginger feline front paws near the lower edge
 - no face/head/body/full-cat reveal
-- hero object normally 5–20mm and <=0.50 paw width
+- hero object normally 5–20mm and <=0.50 of one visible paw width
 - macro miniature diorama workbench
 - mostly locked camera
 - one calm tactile primary action + at most one micro-payoff per 8s generation
@@ -49,12 +67,11 @@ Official Google Flow help rechecked **2026-08-27**:
 - Google AI Pro: 1,000 Flow credits/month
 - Veo 3.1 Lite 4s/6s/8s + Extend: non-Ultra 10 credits/generation
 - First + Last frames: Lite supports 4s/6s/8s
-- Ingredients/References to Video: Lite can be 8s-only
+- Ingredients/References to Video can be 8s-only
 - output count = 1
-- 1080p upscaling = 0 credits for Plus/Pro/Ultra
-- Gemini Omni Flash edits are a different, higher-cost path
-- Nano Banana 2 Lite is currently described as a no-charge default image generation/editing option
-- actual Flow UI active model/mode/output count/displayed cost is final generation-time truth
+- actual Flow UI active model/mode/output count/displayed cost is the generation-time source of truth
+
+Do not confuse an existing-video edit / Omni Flash edit screen with standard new-video generation.
 
 Canonical operator docs:
 - `docs/23_minimum_credit_operator_architecture.md`
@@ -63,15 +80,15 @@ Canonical operator docs:
 
 ## Gate A — planned keyframe continuity
 
-Before any paid Veo generation:
+Before paid Veo generation:
 
 ```text
-Flow image generation
+Flow image generation/editing
 → check active image model + displayed cost
-→ use no-charge path only when UI confirms it
+→ use a no-charge path only when the UI confirms it
 → create KF0 master visual anchor
 → QC POV / paws / scale / camera / fixed props / lighting
-→ derive KF1 from approved KF0 using edit/refine or reference/ingredient
+→ derive KF1 from approved KF0 using edit/reference
 → derive KF2 from approved KF1
 → continue sequentially
 → only proceed to G1 after all required planned KFs PASS
@@ -79,7 +96,7 @@ Flow image generation
 
 Hard rule: do not create KF1+ as unrelated fresh text-to-image lottery tickets when an approved previous KF can anchor continuity.
 
-If drift occurs, repair it in the no-charge image stage. Do not make paid Veo interpolate accidental camera/world changes. QC shorthand: `KEYFRAME DRIFT FAIL`.
+If drift occurs, repair it in the no-charge image stage. QC shorthand: `KEYFRAME DRIFT FAIL`.
 
 Planned KFs are destinations. Actual video frames are continuity bridges.
 
@@ -129,13 +146,13 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 ## Deterministic safeguards already built
 
 - latest-main / recent-PR / handoff-first work-start order
+- direct Chat/Codex repository-development policy from `AGENTS.md`
 - POV paw-only + tiny-scale hard gates
 - Flow generation-vs-edit UI preflight
-- zero-credit image-model/cost preflight
+- no-charge image-model/cost preflight
 - planned KF continuity chain
 - manifest-aware H30/H40 guidance
 - scene-count/generation-count/credit-budget consistency validation
-- 8s scene requirement for current grammar
 - keyframe map/reference integrity
 - non-empty action/action_guard for every paid scene
 - explicit zero-cut preservation
@@ -146,24 +163,8 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - novelty/authenticity gate against repeated recent fingerprints
 - seasonal evidence saturation/no-churn gate
 - bundle-level current-standard validation
-- local handoff update guard
+- local handoff-update guard
 - regression tests for core production invariants
-
-## Latest material change — CURRENT_STANDARD synchronization
-
-Problem found after PR #35:
-- `PROJECT_HANDOFF.md`, `docs/23_minimum_credit_operator_architecture.md`, generated Flow Packs, and `docs/29_planned_keyframe_continuity_chain.md` had adopted the new planned-KF continuity workflow.
-- root `CURRENT_STANDARD.md` still showed its older 2026-08-25 baseline and only described a generic free keyframe preflight + paid actual-frame chain.
-- because `CURRENT_STANDARD.md` is a declared source of truth, a future AI/operator could follow it and regress to independent KF generation or skip the KF0→KF1→... continuity rule.
-
-Fix:
-- refresh `CURRENT_STANDARD.md` to the 2026-08-27 operating baseline
-- make the no-charge image-model/cost preflight explicit
-- make KF0 master anchor + KF1+ edit/reference chaining explicit
-- distinguish planned target KFs from actual saved-video continuity frames
-- include native `Save frame`, zero-cut long-take, current H30/H40 rules, and current TK-005 production state
-
-This is a documentation source-of-truth consistency fix. No story, scoring, runtime, NEXT_EPISODE, or paid budget changes.
 
 ## Research / idea policy
 
@@ -187,7 +188,7 @@ Current candidate state:
 - `IDEA-010` 8mm 新米塩むすび → future candidate backed by current reservation/arrival behavior
 - `IDEA-002` gummy → blocked against a recent equivalent conflict/ending structure
 
-Fresh 2026-08-27 review did not justify ranking, evidence-class, publish-timing, or NEXT_EPISODE changes. Same-class autumn retail announcements remain saturated.
+Fresh 2026-08-27 review does not justify ranking, evidence-class, publish-timing, or NEXT_EPISODE changes. Same-class autumn retail announcements remain saturated.
 
 ## Current production state
 
@@ -283,19 +284,21 @@ Expand distinct worlds only after performance evidence, without repeating recent
 
 1. latest main SHA
 2. recent commits/PRs
-3. `PROJECT_HANDOFF.md`
-4. `START_HERE.md`
-5. `CURRENT_STANDARD.md`
-6. `docs/22_continuous_episode_learning_engine.md`
-7. `docs/23_minimum_credit_operator_architecture.md`
-8. `production/NEXT_EPISODE.txt`
-9. current episode manifest
-10. research/backlog/learning ledger
+3. `AGENTS.md`
+4. `PROJECT_HANDOFF.md`
+5. `START_HERE.md`
+6. `CURRENT_STANDARD.md`
+7. `docs/22_continuous_episode_learning_engine.md`
+8. `docs/23_minimum_credit_operator_architecture.md`
+9. `production/NEXT_EPISODE.txt`
+10. current episode manifest
+11. research/backlog/learning ledger
 
 Stale chat or automation wording never overrides newer merged repository state.
 
 ## Safety / invariants
 
+- no OpenCode Go delegation for repository development while `AGENTS.md` forbids it
 - no automatic Flow credit spend
 - no automatic paid generation
 - no automatic YouTube publish
@@ -333,28 +336,29 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-27 — CURRENT_STANDARD synchronized to actual production OS
-Baseline `main@2578b066727eec536d84cc6c1b074531fcb15221`.
+### 2026-08-27 — Development executor policy synchronized
+Baseline `main@48e0191e8b36ad3e97ac62e5abbdafbaffcb9e2c`.
 
 Changed:
-- root `CURRENT_STANDARD.md` now reflects planned keyframe continuity, no-charge image preflight, actual Save-frame chaining, zero-cut behavior, adaptive H30/H40, and current TK-005 state
-- removed the risk of a future agent following the stale 2026-08-25 production baseline
-- synchronized this handoff
+- synchronized this handoff with the latest `AGENTS.md` direct Chat/Codex development policy
+- recorded removal of OpenCode Go development routing from `.opencode/opencode.json`
+- added `AGENTS.md` to the mandatory work-start order
+- made stale model-routing instructions explicitly subordinate to latest merged repository policy
 
 Verified:
-- official Google Flow help still lists Veo 3.1 Lite 4/6/8s + Extend at 10 credits/generation for non-Ultra
-- Lite First+Last remains 4/6/8s
-- Nano Banana 2 Lite remains described as the no-charge default image option
-- no candidate/NEXT_EPISODE change justified
+- current Flow pricing baseline remains unchanged on 2026-08-27
+- no fresh research changes candidate ranking, timing, or NEXT_EPISODE
 
 Unchanged:
 - NEXT_EPISODE = TK-005
 - immersive_h40 / four Lite scenes / current 40-credit first-pass ceiling
+- no Flow credits spent
 - no paid generation or publishing
 
 ### Earlier 2026-08-27 work
+- CURRENT_STANDARD synchronization
 - planned keyframe continuity chain
-- zero-credit keyframe cost preflight
+- no-charge keyframe cost preflight
 - Flow native Save frame bridge
 - TK-005 fixed warmer/niche continuity
 - zero-cut prompt preservation
