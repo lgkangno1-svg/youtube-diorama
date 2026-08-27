@@ -3,10 +3,12 @@
 목표: 사용자가 매번 주제, 대본, Flow 프롬프트, 편집 순서를 고민하지 않고 **한 문장 → 무료 preflight → 필요한 generation만 순차 실행 → 결과 학습**으로 끝내게 한다.
 
 관련 source of truth:
+- handoff/current progress: `PROJECT_HANDOFF.md`
 - production: `CURRENT_STANDARD.md`
 - learning: `docs/22_continuous_episode_learning_engine.md`
 - character/world: `docs/24_hero_cat_brand_identity.md`
 - Shorts camera/scale: `docs/25_pov_paws_microworld_grammar.md`
+- Flow UI state: `docs/26_flow_ui_mode_preflight.md`
 
 ## 사용자 인터페이스
 
@@ -35,9 +37,29 @@ ChatGPT가:
 
 만 실행한다.
 
-## Gate A — 0 credits
+## Gate A — 0-credit keyframe preflight
 
-Flow video를 만들기 전에 무료 keyframe/reference를 먼저 검수한다.
+Paid Veo video를 만들기 전에 manifest에 정의된 opening/target keyframe만 먼저 만든다.
+
+2026-08-27 공식 Flow 모델 도움말 재확인 기준으로 `Nano Banana 2 Lite`는 빠른 이미지 생성/편집용 기본 모델이며 **available at no charge**로 안내된다. 다만 UI와 비용은 바뀔 수 있으므로 **모델 이름 자체보다 실제 Flow UI의 표시 비용이 최종 source of truth**다.
+
+운영 순서:
+
+```text
+Flow image generation
+→ active image model 확인
+→ 가능하면 Nano Banana 2 Lite 선택
+→ displayed cost가 실제로 0 / no charge인지 확인
+→ manifest에 필요한 KF만 생성
+→ POV / paw-only / scale / anatomy / fixed-prop layout 검수
+→ 모두 PASS한 뒤에만 Veo G1 진행
+```
+
+중요:
+- 이미지 모델이 non-zero cost를 표시하면 `무료 keyframe`이라고 가정하지 않는다.
+- 무료라고 해도 여러 장의 장식용 대안을 무한 생성하지 않는다. manifest가 요구하는 KF만 만든다.
+- keyframe에서 이미 POV, scale, anatomy, 주요 고정 소품 위치가 틀리면 paid video generation으로 넘어가지 않는다.
+- 이후 sequential bridge는 새 이미지를 생성하는 것이 아니라 이전 QC-PASS 영상의 실제 frame을 Flow native `Save frame`으로 저장해 사용한다.
 
 반드시 PASS:
 - true first-person cat POV
@@ -48,6 +70,7 @@ Flow video를 만들기 전에 무료 keyframe/reference를 먼저 검수한다.
 - 5~20mm 수준의 tiny-object 느낌
 - macro miniature diorama workbench
 - 첫 1초에 scale contrast가 이해됨
+- manifest에서 고정한 warmer/niche/tray 등 큰 소품 위치가 planned frames 사이에서 불필요하게 바뀌지 않음
 
 다음이면 즉시 STOP:
 - 고양이가 카운터 뒤에서 보이는 third-person chef shot
@@ -55,24 +78,28 @@ Flow video를 만들기 전에 무료 keyframe/reference를 먼저 검수한다.
 - 음식/도구가 앞발과 비슷하거나 더 큼
 - human fingers/thumbs
 - paw가 사람처럼 tool을 grip
+- major fixed prop이 keyframe 사이에서 새로 생기거나 사라짐
 
-## Flow settings
+## Paid Flow video settings
 
 생성 직전 실제 UI 확인:
 
 ```text
+NEW VIDEO GENERATION 상태
 Veo 3.1 Lite
 9:16
 8 seconds
 output count = 1
-표시 비용 = 10 credits / generation (현재 UI가 그렇게 보일 때)
+표시 비용 = 현재 공식표/실제 UI와 일치
 ```
 
-UI가 다르면 생성하지 말고 모델/비용을 재검토한다.
+현재 2026-08-27 공식 도움말 기준 non-Ultra Veo 3.1 Lite 4/6/8s 및 Extend는 10 credits/generation이다. 비용/기능은 바뀔 수 있으므로 실제 UI 표시값을 최종 기준으로 한다.
+
+기존 영상의 수정 화면이나 Omni Flash video edit를 G1/G2/G3/G4 생성 화면으로 착각하지 않는다.
 
 ## Progressive Spend
 
-### G1 — 누적 10
+### G1 — 누적 10 (현재 기준)
 
 G1은 channel grammar anchor다.
 
@@ -83,16 +110,27 @@ QC:
 - anatomy
 - miniature material language
 - primary action
+- zero-cut long-take behavior
+- planned fixed-prop continuity
 
 하나라도 구조적으로 틀리면 G2 금지.
 
 ### G2 — 누적 20
 
-G1의 actual last usable frame을 G2 First frame으로 사용한다.
+G1이 PASS한 경우에만:
+
+```text
+G1 PASS clip 열기
+→ 정확한 마지막 usable frame에 pause
+→ Flow native `Save frame`
+→ 저장된 project frame을 G2 First frame으로 사용
+```
+
+browser screenshot / 재인코딩 still / prettier planned KF로 대체하지 않는다.
 
 ### G3 — 누적 30
 
-G2의 actual last usable frame을 G3 First frame으로 사용한다.
+G2가 PASS한 뒤 같은 방식으로 G2 actual saved frame을 G3 First frame으로 사용한다.
 
 여기까지로 완결되면 `compact_h30`으로 끝낸다.
 
@@ -176,16 +214,20 @@ Veo reliability 우선:
 
 no rapid montage / no camera orbit / no full-cat reveal.
 
+현재 기본 manifest의 `max_visual_cuts_per_8s_generation: 0`은 generated prompt에도 literal zero-cut instruction으로 남아야 한다.
+
 ## Sequential Frame Chain
 
 ```text
+FREE planned KF0/KF1...
+↓
 G1
-↓ actual last usable frame
-G2
-↓ actual last usable frame
-G3
-↓ actual last usable frame
-G4 only if immersive_h40
+↓ Flow native Save frame from actual QC-PASS output
+G2 First
+↓ actual saved frame
+G3 First
+↓ actual saved frame
+G4 First only if immersive_h40
 ```
 
 연속성 우선순위:
@@ -193,7 +235,10 @@ G4 only if immersive_h40
 2. paw fur/anatomy
 3. hero-object size ratio
 4. cookware/food state
-5. lighting/workbench
+5. fixed major props
+6. lighting/workbench
+
+planned target keyframe는 destination이고, actual saved frame은 continuity bridge다. 역할을 바꾸지 않는다.
 
 ## Audio
 
@@ -228,6 +273,7 @@ ChatGPT 판정:
 - `SCALE FAIL`
 - `ANATOMY FAIL`
 - `CAMERA FAIL`
+- `FRAME CHAIN FAIL`
 - `PADDING FAIL`
 
 ## 학습
@@ -247,6 +293,7 @@ ChatGPT 판정:
 - POV/scale/anatomy failures
 - failed action type
 - usable motion seconds
+- continuity issue
 - final runtime
 
 장기 최적화:

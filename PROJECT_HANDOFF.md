@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-27 KST**  
-Baseline inspected before this change: `main@eab9cc1b304a74e26d45906b33467b625ffdba05`
+Baseline inspected before this change: `main@d6c5f206c2f6b8dd279b8190bbbbb9093ebd6e15`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -52,7 +52,10 @@ Official Google Flow help rechecked **2026-08-27**:
 - output count = 1
 - 1080p upscaling = 0 credits for Plus/Pro/Ultra
 - actual Flow UI active model/mode/output count/displayed cost remains final generation-time truth
-- Flow can save a paused generated-video frame directly into the project with the native `Save frame` action; that saved frame can then be used as an ingredient, start frame, or end frame
+- Flow can save a paused generated-video frame directly into the project with native `Save frame`; that saved frame can then be used as an ingredient/start/end frame
+- official image-model help currently describes `Nano Banana 2 Lite` as the default fast image generation/editing model **available at no charge**
+
+Because UI/costs can change, `Nano Banana 2 Lite` is a preferred current no-charge option, not a permanent hard-coded promise. Gate A only counts as 0-credit when Flow itself shows 0/no charge before generation.
 
 Do not confuse an existing-video edit / Omni Flash modify screen with standard new-video generation.
 
@@ -60,10 +63,32 @@ Canonical operator docs:
 - `docs/23_minimum_credit_operator_architecture.md`
 - `docs/26_flow_ui_mode_preflight.md`
 
+## Gate A — zero-credit planned keyframes
+
+Before any paid Veo generation:
+
+```text
+Flow image generation
+→ active image model 확인
+→ prefer Nano Banana 2 Lite while UI shows no charge
+→ verify displayed cost = 0 / no charge
+→ generate only manifest-required KF frames
+→ QC POV / paws-only / scale / anatomy / fixed props
+→ only then proceed to G1
+```
+
+Rules:
+- never assume a keyframe is free merely because the repository calls it a FREE KF
+- if image generation shows a non-zero cost, stop and re-check model/current pricing rather than spending by accident
+- do not generate decorative alternatives merely because the model is free; create only planned KF frames needed for the manifest
+- reject bad POV/scale/anatomy/fixed-prop layout at image stage before any video credits are exposed
+
+This closes a practical operator gap: earlier packs said “approve free keyframes” without telling the user how to verify that the current Flow image generation state is actually no-charge.
+
 ## Progressive Spend
 
 ```text
-FREE keyframe/reference preflight
+FREE planned keyframe/reference preflight
 → G1 only
 → QC
 → save actual last usable frame with Flow native Save frame
@@ -104,9 +129,10 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 
 ## Deterministic production safeguards already built
 
-- source-of-truth work-start order
+- latest-main / recent-PR / handoff-first work-start order
 - POV paw-only + tiny-scale hard gates
 - Flow generation-vs-edit UI preflight
+- **zero-credit image-keyframe model/cost preflight**
 - manifest-aware H30/H40 guidance
 - scene-count/generation-count/credit-budget consistency validation
 - required 8s production scene length for current grammar
@@ -114,7 +140,7 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - non-empty action/action_guard for every paid scene
 - explicit zero-cut preservation in generated prompts
 - actual-last-frame First-frame mapping
-- **native Flow `Save frame` bridge instructions for every sequential PASS scene**
+- native Flow `Save frame` bridge instructions for every sequential PASS scene
 - progressive-spend PASS dependency validation
 - sequential-chain metadata validation
 - novelty/authenticity gate against repeated recent hook/conflict/ending fingerprints
@@ -123,22 +149,23 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - local handoff update guard
 - regression tests for core production invariants
 
-## Latest material change — native Flow frame bridge
+## Latest material change — keyframe cost preflight
 
-Official Flow documentation confirms a generated clip can be opened, paused on a frame, and that exact frame can be saved into the project with `Save frame`, after which it can be reused as a start/end frame.
+Problem:
+- the repository has long called planned image keyframes “FREE” and uses them as Gate A before paid Veo clips
+- the generated Flow Pack did not explicitly tell the operator which current image model is the no-charge option or require checking the UI-displayed cost before generating the KF set
+- that ambiguity matters because Flow model availability/pricing can change, and the user wants a simple low-credit workflow
 
-Before this change the generated Flow Pack only said to “save the actual last usable frame” and suggested a local PNG filename. That left room for an operator to use a browser screenshot, screen capture, downloaded/re-encoded still, or reconstructed target frame. Those alternatives can change pixels/crop/compression/state and undermine the purpose of sequential continuity.
+Fix:
+- `tools/build_flow_pack.py` now starts with a dedicated `Gate A — FREE keyframe preflight` section
+- it recommends `Nano Banana 2 Lite` only while Flow itself marks it available at no charge
+- it requires the operator to check active image model + displayed cost before each planned KF generation
+- any non-zero image cost triggers STOP/re-check instead of silent spend
+- it tells the operator to create only the manifest-required KF set, not endless decorative alternatives
+- `tools/test_build_flow_pack.py` now asserts this cost-preflight guidance remains present
+- `docs/23_minimum_credit_operator_architecture.md` now documents the same rule
 
-Fix in `tools/build_flow_pack.py`:
-- after a scene PASS, explicitly instruct: open the PASS clip → pause on exact last usable frame → hover → click native `Save frame`
-- use that saved Flow project asset as the next First frame
-- screenshots/re-encoded/recreated stills are now explicitly discouraged when native Save frame is available
-- `FRAME CHAIN FAIL` includes using the wrong non-native bridge asset
-- recovery instruction reopens the PASS clip and saves the correct frame rather than rerolling or substituting a planned target
-
-Regression coverage in `tools/test_build_flow_pack.py` now requires these instructions to remain present.
-
-This is a 0-credit operator/tooling improvement. It changes no episode story, runtime, ranking, generation count, or spend ceiling.
+This is a 0-credit operator/tooling improvement. It changes no episode story, runtime, ranking, generation count, or paid-video ceiling.
 
 ## Research / idea policy
 
@@ -162,7 +189,7 @@ Current candidate state:
 - `IDEA-010` 8mm 新米塩むすび → future candidate supported by current rice-reservation/arrival behavior
 - `IDEA-002` gummy → currently blocked against a recent equivalent conflict/ending structure
 
-Fresh 2026-08-27 research still does not justify ranking, evidence-class, or NEXT_EPISODE changes. Same-class Tsukimi/autumn retail announcements are saturated and are not recorded merely to create commits.
+Fresh 2026-08-27 research did not justify ranking, evidence-class, publish timing, or NEXT_EPISODE changes. Same-class Tsukimi/autumn retail announcements remain saturated and are not recorded merely to create commits.
 
 ## Current production state
 
@@ -176,7 +203,7 @@ Title:
 
 Manifest: `episodes/TK-005.yaml`  
 Runtime: `immersive_h40`  
-First-pass ceiling: 4 Lite generations / 40 credits
+First-pass ceiling: 4 Lite generations / 40 credits under the currently verified non-Ultra Lite rate
 
 Beats:
 1. impossible-scale reveal — 12mm purple sweet potato beside paws
@@ -197,7 +224,7 @@ Continuity/action rules:
 - every G scene has explicit action + action_guard
 - zero-cut constraint remains literal in generated prompts
 
-Highest-value next real-world step: **generate TK-005 G1 only and QC it.** Automation must not spend that credit for the user.
+Highest-value next real-world step remains **generate TK-005 G1 only and QC it.** Automation must not spend that credit for the user.
 
 ## Production learning available
 
@@ -226,8 +253,8 @@ subscribers / 100 credits
 ## Roadmap
 
 ### Phase A — TK-005 production truth
-1. approve free opening/target frames
-2. run local preparation/validation
+1. run local preparation/validation
+2. create/approve manifest-required KF0–KF4 using the current no-charge image path after checking actual UI cost
 3. generate G1 only
 4. QC POV / scale / anatomy / camera / action / zero-cut behavior / warmer+niche continuity
 5. on PASS, use Flow native `Save frame` on the exact last usable frame
@@ -248,13 +275,14 @@ After performance evidence exists, expand distinct tiny stalls, rainy shops, aft
 
 ## Next priorities
 
-1. TK-005 actual G1 production/QC data
-2. confirm warmer + distant serving niche + tray + paw + camera layout survives G1
-3. verify zero-cut long-take behavior in real Flow output
-4. verify native Save frame → next First frame continuity in practice
-5. record actual credits/rerolls/usable motion
-6. obtain first public 24h/72h sample
-7. only then re-weight runtime/action/idea priors
+1. TK-005 actual Gate-A KF creation/QC using a UI-confirmed no-charge image model
+2. TK-005 actual G1 production/QC data
+3. confirm warmer + distant serving niche + tray + paw + camera layout survives G1
+4. verify zero-cut long-take behavior in real Flow output
+5. verify native Save frame → next First frame continuity in practice
+6. record actual credits/rerolls/usable motion
+7. obtain first public 24h/72h sample
+8. only then re-weight runtime/action/idea priors
 
 More same-class retail PR collection is not a priority.
 
@@ -283,7 +311,8 @@ Newer merged repository state overrides stale chat or automation wording.
 - no third-person/full-cat regression
 - no human fingers/thumbs/tool-grip regression
 - no undefined/missing KF improvisation
-- no blank paid-scene action/action_guard
+- no assumption that a planned image KF is free without checking actual UI cost
+- no paid scene with blank action/action_guard
 - no next-scene spend before previous PASS
 - no stale progressive-spend or sequential-chain metadata
 - no planned target frame substituted for previous actual PASS frame
@@ -303,7 +332,7 @@ current research
 → POV/tiny-scale production-safe manifest
 → current-standard + originality validation PASS
 → spend/runtime/keyframe/action/cut/chain validation PASS
-→ free frame preflight
+→ UI-confirmed 0-credit planned keyframe preflight
 → progressive Flow generation
 → native Save frame actual-frame continuity chain
 → edit/export
@@ -316,26 +345,33 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-27 — Native Flow Save-frame bridge
-Baseline `main@eab9cc1b304a74e26d45906b33467b625ffdba05`.
+### 2026-08-27 — Zero-credit keyframe cost preflight
+Baseline `main@d6c5f206c2f6b8dd279b8190bbbbb9093ebd6e15`.
 
 Changed:
-- convert ambiguous “save last usable frame” guidance into Flow-native `Save frame` steps
-- require that native saved project asset as the preferred next-scene First frame
-- discourage screenshot/re-encoded/recreated continuity stills
-- add regression assertions for the native bridge instructions
+- add explicit Gate-A image-model/cost verification to generated Flow Pack
+- prefer Nano Banana 2 Lite only while current Flow UI marks it no-charge
+- stop if displayed image-generation cost is non-zero instead of assuming planned KF is free
+- limit free image generation to manifest-required keyframes
+- add regression assertions for this guidance
+- refresh minimum-credit operator documentation
 - synchronize this handoff
 
 Verified:
-- official Flow documentation explicitly supports saving a paused video frame to the project and reusing it as start/end frame
-- Veo 3.1 Lite 4/6/8s pricing and First+Last support remain unchanged on 2026-08-27
-- NEXT_EPISODE remains TK-005
-- immersive_h40 and 40-credit first-pass ceiling unchanged
-- fresh seasonal research does not justify candidate/ranking changes
+- official Flow model help currently describes Nano Banana 2 Lite as available at no charge
+- official Veo 3.1 Lite 4/6/8s + Extend pricing remains 10 credits/generation for non-Ultra
+- First+Last support and native Save frame behavior remain available
+- fresh seasonal/adjacent research did not change candidate ranking or NEXT_EPISODE
 
-No Flow credits spent, no paid generation, no publishing.
+Unchanged:
+- NEXT_EPISODE = TK-005
+- TK-005 story/runtime/4-generation structure
+- 40-credit current first-pass video ceiling
+- candidate ranking
+- no credits spent, no paid generation, no publishing
 
 ### Earlier 2026-08-27 work
+- native Flow Save-frame bridge
 - full TK-005 warmer + serving-niche static-prop continuity
 - G1 warmer continuity fix
 - bundle-level current-standard validation
@@ -343,5 +379,4 @@ No Flow credits spent, no paid generation, no publishing.
 - explicit zero-cut prompt preservation
 - scene-action/keyframe integrity gates
 - runtime-aware operator guidance
-- explicit First/Last actual-frame mapping
 - deterministic novelty/authenticity gate

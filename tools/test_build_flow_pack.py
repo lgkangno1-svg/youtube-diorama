@@ -63,6 +63,11 @@ class FlowFrameInputMapTests(unittest.TestCase):
         }
         output = build(data)
 
+        self.assertIn("Gate A — FREE keyframe preflight", output)
+        self.assertIn("Nano Banana 2 Lite", output)
+        self.assertIn("displayed cost", output)
+        self.assertIn("0-credit preflight", output)
+        self.assertIn("STOP rather than assuming the keyframe is free", output)
         self.assertIn("Sequential-frame operator rule", output)
         self.assertIn("First frame: use the approved FREE target/reference keyframe `KF0_OPEN`", output)
         self.assertIn("First frame: use the ACTUAL frame saved from the QC-PASS G1 clip with Flow's native `Save frame` action", output)
