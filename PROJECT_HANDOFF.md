@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**  
-Baseline inspected before this change: `main@b678680b2345d84084ef58104a2a2a15f6f672b5`
+Baseline inspected before this change: `main@dea8bb36661b8893b12b272ee82fae610e5105fa`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -108,6 +108,15 @@ Important distinction:
 - planned KF = destination / target state
 - actual saved video frame = next-scene continuity bridge
 
+### Authoritative KF ordering
+
+Planned keyframe sequence is defined by the numeric prefix `KF0`, `KF1`, `KF2` ... — **not by YAML mapping insertion order**.
+
+- `tools/validate_current_standard.py` validates contiguous numeric KF0..KFn semantics
+- `tools/build_flow_pack.py` must sort the operator keyframe creation chain by the same numeric semantics
+- harmless YAML reordering must never redefine the master anchor or make KF2 derive from KF0 before KF1
+- malformed, duplicate or non-contiguous KF indices fail closed rather than silently changing the operator sequence
+
 ## Progressive Spend / actual-frame chain
 
 ```text
@@ -172,6 +181,7 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - Flow generation-vs-edit UI preflight
 - planned KF0→KFn continuity chain
 - numeric KF0..KFn sequence semantics independent of YAML mapping order
+- **generated Flow Pack uses the same numeric KF0..KFn ordering instead of raw YAML mapping order**
 - manifest-aware H30/H40 guidance
 - scene-count/generation-count/credit-budget consistency validation
 - keyframe map/reference integrity
@@ -188,19 +198,20 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - regression tests for core production invariants
 - long-take manifest guard: 0/1 cut max and exactly one preferred primary action
 
-## Latest improvement — operator Gate A synchronization
+## Latest improvement — Flow Pack numeric KF-order alignment
 
 Problem found on **2026-08-28**:
-- `CURRENT_STANDARD.md`, `docs/29_planned_keyframe_continuity_chain.md`, `START_HERE.md` and this handoff already required KF0→KF1→KF2... sequential edit/reference derivation
-- `docs/23_minimum_credit_operator_architecture.md`, one of the user's explicit operating-system files, still said only to generate the manifest-required KFs and QC them
-- that wording did not explicitly prohibit independent KF1/KF2 fresh generations and therefore left a practical continuity loophole in the primary operator architecture
+- the validator already treated `KF0..KFn` numeric indices as authoritative and deliberately allowed harmless YAML keyframe mapping reorder
+- `tools/build_flow_pack.py` still used `list(keyframes.keys())`, so the generated operator pack followed YAML insertion order
+- a formatter/manual reorder such as `KF2, KF0, KF1` could therefore make the pack present KF2 as the master anchor or tell the operator to derive the wrong planned KF from the wrong predecessor even though the manifest itself passed current-standard validation
+- that mismatch was especially risky because Gate A is intended to reduce paid Veo continuity rerolls before G1
 
 Fix:
-- Gate A in `docs/23_minimum_credit_operator_architecture.md` now explicitly requires KF0 as master anchor and every later KF to derive from the previous approved KF
-- it now includes the same `KEYFRAME DRIFT FAIL` criteria and planned-KF vs actual-saved-frame distinction as the newer standards
-- current official Flow pricing/features were rechecked and remain unchanged
+- `tools/build_flow_pack.py` now parses the numeric `KF<number>` prefix and sorts planned KFs by index
+- duplicate, malformed or non-contiguous indices fail closed in the pack builder as well as the validator
+- regression coverage deliberately supplies reordered YAML and verifies the generated pack still renders `KF0 → KF1 → KF2` and the correct derivation instructions
 
-This is a 0-credit documentation/operating-system correction. It does not change TK-005 story, runtime, generation count, budget, candidate ranking or NEXT_EPISODE.
+This is a 0-credit deterministic tooling fix. It does not change TK-005 story, runtime, generation count, budget, candidate ranking or NEXT_EPISODE.
 
 ## Research / idea policy
 
@@ -218,7 +229,8 @@ Evidence saturation rule: do not keep committing same-class seasonal retail/PR s
 
 2026-08-28 research check:
 - official Google Flow pricing/features remain unchanged for the current Lite workflow
-- current Japanese sweet-potato/month-viewing/autumn retail signals remain same-class evidence already represented in the repository
+- Veo 3.1 Lite still supports First + Last frame videos at 4s/6s/8s, while Ingredients/References and Extend are 8s-only
+- current Japanese sweet-potato/month-viewing/autumn/new-rice signals remain same-class evidence already represented in the repository
 - fresh search did not reveal a current AI-cat/miniature/ASMR mechanism strong enough to change candidate ranking or production mechanics
 - research/backlog files intentionally remain unchanged this run
 
@@ -358,7 +370,8 @@ Expand distinct worlds only after performance evidence, without repeating recent
 - no paid G1 before full planned KF chain PASS
 - no independent fresh KF1+ when a previous approved planned KF can anchor it
 - no planned KF substituted for previous actual PASS frame
-- no undefined/malformed/duplicate KF sequence
+- no undefined/malformed/duplicate/non-contiguous KF sequence
+- no YAML mapping order changing planned KF semantics
 - no blank action/action_guard
 - no missing cut ceiling
 - no >1 visual cut per 8s production scene plan
@@ -390,24 +403,28 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-28 — operator Gate A sequential-KF synchronization
-Baseline `main@b678680b2345d84084ef58104a2a2a15f6f672b5`.
+### 2026-08-28 — Flow Pack numeric KF-order alignment
+Baseline `main@dea8bb36661b8893b12b272ee82fae610e5105fa`.
 
 Changed:
-- align `docs/23_minimum_credit_operator_architecture.md` with the already-adopted planned KF continuity architecture
-- require KF0 master anchor → KF1 from KF0 → KF2 from KF1 → ...
-- add KEYFRAME DRIFT FAIL criteria and planned-target vs actual-bridge distinction to the operator doc
-- refresh official Flow assumptions without changing production economics
+- fix Flow Pack planned-keyframe ordering so numeric KF0..KFn semantics match current-standard validation
+- reject malformed/duplicate/non-contiguous KF indices in the pack builder rather than silently using mapping order
+- add regression coverage with intentionally reordered YAML keyframes
 - synchronize this handoff
+
+Verified assumptions:
+- official Google Flow credit/features remain compatible with the current Veo 3.1 Lite strategy
+- NEXT_EPISODE and candidate ranking do not change
+- no same-class seasonal evidence was added merely for activity
 
 Unchanged:
 - NEXT_EPISODE = TK-005
 - immersive_h40 / four Lite scenes / current 40-credit first-pass ceiling
-- candidate ranking
 - no Flow credits spent
 - no paid generation or publishing
 
 ### Earlier 2026-08-28 work
+- operator Gate A sequential-KF synchronization
 - long-take manifest drift guard
 - numeric planned-keyframe sequence gate
 - planned-keyframe scene-order gate
