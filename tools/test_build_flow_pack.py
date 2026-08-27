@@ -34,6 +34,7 @@ class FlowFrameInputMapTests(unittest.TestCase):
                 "max_lite_generations_first_pass": 2,
                 "non_ultra_credit_budget_first_pass": 20,
                 "pacing": "healing_motion_dense",
+                "max_visual_cuts_per_8s_generation": 0,
             },
             "keyframes": {
                 "KF0_OPEN": "opening",
@@ -67,6 +68,33 @@ class FlowFrameInputMapTests(unittest.TestCase):
         self.assertIn("After G1 PASS", output)
         self.assertIn("G1_last_usable.png", output)
         self.assertIn("FRAME CHAIN FAIL", output)
+        self.assertIn("Maximum visual cuts in this 8s generation: 0.", output)
+
+    def test_missing_cut_limit_does_not_invent_one(self) -> None:
+        data = {
+            "episode_id": "TK-CUTS-UNSET",
+            "title": "test",
+            "hook": "test",
+            "camera_grammar": {"hero_object_paw_width_ratio": [0.2, 0.3]},
+            "flow_strategy": {
+                "max_lite_generations_first_pass": 1,
+                "non_ultra_credit_budget_first_pass": 10,
+                "pacing": "healing_motion_dense",
+            },
+            "keyframes": {"KF0": "open", "KF1": "target"},
+            "scenes": [
+                {
+                    "id": "G1",
+                    "generation_type": "first_plus_last",
+                    "generation_seconds": 8,
+                    "start_frame": "KF0",
+                    "end_frame": "KF1",
+                    "action": "one slow slide",
+                }
+            ],
+        }
+        output = build(data)
+        self.assertNotIn("Maximum visual cuts in this 8s generation:", output)
 
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-27 KST**  
-Baseline inspected before this change: `main@95c65b7991327840138bc8abfe486a2b0485e00c`
+Baseline inspected before this change: `main@4c61aeb32dcde224730ec18f424923392735bfbf`
 
-This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer should be able to continue from this repository without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
+This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer should be able to continue from the repository without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
 ## Mission
 
@@ -97,24 +97,24 @@ Sequential continuity uses the real previous PASS frame, not the prettier planne
 - seasonal evidence saturation/no-churn gate
 - manifest scene-count/runtime/credit consistency validation
 - keyframe-reference integrity: planned `KF*` tokens must exist and contain non-empty prompts
-- **scene-action integrity: every paid G scene must have a non-empty `action` and `action_guard` before operator files are prepared**
-- local regression tests for runtime, frame chain, novelty, manifest consistency, keyframes, and scene-action instructions
+- scene-action integrity: every paid G scene must have a non-empty `action` and `action_guard`
+- **explicit zero-cut preservation: when a manifest says `max_visual_cuts_per_8s_generation: 0`, the generated paid prompt now literally says `Maximum visual cuts ...: 0` instead of silently dropping the constraint**
+- local regression tests for runtime, frame chain, novelty, manifest consistency, keyframes, scene-action instructions, and zero-cut prompt rendering
 
-## Latest change — Scene Action Integrity Gate
+## Latest change — Explicit Zero-Cut Prompt Preservation
 
-Problem found before TK-005 production:
-- `tools/validate_current_standard.py` validated scene count, frame inputs, runtime and credit ceilings but did not require `action` or `action_guard` text.
-- A malformed future manifest could therefore pass preparation and produce a Flow Pack containing effectively `Action: . Guard: .`.
-- That delegates the critical motion and safety constraints to Veo, increasing POV/scale/anatomy drift and avoidable reroll risk.
+Problem found in `tools/build_flow_pack.py` before TK-005 production:
+- TK-005 declares `max_visual_cuts_per_8s_generation: 0` to enforce calm long-take pacing.
+- The Flow Pack builder used `if max_cuts`, so numeric zero was treated as false and the scene-level cut constraint disappeared from the paid prompt.
+- Global text still discouraged rapid montage, but the strongest deterministic scene-level instruction was missing exactly when the manifest demanded zero cuts.
+- This could increase unnecessary shot changes, continuity drift, and reroll risk per credit.
 
 Fix:
-- every G scene now requires a non-empty `action`
-- every G scene now requires a non-empty `action_guard`
-- this applies before any paid generation, including first+last and Extend scenes
-- regression tests cover empty action and whitespace-only guard
-- existing test fixtures now model real production scenes with explicit action/guard text
+- render the cut clause whenever the value is explicitly present, including `0`
+- leave it absent only when the manifest did not specify a cut limit
+- regression coverage proves `0` is rendered and an unset value is not invented
 
-This gate uses 0 Flow credits and does not change TK-005's story, runtime, or credit budget.
+This is a 0-credit operator/tooling fix. It does not change TK-005's story, runtime, generation count, or budget.
 
 ## Research / idea policy
 
@@ -130,7 +130,7 @@ Current candidate state:
 - IDEA-010 8mm 新米塩むすび is a future candidate backed by current rice-reservation behavior
 - IDEA-002 gummy is blocked against a recent equivalent conflict/ending structure
 
-Fresh 2026-08-27 research does **not** justify another research/backlog change: Flow assumptions are unchanged and additional autumn retail signals do not change current evidence class, candidate ranking, or NEXT_EPISODE.
+Fresh 2026-08-27 research does **not** justify another research/backlog change: official Flow assumptions are unchanged and newly found autumn retail/adjacent content signals do not change evidence class, candidate ranking, production timing, or NEXT_EPISODE.
 
 ## Current production state
 
@@ -159,9 +159,10 @@ Continuity and action rules:
 - G3 First = actual last usable frame from G2
 - G4 First = actual last usable frame from G3
 - all planned KF references must resolve before preparation
-- every G1–G4 scene already has explicit `action` and `action_guard`, so TK-005 is compatible with the new gate
+- every G1–G4 scene has explicit `action` and `action_guard`
+- `max_visual_cuts_per_8s_generation: 0` must remain literal in generated G prompts
 
-The highest-value next real-world step is still **generate TK-005 G1 only and QC it**. Automation must not spend that credit for the user.
+The highest-value next real-world step remains **generate TK-005 G1 only and QC it**. Automation must not spend that credit for the user.
 
 ## Production learning available so far
 
@@ -192,7 +193,7 @@ subscribers / 100 credits
 ### Phase A — TK-005 production truth
 1. approve free opening/target frames
 2. generate G1 only
-3. QC POV / scale / anatomy / camera / action
+3. QC POV / scale / anatomy / camera / action / unwanted cuts
 4. on PASS, save actual last usable frame
 5. continue G2 → G3 → justified G4 only through progressive gates
 6. record actual credits, rerolls, usable seconds, failure type
@@ -212,10 +213,11 @@ Only after performance evidence supports it, expand tiny-stall, rainy-shop, afte
 ## Next priorities
 
 1. TK-005 actual G1 production/QC data
-2. verify actual-last-usable-frame continuity in practice
-3. record actual credits/rerolls/usable motion
-4. obtain first public 24h/72h sample
-5. only then re-weight runtime/action/idea priors
+2. confirm true zero-cut long-take behavior in the real Flow output
+3. verify actual-last-usable-frame continuity in practice
+4. record actual credits/rerolls/usable motion
+5. obtain first public 24h/72h sample
+6. only then re-weight runtime/action/idea priors
 
 More same-class retail PR collection is not a priority.
 
@@ -244,7 +246,8 @@ Stale chat or automation wording never overrides newer merged repository state.
 - no third-person/full-cat regression
 - no substitute planned frame for an actual previous PASS frame
 - no undefined/missing KF improvisation at production time
-- **no paid scene with blank action or blank action_guard**
+- no paid scene with blank action or blank action_guard
+- no silent loss of an explicit `0`-cut scene constraint
 - no next-scene spend after previous-scene failure
 - no scene-count/runtime/credit mismatch
 - no padding G4 merely to hit a duration
@@ -258,7 +261,7 @@ Stale chat or automation wording never overrides newer merged repository state.
 current research
 → scored + novelty-safe candidate
 → POV/tiny-scale production-safe manifest
-→ spend/runtime/keyframe/action consistency PASS
+→ spend/runtime/keyframe/action/cut consistency PASS
 → free frame preflight
 → progressive Flow generation
 → actual-frame continuity chain
@@ -268,23 +271,23 @@ current research
 → next episode prior update
 ```
 
-Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer continuity rerolls, less operator judgment, and fewer repeated story fingerprints — not by commit count.
+Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer continuity/camera rerolls, less operator judgment, and fewer repeated story fingerprints — not by commit count.
 
 ## Change log
 
-### 2026-08-27 — Scene action integrity gate
-Baseline `main@95c65b7991327840138bc8abfe486a2b0485e00c`.
+### 2026-08-27 — Explicit zero-cut Flow prompt preservation
+Baseline `main@4c61aeb32dcde224730ec18f424923392735bfbf`.
 
 Changed:
-- require non-empty `action` for every paid scene
-- require non-empty `action_guard` for every paid scene
-- add regression coverage and realistic action-bearing test fixtures
+- fix truthiness bug that dropped `max_visual_cuts_per_8s_generation: 0`
+- paid scene prompts now explicitly preserve a declared zero-cut constraint
+- add regression coverage for explicit zero and unset cut limit
 - synchronize this handoff
 
 Verified assumptions:
-- current TK-005 G1–G4 all provide action + action_guard and remain compatible
+- TK-005 already declares zero cuts and directly benefits from the fix
 - official Flow pricing/features remain unchanged on 2026-08-27
-- no fresh research justified ranking/NEXT_EPISODE changes
+- fresh research did not justify ranking/NEXT_EPISODE changes
 
 Unchanged:
 - NEXT_EPISODE = TK-005
@@ -293,6 +296,7 @@ Unchanged:
 - no credits spent, no paid generation, no publishing
 
 ### Earlier 2026-08-27 work
+- scene-action integrity gate
 - keyframe-reference integrity gate
 - manifest spend consistency fail-closed gate
 - runtime-aware operator guidance
