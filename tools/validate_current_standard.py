@@ -111,6 +111,38 @@ def validate(data: dict[str, Any]) -> list[str]:
                 f"{CURRENT_NON_ULTRA_LITE_CREDITS_PER_GENERATION} credits/generation; declared {declared_budget})"
             )
 
+    # The manifest itself must preserve the progressive-spend policy, not merely the
+    # generated operator text. Otherwise a stale/hand-edited manifest can claim that
+    # G2/G3/G4 may proceed without the prior scene passing, which contradicts the
+    # repository's most important credit-safety rule.
+    progressive_gate = flow.get("progressive_spend_gate") or {}
+    required_pass_gates = {
+        "g2_requires_g1_pass": scene_count >= 2,
+        "g3_requires_g2_pass": scene_count >= 3,
+        "g4_requires_g3_pass": scene_count >= 4,
+    }
+    for gate_name, required in required_pass_gates.items():
+        if required and progressive_gate.get(gate_name) is not True:
+            errors.append(f"flow_strategy.progressive_spend_gate.{gate_name} must be true")
+    if progressive_gate.get("stop_if_pov_scale_anatomy_or_premise_fails") is not True:
+        errors.append(
+            "flow_strategy.progressive_spend_gate.stop_if_pov_scale_anatomy_or_premise_fails must be true"
+        )
+    if progressive_gate.get("reroll_only_structural_failure") is not True:
+        errors.append("flow_strategy.progressive_spend_gate.reroll_only_structural_failure must be true")
+
+    sequential_chain = flow.get("sequential_chain") or {}
+    expected_chain_sources = {
+        2: "save_actual_last_usable_frame_from_G1",
+        3: "save_actual_last_usable_frame_from_G2",
+        4: "save_actual_last_usable_frame_from_G3",
+    }
+    for scene_index, expected_source in expected_chain_sources.items():
+        if scene_count >= scene_index:
+            key = f"g{scene_index}_start_source"
+            if sequential_chain.get(key) != expected_source:
+                errors.append(f"flow_strategy.sequential_chain.{key} must be {expected_source}")
+
     if runtime_mode == "compact_h30":
         if scene_count != 3 or max_gens != 3:
             errors.append("compact_h30 must declare exactly 3 scenes and 3 first-pass Lite generations")
