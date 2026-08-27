@@ -186,6 +186,19 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
             errors,
         )
 
+    def test_extend_scene_does_not_require_saved_still_chain_metadata(self) -> None:
+        data = base_manifest()
+        data["scenes"][1] = {
+            "id": "G2",
+            "generation_type": "extend",
+            "generation_seconds": 8,
+            "source_scene": "G1",
+            "action": "continue the same tiny warming motion",
+            "action_guard": "preserve POV and scale; no camera cut or new prop",
+        }
+        del data["flow_strategy"]["sequential_chain"]["g2_start_source"]
+        self.assertEqual(validate(data), [])
+
 
 if __name__ == "__main__":
     unittest.main()
