@@ -109,10 +109,6 @@ def validate(data: dict[str, Any]) -> list[str]:
                 f"{CURRENT_NON_ULTRA_LITE_CREDITS_PER_GENERATION} credits/generation; declared {declared_budget})"
             )
 
-    # The manifest itself must preserve the progressive-spend policy, not merely the
-    # generated operator text. Otherwise a stale/hand-edited manifest can claim that
-    # G2/G3/G4 may proceed without the prior scene passing, contradicting the most
-    # important credit-safety rule in the repository.
     progressive_gate = flow.get("progressive_spend_gate") or {}
     required_pass_gates = {
         "g2_requires_g1_pass": scene_count >= 2,
@@ -129,9 +125,6 @@ def validate(data: dict[str, Any]) -> list[str]:
     if progressive_gate.get("reroll_only_structural_failure") is not True:
         errors.append("flow_strategy.progressive_spend_gate.reroll_only_structural_failure must be true")
 
-    # Sequential-chain metadata is required only for scenes that actually use
-    # First+Last framing. Extend scenes continue from a source clip and therefore do
-    # not upload a saved still as their First frame.
     sequential_chain = flow.get("sequential_chain") or {}
     expected_chain_sources = {
         2: "save_actual_last_usable_frame_from_G1",
@@ -206,6 +199,37 @@ def validate(data: dict[str, Any]) -> list[str]:
             if str(scene.get("generation_type") or "first_plus_last") == "first_plus_last":
                 if str(scene.get("start_frame") or "") != expected:
                     errors.append(f"G{index} must start from {expected}")
+
+    # When every paid scene uses First+Last framing, the planned KF map is not just
+    # a bag of valid names: its insertion order defines the approved destination
+    # chain that Gate A asks the operator to build sequentially. A manifest could
+    # previously reference an existing but wrong KF (for example G2 -> KF3), pass
+    # validation, and ask Veo to interpolate toward the wrong state. Fail closed on
+    # that mismatch before any credits are spent.
+    all_first_plus_last = bool(scenes) and all(
+        str((scene or {}).get("generation_type") or "first_plus_last") == "first_plus_last"
+        for scene in scenes
+    )
+    if all_first_plus_last and keyframes:
+        ordered_kfs = [str(name) for name in keyframes.keys()]
+        expected_kf_count = scene_count + 1
+        if len(ordered_kfs) != expected_kf_count:
+            errors.append(
+                "all-first_plus_last manifests must define exactly one opening KF plus one ordered target KF per scene "
+                f"({expected_kf_count} expected for {scene_count} scenes; found {len(ordered_kfs)})"
+            )
+        if ordered_kfs:
+            g1_start = str((scenes[0] or {}).get("start_frame") or "")
+            if g1_start != ordered_kfs[0]:
+                errors.append(f"G1 must start from the first planned keyframe {ordered_kfs[0]}")
+            for index, scene in enumerate(scenes, 1):
+                if index < len(ordered_kfs):
+                    expected_end = ordered_kfs[index]
+                    actual_end = str((scene or {}).get("end_frame") or "")
+                    if actual_end != expected_end:
+                        errors.append(
+                            f"G{index} end_frame must follow planned keyframe order: expected {expected_end}, got {actual_end or '<missing>'}"
+                        )
 
     serialized = yaml.safe_dump(data, allow_unicode=True).lower()
     for legacy_token in (
