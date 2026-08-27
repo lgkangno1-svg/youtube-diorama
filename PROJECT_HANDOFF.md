@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-27 KST**  
-Baseline inspected before this change: `main@d6c5f206c2f6b8dd279b8190bbbbb9093ebd6e15`
+Baseline inspected before this change: `main@1bfe81535616d5371cfbc08201eedad04b592a93`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -26,7 +26,7 @@ Never spend Flow credits, generate paid video, or publish to YouTube without exp
 Default grammar: `POV_PAWS_MICROWORLD_V1`.
 
 - true first-person cat POV
-- only cream + pale-ginger real feline front paws visible near lower edge
+- only cream + pale-ginger real feline front paws near the lower edge
 - no face/head/body/full-cat reveal
 - hero object normally 5–20mm and <=0.50 of one paw width
 - macro miniature diorama workbench
@@ -52,16 +52,17 @@ Official Google Flow help rechecked **2026-08-27**:
 - output count = 1
 - 1080p upscaling = 0 credits for Plus/Pro/Ultra
 - actual Flow UI active model/mode/output count/displayed cost remains final generation-time truth
-- Flow can save a paused generated-video frame directly into the project with native `Save frame`; that saved frame can then be used as an ingredient/start/end frame
-- official image-model help currently describes `Nano Banana 2 Lite` as the default fast image generation/editing model **available at no charge**
+- Flow can save a paused generated-video frame directly into the project with native `Save frame`
+- Flow image generation supports adding existing images as references/ingredients
+- Nano Banana image editing supports iterative edit/refine workflows and keeps prior versions in history/stack
+- `Nano Banana 2 Lite` is currently described by official Flow help as a no-charge image generation/editing option
 
-Because UI/costs can change, `Nano Banana 2 Lite` is a preferred current no-charge option, not a permanent hard-coded promise. Gate A only counts as 0-credit when Flow itself shows 0/no charge before generation.
-
-Do not confuse an existing-video edit / Omni Flash modify screen with standard new-video generation.
+Because UI/costs can change, model names are not permanent pricing promises. Always verify the current Flow UI before generation.
 
 Canonical operator docs:
 - `docs/23_minimum_credit_operator_architecture.md`
 - `docs/26_flow_ui_mode_preflight.md`
+- `docs/29_planned_keyframe_continuity_chain.md`
 
 ## Gate A — zero-credit planned keyframes
 
@@ -69,21 +70,38 @@ Before any paid Veo generation:
 
 ```text
 Flow image generation
-→ active image model 확인
-→ prefer Nano Banana 2 Lite while UI shows no charge
-→ verify displayed cost = 0 / no charge
-→ generate only manifest-required KF frames
-→ QC POV / paws-only / scale / anatomy / fixed props
+→ active image model + displayed cost 확인
+→ use no-charge path only when UI confirms it
+→ create KF0 as master visual anchor
+→ QC POV / paws / scale / camera / fixed props / lighting
+→ derive KF1 from approved KF0 using image edit/refine or reference/ingredient
+→ derive KF2 from approved KF1
+→ continue sequentially for required planned KFs
 → only then proceed to G1
 ```
 
-Rules:
-- never assume a keyframe is free merely because the repository calls it a FREE KF
-- if image generation shows a non-zero cost, stop and re-check model/current pricing rather than spending by accident
-- do not generate decorative alternatives merely because the model is free; create only planned KF frames needed for the manifest
-- reject bad POV/scale/anatomy/fixed-prop layout at image stage before any video credits are exposed
+### New hard rule: planned keyframes are a continuity chain
 
-This closes a practical operator gap: earlier packs said “approve free keyframes” without telling the user how to verify that the current Flow image generation state is actually no-charge.
+Do **not** create KF0/KF1/KF2/KF3/KF4 as unrelated fresh text-to-image lottery tickets.
+
+For KF1+:
+- open/edit/refine the prior approved KF, or
+- add the prior approved KF back to the Flow image prompt as a reference/ingredient
+- change only the state required by the manifest
+- preserve paw fur/anatomy, camera, hero-object scale, workbench geometry, fixed props, lighting and lens language
+
+If a later planned KF drifts, repair it while image generation is still no-charge. Do not ask paid Veo to interpolate between incompatible endpoints.
+
+QC shorthand: `KEYFRAME DRIFT FAIL`.
+
+This planned-image chain is separate from the paid-video actual-frame chain:
+
+```text
+planned KF chain: KF0 → edit/reference → KF1 → edit/reference → KF2 ...
+actual video chain: G1 PASS actual frame → Save frame → G2 First → ...
+```
+
+Planned KFs are destinations. Actual saved frames are continuity bridges.
 
 ## Progressive Spend
 
@@ -98,7 +116,7 @@ FREE planned keyframe/reference preflight
 → G4 only if immersive_h40 explicitly needs an independent world-resolution beat and G3 PASSed
 ```
 
-Sequential continuity always uses the real previous PASS frame as the next First frame. Never substitute a prettier planned target frame. Prefer Flow's native saved project frame over browser screenshots, screen captures, downloaded/re-encoded stills, or recreated frames.
+Never substitute a prettier planned KF for the actual previous PASS frame when chaining paid scenes.
 
 ## Runtime policy
 
@@ -132,7 +150,8 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - latest-main / recent-PR / handoff-first work-start order
 - POV paw-only + tiny-scale hard gates
 - Flow generation-vs-edit UI preflight
-- **zero-credit image-keyframe model/cost preflight**
+- zero-credit image-keyframe model/cost preflight
+- **planned keyframe continuity chain: KF0 master anchor → edit/reference derived KF1+**
 - manifest-aware H30/H40 guidance
 - scene-count/generation-count/credit-budget consistency validation
 - required 8s production scene length for current grammar
@@ -149,23 +168,27 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - local handoff update guard
 - regression tests for core production invariants
 
-## Latest material change — keyframe cost preflight
+## Latest material change — planned keyframe continuity chain
 
 Problem:
-- the repository has long called planned image keyframes “FREE” and uses them as Gate A before paid Veo clips
-- the generated Flow Pack did not explicitly tell the operator which current image model is the no-charge option or require checking the UI-displayed cost before generating the KF set
-- that ambiguity matters because Flow model availability/pricing can change, and the user wants a simple low-credit workflow
+- planned KF0–KFn were previously listed as separate image prompts
+- an operator could generate each from scratch, producing different paw identity, camera, prop placement, scale or lighting
+- First+Last Veo would then need to interpolate both the intended food-state change and accidental world/camera changes, increasing drift/reroll risk
 
 Fix:
-- `tools/build_flow_pack.py` now starts with a dedicated `Gate A — FREE keyframe preflight` section
-- it recommends `Nano Banana 2 Lite` only while Flow itself marks it available at no charge
-- it requires the operator to check active image model + displayed cost before each planned KF generation
-- any non-zero image cost triggers STOP/re-check instead of silent spend
-- it tells the operator to create only the manifest-required KF set, not endless decorative alternatives
-- `tools/test_build_flow_pack.py` now asserts this cost-preflight guidance remains present
-- `docs/23_minimum_credit_operator_architecture.md` now documents the same rule
+- `tools/build_flow_pack.py` now explicitly tells the operator to create KF0 as the master anchor
+- every later KF is derived from the prior approved KF through Flow image edit/refine or image reference/ingredient reuse
+- the generated pack adds `KEYFRAME DRIFT FAIL`
+- `tools/test_build_flow_pack.py` protects the new continuity instructions
+- `docs/29_planned_keyframe_continuity_chain.md` documents the rationale and operator rule
 
-This is a 0-credit operator/tooling improvement. It changes no episode story, runtime, ranking, generation count, or paid-video ceiling.
+Expected impact:
+- same number of planned KFs
+- no extra paid-video credits
+- lower endpoint mismatch before G1
+- fewer continuity/camera/prop rerolls per usable second
+
+No story, candidate score, runtime, NEXT_EPISODE, or paid-generation budget changed.
 
 ## Research / idea policy
 
@@ -213,18 +236,19 @@ Beats:
 
 Continuity/action rules:
 - same roasting tray G1–G4
-- same fixed miniature tabletop warmer remains explicit KF0–KF4
-- same small serving niche remains visible at the upper-right KF0–KF4
+- same fixed miniature tabletop warmer KF0–KF4
+- same small serving niche upper-right KF0–KF4
 - no surprise new cookware/shelf/stall structure
 - no direct pinch/grab of sweet potato
+- KF0 = master planned image anchor
+- KF1→KF4 = sequential edit/reference derivations from previous approved planned KF
 - G2 First = Flow-native saved actual last usable frame from G1 PASS
 - G3 First = Flow-native saved actual last usable frame from G2 PASS
 - G4 First = Flow-native saved actual last usable frame from G3 PASS
-- all planned KF references resolve before preparation
 - every G scene has explicit action + action_guard
 - zero-cut constraint remains literal in generated prompts
 
-Highest-value next real-world step remains **generate TK-005 G1 only and QC it.** Automation must not spend that credit for the user.
+Highest-value next real-world step remains **generate/approve the TK-005 planned KF chain, then generate G1 only and QC it.** Automation must not spend that credit for the user.
 
 ## Production learning available
 
@@ -254,35 +278,35 @@ subscribers / 100 credits
 
 ### Phase A — TK-005 production truth
 1. run local preparation/validation
-2. create/approve manifest-required KF0–KF4 using the current no-charge image path after checking actual UI cost
-3. generate G1 only
-4. QC POV / scale / anatomy / camera / action / zero-cut behavior / warmer+niche continuity
-5. on PASS, use Flow native `Save frame` on the exact last usable frame
-6. continue G2 → G3 → justified G4 only through progressive gates
-7. record credits/rerolls/usable seconds/failure type
+2. create KF0 master anchor using current no-charge image path after checking UI cost
+3. derive/approve KF1→KF4 from each prior approved KF using image edit/reference chaining
+4. generate G1 only
+5. QC POV / scale / anatomy / camera / action / zero-cut behavior / warmer+niche continuity
+6. on PASS, save actual last usable G1 frame with Flow native `Save frame`
+7. continue G2 → G3 → justified G4 only through progressive gates
+8. record actual credits, rerolls, usable seconds and failure type
 
 ### Phase B — first public Shorts learning
-At 24h/72h record Stayed to watch, APV, engaged views, subscribers, comments, final runtime, credits, and rerolls.
+At 24h/72h record Stayed to watch, APV, engaged views, subscribers, comments, final runtime, credits and rerolls.
 
 ### Phase C — runtime learning
-Compare compact_h30 vs immersive_h40 using APV, engaged views/credit, subscribers/100 credits, and beat drop-off.
+Compare compact_h30 vs immersive_h40 on APV, engaged views/credit, subscribers/100 credits and beat drop-off.
 
 ### Phase D — operator simplification
-Keep reducing manual judgment so `다음 영상 준비해줘` remains sufficient. Add tooling only when actual Flow behavior or production evidence reveals a real risk.
+Keep reducing manual judgment so `다음 영상 준비해줘` remains sufficient. Update tooling only when actual Flow behavior or production evidence changes.
 
 ### Phase E — worldbuilding expansion
-After performance evidence exists, expand distinct tiny stalls, rainy shops, after-hours bakery, seasonal rituals, and other worlds without repeating story fingerprints.
+Only after performance evidence supports it, expand tiny-stall, rainy-shop, after-hours bakery, seasonal ritual and other distinct worlds without repeating the same story fingerprint.
 
 ## Next priorities
 
-1. TK-005 actual Gate-A KF creation/QC using a UI-confirmed no-charge image model
+1. TK-005 planned KF0→KF4 continuity validation in real Flow
 2. TK-005 actual G1 production/QC data
-3. confirm warmer + distant serving niche + tray + paw + camera layout survives G1
-4. verify zero-cut long-take behavior in real Flow output
-5. verify native Save frame → next First frame continuity in practice
-6. record actual credits/rerolls/usable motion
-7. obtain first public 24h/72h sample
-8. only then re-weight runtime/action/idea priors
+3. confirm zero-cut long-take behavior in real Flow output
+4. verify actual-last-usable-frame continuity in practice
+5. record actual credits/rerolls/usable motion
+6. obtain first public 24h/72h sample
+7. only then re-weight runtime/action/idea priors
 
 More same-class retail PR collection is not a priority.
 
@@ -300,7 +324,7 @@ Always inspect in this order:
 9. current episode manifest
 10. research/backlog/learning ledger
 
-Newer merged repository state overrides stale chat or automation wording.
+Stale chat or automation wording never overrides newer merged repository state.
 
 ## Safety / invariants
 
@@ -309,19 +333,16 @@ Newer merged repository state overrides stale chat or automation wording.
 - no automatic YouTube publish
 - no exact competitor copying
 - no third-person/full-cat regression
-- no human fingers/thumbs/tool-grip regression
-- no undefined/missing KF improvisation
-- no assumption that a planned image KF is free without checking actual UI cost
-- no paid scene with blank action/action_guard
-- no next-scene spend before previous PASS
-- no stale progressive-spend or sequential-chain metadata
-- no planned target frame substituted for previous actual PASS frame
-- prefer Flow native saved actual frame over screenshot/re-encoded/recreated bridge assets
+- no independent fresh-generation planned KF1+ when an approved prior KF can anchor edit/reference continuity
+- no substitute planned frame for an actual previous PASS frame
+- no undefined/missing KF improvisation at production time
+- no paid scene with blank action or blank action_guard
+- no silent loss of an explicit `0`-cut scene constraint
+- no next-scene spend after previous-scene failure
 - no scene-count/runtime/credit mismatch
-- no major static prop appearing or disappearing mid-generation when it can be fixed in planned frames
-- no padding G4
+- no padding G4 merely to hit a duration
 - no reroll of good motion for audio-only defects
-- no placeholder analytics treated as real data
+- no placeholder analytics treated as real observations
 - do not modify Cali or unrelated repositories
 
 ## Definition of Done
@@ -330,53 +351,48 @@ Newer merged repository state overrides stale chat or automation wording.
 current research
 → scored + novelty-safe candidate
 → POV/tiny-scale production-safe manifest
-→ current-standard + originality validation PASS
-→ spend/runtime/keyframe/action/cut/chain validation PASS
-→ UI-confirmed 0-credit planned keyframe preflight
+→ spend/runtime/keyframe/action/cut consistency PASS
+→ planned KF continuity chain PASS
 → progressive Flow generation
-→ native Save frame actual-frame continuity chain
+→ actual-frame continuity chain
 → edit/export
 → upload
 → 24h/72h learning
 → next episode prior update
 ```
 
-Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer camera/continuity rerolls, less operator judgment, and fewer repeated story fingerprints — not by commit count.
+Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer continuity/camera rerolls, less operator judgment, and fewer repeated story fingerprints — not by commit count.
 
 ## Change log
 
-### 2026-08-27 — Zero-credit keyframe cost preflight
-Baseline `main@d6c5f206c2f6b8dd279b8190bbbbb9093ebd6e15`.
+### 2026-08-27 — Planned keyframe continuity chain
+Baseline `main@1bfe81535616d5371cfbc08201eedad04b592a93`.
 
 Changed:
-- add explicit Gate-A image-model/cost verification to generated Flow Pack
-- prefer Nano Banana 2 Lite only while current Flow UI marks it no-charge
-- stop if displayed image-generation cost is non-zero instead of assuming planned KF is free
-- limit free image generation to manifest-required keyframes
-- add regression assertions for this guidance
-- refresh minimum-credit operator documentation
+- KF0 becomes master visual anchor
+- KF1+ are derived from the previous approved KF through Flow edit/refine or image reference/ingredient reuse
+- generated Flow Pack includes the rule and `KEYFRAME DRIFT FAIL`
+- add regression coverage and `docs/29_planned_keyframe_continuity_chain.md`
 - synchronize this handoff
 
 Verified:
-- official Flow model help currently describes Nano Banana 2 Lite as available at no charge
-- official Veo 3.1 Lite 4/6/8s + Extend pricing remains 10 credits/generation for non-Ultra
-- First+Last support and native Save frame behavior remain available
-- fresh seasonal/adjacent research did not change candidate ranking or NEXT_EPISODE
+- official Flow image help supports iterative editing and adding existing images as prompt references
+- no Flow/Veo pricing assumption change was required
+- TK-005 directly benefits because warmer/niche/paw/camera continuity is critical across KF0–KF4
 
 Unchanged:
 - NEXT_EPISODE = TK-005
-- TK-005 story/runtime/4-generation structure
-- 40-credit current first-pass video ceiling
-- candidate ranking
-- no credits spent, no paid generation, no publishing
+- immersive_h40 / four Lite scenes / current 40-credit first-pass ceiling
+- no paid generation or publishing
 
 ### Earlier 2026-08-27 work
-- native Flow Save-frame bridge
-- full TK-005 warmer + serving-niche static-prop continuity
-- G1 warmer continuity fix
-- bundle-level current-standard validation
-- progressive-spend/sequential-chain manifest validation
-- explicit zero-cut prompt preservation
-- scene-action/keyframe integrity gates
+- zero-credit keyframe cost preflight
+- Flow native `Save frame` sequential bridge
+- TK-005 fixed warmer/niche continuity
+- zero-cut prompt preservation
+- scene-action integrity gate
+- keyframe-reference integrity gate
+- manifest spend consistency fail-closed gate
 - runtime-aware operator guidance
+- IDEA-010 new-rice onigiri candidate
 - deterministic novelty/authenticity gate
