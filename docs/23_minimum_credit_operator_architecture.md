@@ -164,21 +164,27 @@ G2 PASS actual frame → Save frame → G3 First
 
 둘을 바꾸지 않는다.
 
-## Runtime
+## Runtime — H30/H40는 credit tier
+
+`compact_h30`과 `immersive_h40`의 숫자는 **first-pass credit ceiling**을 뜻한다. 최종 초 길이 목표가 아니다.
 
 ### compact_h30
-- 정확히 3 × 8s Lite scenes
+- 정확히 3 × 8s Lite scenes = raw 24s
 - 현재 30-credit first-pass ceiling
-- final 약 30~36s
+- 기본 final 약 **24~27s**
 - scale reveal → making → payoff 3 beat로 완결될 때
 
 ### immersive_h40
-- 정확히 4 × 8s Lite scenes
+- 정확히 4 × 8s Lite scenes = raw 32s
 - 현재 40-credit first-pass ceiling
-- final 약 38~46s
+- 기본 final 약 **32~35s**
 - G4가 독립적인 world-resolution 가치를 가질 때만
 
-48~60s는 실제 채널 retention/engaged-views-per-credit가 지지하기 전에는 기본값이 아니다.
+자연스러운 slowdown은 manifest의 허용 범위 안에서만 사용한다. 정적/keyframe hold는 `editorial_seconds`에 명시된 경우에만 사용한다. `max_total_static_hold_seconds`는 자동 패딩 예산이 아니다.
+
+현재 validator는 generated motion + 허용 slowdown + **명시된** hold로 도달할 수 없는 target을 paid generation 전에 FAIL 처리한다.
+
+48~60s는 실제 채널 retention/engaged-views-per-credit가 지지하기 전에는 기본값이 아니다. 필요하면 더 많은 독립 motion beat/generation 전략으로 별도 설계한다.
 
 ## Paw-action grammar
 
@@ -274,4 +280,4 @@ engaged views / credit
 subscribers / 100 credits
 ```
 
-핵심 원칙: **무료 단계에서 해결 가능한 continuity 문제를 paid Veo reroll로 넘기지 않는다.**
+핵심 원칙: **무료 단계에서 해결 가능한 continuity 문제와 편집 단계에서 해결 불가능한 runtime 산술 오류를 paid Veo reroll로 넘기지 않는다.**
