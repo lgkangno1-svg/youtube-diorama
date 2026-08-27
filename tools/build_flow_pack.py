@@ -99,6 +99,19 @@ def next_scene_uses_actual_frame(scenes: list[dict[str, Any]], index: int, scene
     return next_start == f"ACTUAL_LAST_USABLE_FRAME_{scene_id}"
 
 
+def keyframe_creation_instruction(kfs: list[str], index: int) -> str:
+    """Tell the operator how to preserve continuity across planned image keyframes."""
+    current = kfs[index]
+    if index == 0:
+        return (
+            f"Create `{current}` as the master visual anchor first. Approve its POV, paw anatomy, tiny scale, camera, lighting and fixed-prop layout before deriving any later KF."
+        )
+    previous = kfs[index - 1]
+    return (
+        f"Derive `{current}` from the approved `{previous}` instead of starting a fresh unrelated text-to-image generation: open/edit/refine the prior image or add it back to the Flow prompt as an image reference/ingredient, then change only the state required by this KF. Preserve paw fur, camera, workbench, lighting, hero-object scale and fixed props."
+    )
+
+
 def build(data: dict[str, Any]) -> str:
     episode_id = data["episode_id"]
     refs = ", ".join(data.get("references", [])) or "HERO_CAT_V1_PAWS, POV_PAWS_MICROWORLD_V1, KITCHEN_WORLD_V1"
@@ -125,6 +138,9 @@ def build(data: dict[str, Any]) -> str:
         "- Before generating each planned keyframe, verify the active image model and displayed cost. Gate A is only a 0-credit preflight when the UI actually shows 0 credits / no charge.",
         "- If the selected image model shows a non-zero cost, STOP rather than assuming the keyframe is free; switch back to the no-charge image option or re-check current official Flow model/cost guidance.",
         f"- Create/approve only the {len(kfs)} planned keyframes needed by this manifest; do not make decorative alternatives just because image generation is free.",
+        "- Build planned keyframes as a continuity chain, not independent lottery tickets: create KF0 as the approved master anchor, then derive each later KF by editing/refining the prior approved KF or adding that prior KF back to the image prompt as a reference/ingredient.",
+        "- For KF1+, change only the state required by the manifest. Preserve paw fur pattern, first-person camera, workbench layout, fixed props, lighting and hero-object scale unless that KF explicitly requires a state change.",
+        "- If a later KF drifts in camera, paw identity, scale or fixed-prop placement, reject/repair it while image generation is still no-charge instead of asking paid Veo to interpolate between incompatible endpoints.",
         "- Reject a free frame before video spend if POV, paw-only anatomy, tiny scale, fixed-prop layout, or premise is structurally wrong.",
         "",
         "## Flow UI preflight — do this before every paid generation",
@@ -175,9 +191,11 @@ def build(data: dict[str, Any]) -> str:
         "",
     ]
 
-    for kf in kfs:
+    for index, kf in enumerate(kfs):
         lines += [
             f"### {kf}",
+            "",
+            f"- {keyframe_creation_instruction(kfs, index)}",
             "",
             "```text",
             f"{frame_text(data, kf)}. {scale} {POV_STYLE}",
@@ -257,6 +275,7 @@ def build(data: dict[str, Any]) -> str:
         "- CAMERA FAIL: third-person chef composition",
         "- PADDING FAIL: extra generation adds duration but no independent beat",
         "- UI MODE FAIL: existing-video edit/Omni Flash edit was mistaken for a new Veo Lite scene",
+        "- KEYFRAME DRIFT FAIL: a planned later KF was generated independently and no longer preserves the approved anchor's paw identity, camera, scale, lighting or fixed-prop layout",
         "- FRAME CHAIN FAIL: next scene used a planned keyframe, screenshot/re-encoded still, or wrong asset instead of the previous PASS scene's native saved actual frame",
         "",
         "## Failure escalation",
@@ -268,6 +287,7 @@ def build(data: dict[str, Any]) -> str:
         "5. Do not buy G4 merely to reach a target duration; use it only for a distinct world-resolution or tactile payoff beat.",
         "6. If Flow opens an existing-video edit mode or Omni Flash video edit, return to new-video generation and re-check model/mode/cost before spending.",
         "7. If the required previous-scene actual frame was not saved, reopen the QC-PASS clip and recover it with Flow's native `Save frame` action before continuing; do not substitute the planned target frame or a screenshot.",
+        "8. If a planned KF drifts from the approved KF0/KF-chain layout, repair it through image edit/reference chaining before paid video generation; do not ask Veo to reconcile incompatible endpoints.",
     ]
     return "\n".join(lines) + "\n"
 
