@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import unittest
 
-from build_flow_pack import build, frame_input_instruction
+from build_flow_pack import build, frame_input_instruction, keyframe_creation_instruction
 
 
 class FlowFrameInputMapTests(unittest.TestCase):
@@ -21,6 +21,17 @@ class FlowFrameInputMapTests(unittest.TestCase):
         text = frame_input_instruction("", role="First frame")
         self.assertIn("STOP", text)
         self.assertIn("repair the manifest", text)
+
+    def test_first_keyframe_is_master_anchor(self) -> None:
+        text = keyframe_creation_instruction(["KF0_OPEN", "KF1_TARGET"], 0)
+        self.assertIn("master visual anchor", text)
+        self.assertIn("KF0_OPEN", text)
+
+    def test_later_keyframe_derives_from_previous_reference(self) -> None:
+        text = keyframe_creation_instruction(["KF0_OPEN", "KF1_TARGET"], 1)
+        self.assertIn("Derive `KF1_TARGET` from the approved `KF0_OPEN`", text)
+        self.assertIn("image reference/ingredient", text)
+        self.assertIn("Preserve paw fur", text)
 
     def test_build_maps_sequential_inputs_and_save_gate(self) -> None:
         data = {
@@ -68,6 +79,10 @@ class FlowFrameInputMapTests(unittest.TestCase):
         self.assertIn("displayed cost", output)
         self.assertIn("0-credit preflight", output)
         self.assertIn("STOP rather than assuming the keyframe is free", output)
+        self.assertIn("continuity chain, not independent lottery tickets", output)
+        self.assertIn("Derive `KF1_TARGET` from the approved `KF0_OPEN`", output)
+        self.assertIn("image reference/ingredient", output)
+        self.assertIn("KEYFRAME DRIFT FAIL", output)
         self.assertIn("Sequential-frame operator rule", output)
         self.assertIn("First frame: use the approved FREE target/reference keyframe `KF0_OPEN`", output)
         self.assertIn("First frame: use the ACTUAL frame saved from the QC-PASS G1 clip with Flow's native `Save frame` action", output)
