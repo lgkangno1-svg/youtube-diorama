@@ -1,9 +1,9 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**  
-Baseline inspected before this change: `main@dea8bb36661b8893b12b272ee82fae610e5105fa`
+Baseline inspected before this iteration: `main@18b707ea116e8413d55085eef233b17213a8d7e3`
 
-This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
+This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research must not churn it.
 
 ## Development execution policy
 
@@ -11,8 +11,9 @@ This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`.
 
 - repository development is performed directly by the active Chat/Codex session
 - do not delegate coding/planning/debugging/refactoring/review/test repair/architecture/repository exploration to OpenCode Go
-- inspect latest main SHA + recent commits/PRs before every change
-- latest merged repository state overrides stale chat or automation wording
+- inspect latest main SHA + recent commits/PRs before every run
+- latest merged repository state overrides stale chat or scheduled-prompt details
+- modify only `lgkangno1-svg/youtube-diorama`; do not touch Cali or unrelated repositories
 
 ## Mission
 
@@ -24,7 +25,7 @@ Normal user interface:
 다음 영상 준비해줘
 ```
 
-The system should research current Japanese/global AI-cat, miniature cooking, ASMR, relaxing-food and adjacent signals, choose a novelty-safe episode, prepare the episode manifest and `production/NEXT_EPISODE.txt`, generate deterministic local operator packs, minimize paid-generation failures, and learn from actual Flow production plus 24h/72h YouTube results.
+The system should research current Japanese/global AI-cat, miniature cooking, ASMR, relaxing-food and adjacent signals, choose a novelty-safe episode, prepare the manifest and `production/NEXT_EPISODE.txt`, generate deterministic local operator packs, minimize paid-generation failures, and learn from actual Flow production plus 24h/72h YouTube results.
 
 User local entrypoint:
 
@@ -63,17 +64,9 @@ Official Google Flow Help rechecked **2026-08-28**:
 - Veo 3.1 Lite 4s/6s/8s + Extend: non-Ultra 10 credits/generation
 - First + Last frames: Lite supports 4s/6s/8s
 - output count = 1
-- 1080p upscaling: 0 credits for Plus/Pro/Ultra
-- Ingredients/References to Video: Lite 8s-only
 - actual Flow UI active model/mode/output count/displayed cost is the generation-time source of truth
-- `Nano Banana 2 Lite` is currently described by Google as the default image generation/editing model available at no charge
 
 Do not confuse an existing-video edit / Omni Flash edit screen with standard new-video generation.
-
-Canonical operator docs:
-- `docs/23_minimum_credit_operator_architecture.md`
-- `docs/26_flow_ui_mode_preflight.md`
-- `docs/29_planned_keyframe_continuity_chain.md`
 
 ## Gate A — planned keyframe continuity
 
@@ -93,29 +86,11 @@ verify image model + displayed cost in Flow
 
 KF1+ must not become independent fresh text-to-image lottery tickets when a previous approved KF can anchor continuity.
 
-Preserve across planned KFs:
-1. true first-person camera
-2. paw count/fur/anatomy
-3. hero-object-to-paw scale
-4. workbench geometry
-5. fixed major props + screen positions
-6. lighting/lens/DOF
-7. only the manifest-required food/object state should change
-
-If these drift, `KEYFRAME DRIFT FAIL` and repair before paid video.
+Planned keyframe order is numeric `KF0`, `KF1`, `KF2` ... rather than YAML mapping insertion order. Both validator and Flow Pack follow that numeric sequence.
 
 Important distinction:
 - planned KF = destination / target state
 - actual saved video frame = next-scene continuity bridge
-
-### Authoritative KF ordering
-
-Planned keyframe sequence is defined by the numeric prefix `KF0`, `KF1`, `KF2` ... — **not by YAML mapping insertion order**.
-
-- `tools/validate_current_standard.py` validates contiguous numeric KF0..KFn semantics
-- `tools/build_flow_pack.py` must sort the operator keyframe creation chain by the same numeric semantics
-- harmless YAML reordering must never redefine the master anchor or make KF2 derive from KF0 before KF1
-- malformed, duplicate or non-contiguous KF indices fail closed rather than silently changing the operator sequence
 
 ## Progressive Spend / actual-frame chain
 
@@ -132,20 +107,36 @@ planned KF chain PASS
 
 Never substitute a prettier planned target KF for the actual previous PASS frame.
 
-## Runtime policy
+## Runtime policy — corrected 2026-08-28
 
-`compact_h30`:
-- exactly 3 first-pass Lite scenes
-- current 30-credit first-pass ceiling
-- final roughly 30–36s
+Important correction: `compact_h30` / `immersive_h40` numbers refer to the **current 30/40-credit first-pass ceilings**, not promised final seconds.
 
-`immersive_h40`:
-- exactly 4 first-pass Lite scenes
-- current 40-credit first-pass ceiling
-- final roughly 38–46s
+### compact_h30
+- exactly 3 × 8s Lite scenes = raw motion 24s
+- current first-pass ceiling = 30 credits
+- default final target ≈ **24–27s**
+- use when three independent beats complete scale reveal → making → payoff
+
+### immersive_h40
+- exactly 4 × 8s Lite scenes = raw motion 32s
+- current first-pass ceiling = 40 credits
+- default final target ≈ **32–35s**
 - G4 must add independent serving/world-resolution/afterglow value
 
-48–60s is not default until the channel's own retention + engaged-views-per-credit data supports it.
+Why this changed:
+- previous docs/manifest advertised compact 30–36s and immersive 38–46s despite only 24s/32s of generated raw motion
+- TK-005 allowed playback only down to 0.92x and declared no explicit editorial holds
+- therefore the previous 38s minimum for TK-005 was physically unreachable without invented stills/loops or slower-than-declared retiming
+- that contradicted `do_not_pad_to_runtime`, healing pacing, and the G4 no-padding rule
+
+New invariant:
+- natural slowdown may be used only inside the manifest's playback-speed range
+- static/keyframe holds count only when explicitly declared in `editorial_seconds`
+- `max_total_static_hold_seconds` is a ceiling, not an automatic padding budget
+- if generated motion + allowed slowdown + explicit holds cannot reach the requested minimum, the manifest fails before paid Flow generation
+- accept a shorter natural Short rather than inventing runtime padding
+
+`tools/validate_current_standard.py` now enforces this feasibility rule. `tools/build_healing_edit_plan.py` no longer fabricates default hero/loop holds when the manifest did not request them.
 
 ## 8-second scene grammar
 
@@ -160,7 +151,7 @@ Production manifests must explicitly declare:
 - `max_visual_cuts_per_8s_generation: 0` or `1`
 - `preferred_action_count_per_generation: 1`
 
-The normal Tiny Cat Kitchen style is 0-cut long take.
+Normal Tiny Cat Kitchen style is 0-cut long take.
 
 ## Audio policy
 
@@ -172,7 +163,7 @@ No generated music
 Quiet room tone + close tiny tactile ASMR
 ```
 
-If motion is good and audio alone is bad, replace audio in edit rather than rerolling video. Use a short user-recorded Japanese line only when it materially improves comprehension, character voice, or payoff.
+If motion is good and audio alone is bad, replace audio in edit rather than rerolling video.
 
 ## Deterministic safeguards already built
 
@@ -180,9 +171,9 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - POV paw-only + tiny-scale hard gates
 - Flow generation-vs-edit UI preflight
 - planned KF0→KFn continuity chain
-- numeric KF0..KFn sequence semantics independent of YAML mapping order
-- **generated Flow Pack uses the same numeric KF0..KFn ordering instead of raw YAML mapping order**
-- manifest-aware H30/H40 guidance
+- numeric KF0..KFn semantics independent of YAML mapping order
+- generated Flow Pack follows numeric KF order
+- manifest-aware H30/H40 credit-tier guidance
 - scene-count/generation-count/credit-budget consistency validation
 - keyframe map/reference integrity
 - non-empty action/action_guard for every paid scene
@@ -193,25 +184,11 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - sequential-chain metadata validation
 - novelty/authenticity gate against repeated recent fingerprints
 - seasonal evidence saturation/no-churn gate
-- bundle-level current-standard validation
+- long-take manifest guard: 0/1 cut max and exactly one preferred primary action
+- **runtime-feasibility no-padding gate**
+- **edit-plan explicit-holds-only rule**
 - local handoff-update guard
 - regression tests for core production invariants
-- long-take manifest guard: 0/1 cut max and exactly one preferred primary action
-
-## Latest improvement — Flow Pack numeric KF-order alignment
-
-Problem found on **2026-08-28**:
-- the validator already treated `KF0..KFn` numeric indices as authoritative and deliberately allowed harmless YAML keyframe mapping reorder
-- `tools/build_flow_pack.py` still used `list(keyframes.keys())`, so the generated operator pack followed YAML insertion order
-- a formatter/manual reorder such as `KF2, KF0, KF1` could therefore make the pack present KF2 as the master anchor or tell the operator to derive the wrong planned KF from the wrong predecessor even though the manifest itself passed current-standard validation
-- that mismatch was especially risky because Gate A is intended to reduce paid Veo continuity rerolls before G1
-
-Fix:
-- `tools/build_flow_pack.py` now parses the numeric `KF<number>` prefix and sorts planned KFs by index
-- duplicate, malformed or non-contiguous indices fail closed in the pack builder as well as the validator
-- regression coverage deliberately supplies reordered YAML and verifies the generated pack still renders `KF0 → KF1 → KF2` and the correct derivation instructions
-
-This is a 0-credit deterministic tooling fix. It does not change TK-005 story, runtime, generation count, budget, candidate ranking or NEXT_EPISODE.
 
 ## Research / idea policy
 
@@ -229,10 +206,9 @@ Evidence saturation rule: do not keep committing same-class seasonal retail/PR s
 
 2026-08-28 research check:
 - official Google Flow pricing/features remain unchanged for the current Lite workflow
-- Veo 3.1 Lite still supports First + Last frame videos at 4s/6s/8s, while Ingredients/References and Extend are 8s-only
-- current Japanese sweet-potato/month-viewing/autumn/new-rice signals remain same-class evidence already represented in the repository
-- fresh search did not reveal a current AI-cat/miniature/ASMR mechanism strong enough to change candidate ranking or production mechanics
-- research/backlog files intentionally remain unchanged this run
+- current sweet-potato / 月見 / new-rice autumn evidence remains same-class evidence already represented in the repository
+- no new benchmark signal justified changing candidate ranking or NEXT_EPISODE
+- research/backlog files intentionally remain unchanged this iteration
 
 Current candidate state:
 - `IDEA-009` yakiimo → realized as TK-005; blocked as future repeat
@@ -251,8 +227,9 @@ Title:
 ```
 
 Manifest: `episodes/TK-005.yaml`  
-Runtime: `immersive_h40`  
-First-pass ceiling: 4 Lite generations / current 40 credits
+Runtime mode: `immersive_h40`  
+First-pass ceiling: 4 Lite generations / current 40 credits  
+Corrected final target: **32–35s**, nominal `length_target_seconds: 34`
 
 Planned KFs:
 1. `KF0_OPEN`
@@ -279,12 +256,12 @@ Continuity/action rules:
 - same serving niche KF0–KF4
 - no surprise new cookware/structure
 - no direct pinch/grab
-- KF0 = master planned anchor
 - KF1→KF4 = sequential edit/reference derivations from previous approved planned KF
 - G2/G3/G4 First = actual saved frame from previous PASS clip
 - explicit action + action_guard in every G scene
 - `max_visual_cuts_per_8s_generation: 0`
 - `preferred_action_count_per_generation: 1`
+- no invented editorial holds merely to push runtime toward 40s
 
 Highest-value next real-world step remains **approve TK-005 KF0→KF4 in real Flow, then generate G1 only and QC it.** Automation must not spend that credit.
 
@@ -322,13 +299,14 @@ subscribers / 100 credits
 5. QC POV / scale / anatomy / camera / action / cut count / fixed-prop continuity
 6. on PASS, native Save frame
 7. continue G2 → G3 → justified G4 through progressive gates
-8. record actual credits, rerolls, usable seconds, failure type
+8. edit to the best natural runtime; do not force 38–46s
+9. record actual credits, rerolls, usable seconds, failure type
 
 ### Phase B — first public Shorts learning
 At 24h/72h record Stayed to watch, APV, engaged views, subscribers, comments, final runtime, credits, rerolls.
 
 ### Phase C — runtime learning
-Compare compact_h30 vs immersive_h40 on APV, engaged views/credit, subscribers/100 credits, beat drop-off.
+Compare compact_h30 vs immersive_h40 using actual final runtime, APV, engaged views/credit, subscribers/100 credits, and beat drop-off. Do not infer runtime from the H30/H40 label.
 
 ### Phase D — operator simplification
 Keep `다음 영상 준비해줘` sufficient; reduce manual judgment only when real Flow behavior supports it.
@@ -344,7 +322,7 @@ Expand distinct worlds only after performance evidence, without repeating recent
 4. actual saved-frame continuity
 5. actual credits/rerolls/usable motion
 6. first public 24h/72h sample
-7. only then re-weight runtime/action/idea priors
+7. learn whether 24–27s vs 32–35s beats fit this channel better before adding longer generation strategies
 
 ## Work-start order
 
@@ -379,6 +357,8 @@ Expand distinct worlds only after performance evidence, without repeating recent
 - no next-scene spend after previous-scene failure
 - no scene-count/runtime/credit mismatch
 - no padding G4
+- **no impossible final-runtime target that requires undeclared padding**
+- **no invented still/loop hold merely to satisfy H30/H40 naming**
 - no reroll of good motion for audio-only defects
 - no placeholder analytics treated as real observations
 - do not modify Cali or unrelated repositories
@@ -388,42 +368,42 @@ Expand distinct worlds only after performance evidence, without repeating recent
 ```text
 current research
 → scored + novelty-safe candidate
-→ production-safe manifest
+→ production-safe + runtime-feasible manifest
 → deterministic validation PASS
 → planned KF continuity PASS
 → progressive paid generation
 → actual-frame continuity chain
-→ edit/export
+→ natural edit/export without padding
 → upload
 → 24h/72h learning
 → next prior update
 ```
 
-Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer continuity/camera/reroll failures, less operator judgment and fewer repeated story fingerprints — not by commit count.
+Success is measured by first-pass success, usable motion/credit, engaged views/credit, subscribers/credit, fewer continuity/camera/reroll failures, less operator judgment and fewer repeated story fingerprints — not by commit count or artificially long runtime.
 
 ## Change log
 
-### 2026-08-28 — Flow Pack numeric KF-order alignment
-Baseline `main@dea8bb36661b8893b12b272ee82fae610e5105fa`.
+### 2026-08-28 — Runtime feasibility / no-padding correction
+Baseline `main@18b707ea116e8413d55085eef233b17213a8d7e3`.
 
 Changed:
-- fix Flow Pack planned-keyframe ordering so numeric KF0..KFn semantics match current-standard validation
-- reject malformed/duplicate/non-contiguous KF indices in the pack builder rather than silently using mapping order
-- add regression coverage with intentionally reordered YAML keyframes
-- synchronize this handoff
+- identify arithmetic mismatch between 24s/32s generated motion and the previous 30–36s/38–46s final targets
+- redefine H30/H40 explicitly as 30/40-credit first-pass tiers, not promised final seconds
+- set default natural targets to compact 24–27s and immersive 32–35s
+- correct TK-005 from 41s / 38–46s to nominal 34s / 32–35s without changing its four-beat story or 40-credit ceiling
+- add validator runtime-feasibility gate using generated motion + allowed slowdown + explicitly declared editorial holds
+- update healing edit-plan builder so it does not manufacture default hero/loop holds
+- add regression tests for infeasible targets, natural slowdown, explicit holds, and no invented edit padding
+- synchronize START_HERE / CURRENT_STANDARD / docs22 / docs23 / this handoff
 
 Verified assumptions:
-- official Google Flow credit/features remain compatible with the current Veo 3.1 Lite strategy
-- NEXT_EPISODE and candidate ranking do not change
-- no same-class seasonal evidence was added merely for activity
-
-Unchanged:
-- NEXT_EPISODE = TK-005
-- immersive_h40 / four Lite scenes / current 40-credit first-pass ceiling
-- no Flow credits spent
-- no paid generation or publishing
+- official Google Flow credit baseline remains Pro 1,000/month and Veo 3.1 Lite 10 credits/generation for non-Ultra
+- NEXT_EPISODE remains TK-005
+- candidate ranking/evidence remains unchanged due research saturation
+- no Flow credits spent, no paid generation, no publishing
 
 ### Earlier 2026-08-28 work
+- Flow Pack numeric KF-order alignment
 - operator Gate A sequential-KF synchronization
 - long-take manifest drift guard
 - numeric planned-keyframe sequence gate
