@@ -59,8 +59,8 @@ references:
   - POV_PAWS_MICROWORLD_V1
   - KITCHEN_WORLD_V1
 keyframes:
-  KF0_OPEN: "true first-person cat POV looking down at a tiny wooden diorama workbench; only two cream-and-pale-ginger feline front paws at the bottom edges; between them sits one absurdly tiny 12mm purple sweet potato on a thumbnail-sized ceramic roasting tray; no cat face/head/body"
-  KF1_WARM: "same POV and paw positions; tiny 12mm sweet potato gently warmed on the same miniature ceramic roasting tray over a miniature charcoal brazier, skin slightly darker; object remains much smaller than either paw"
+  KF0_OPEN: "true first-person cat POV looking down at a tiny wooden diorama workbench; only two cream-and-pale-ginger feline front paws at the bottom edges; between them sits one absurdly tiny 12mm purple sweet potato on a thumbnail-sized ceramic roasting tray; a miniature tabletop warmer is already present a short distance ahead of the tray, clearly separate and fixed in place from the opening frame; no cat face/head/body"
+  KF1_WARM: "same POV and paw positions; tiny 12mm sweet potato gently warmed on the same miniature ceramic roasting tray over the same already-present miniature tabletop warmer, skin slightly darker; object remains much smaller than either paw"
   KF2_CRACK: "same POV; sweet potato skin has one small natural crack with a very thin curl of steam; one paw lightly steadies the same tiny roasting tray from the side, no gripping"
   KF3_OPEN: "same POV and same tiny roasting tray; the tray now rests just away from the heat and the existing crack has widened naturally enough to reveal bright golden center and steam; paws remain only at bottom edges, food still under one third paw width"
   KF4_SERVE: "same POV; the same thumbnail-sized ceramic roasting tray holding the finished 12mm yakiimo now rests inside a miniature stall serving niche; paws are beginning to withdraw, warm steam remains; no new plate or cookware appears"
@@ -71,8 +71,8 @@ scenes:
     generation_seconds: 8
     start_frame: KF0_OPEN
     end_frame: KF1_WARM
-    action: "one front paw slowly nudges the thumbnail-sized roasting tray a few millimeters toward the tiny charcoal heat, then stops; the sweet potato itself barely moves"
-    action_guard: "true first-person POV; front paws only; no face/head/body; no tongs; no gripping; keep the 12mm sweet potato dramatically smaller than the paw; one calm action"
+    action: "one front paw slowly nudges the thumbnail-sized roasting tray a few millimeters toward the already-present tiny tabletop warmer, then stops; the sweet potato itself barely moves"
+    action_guard: "true first-person POV; front paws only; no face/head/body; no tongs; no gripping; keep the 12mm sweet potato dramatically smaller than the paw; keep the warmer fixed and already present rather than creating it mid-shot; one calm action"
   - id: G2
     generation_type: first_plus_last
     purpose: slow_roast_and_skin_crack
@@ -87,7 +87,7 @@ scenes:
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G2
     end_frame: KF3_OPEN
-    action: "one paw slowly slides the same tiny roasting tray a few millimeters away from the charcoal heat, then stops; during the quiet hold the existing crack widens naturally from residual heat and the golden center becomes visible"
+    action: "one paw slowly slides the same tiny roasting tray a few millimeters away from the heat, then stops; during the quiet hold the existing crack widens naturally from residual warmth and the golden center becomes visible"
     action_guard: "one slide plus one passive material micro-beat; paw never touches or pinches the sweet potato; no fingers; no human-like squeeze; preserve the same tray, first-person camera and tiny scale"
   - id: G4
     generation_type: first_plus_last
