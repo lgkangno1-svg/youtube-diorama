@@ -6,6 +6,7 @@ The output is deterministic. It never spends Flow credits.
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +27,8 @@ LOCK = (
     "Do not enlarge the hero object, reveal the cat's body, create human-like gripping, duplicate props, or morph ingredients unless the action explicitly requires it."
 )
 
+KEYFRAME_INDEX_RE = re.compile(r"^KF(\d+)(?:_|$)")
+
 
 def humanize(value: Any) -> str:
     if value is None:
@@ -43,10 +46,35 @@ def get_scene_seconds(scene: dict[str, Any]) -> int:
 
 
 def ordered_keyframes(data: dict[str, Any]) -> list[str]:
+    """Return planned keyframes in authoritative KF-number order.
+
+    Validator semantics already define KF0..KFn as the durable sequence. Keep the
+    generated operator pack aligned with that rule so YAML mapping reordering can
+    never change which image is treated as the master anchor or previous KF.
+    """
     explicit = list((data.get("keyframes") or {}).keys())
-    if explicit:
-        return explicit
-    return ["KF0_OPEN", "KF1_TRANSFORM", "KF2_PAYOFF", "KF3_WORLD_RESOLUTION"]
+    if not explicit:
+        return ["KF0_OPEN", "KF1_TRANSFORM", "KF2_PAYOFF", "KF3_WORLD_RESOLUTION"]
+
+    indexed: list[tuple[int, str]] = []
+    seen: set[int] = set()
+    for raw_name in explicit:
+        name = str(raw_name)
+        match = KEYFRAME_INDEX_RE.match(name)
+        if not match:
+            raise ValueError(f"Keyframe name must start with KF<number>: {name}")
+        index = int(match.group(1))
+        if index in seen:
+            raise ValueError(f"Duplicate keyframe numeric index KF{index}")
+        seen.add(index)
+        indexed.append((index, name))
+
+    indexed.sort(key=lambda item: item[0])
+    actual = [index for index, _ in indexed]
+    expected = list(range(len(indexed)))
+    if actual != expected:
+        raise ValueError(f"Planned keyframes must be contiguous KF0..KFn; found {actual}")
+    return [name for _, name in indexed]
 
 
 def frame_text(data: dict[str, Any], name: str) -> str:
