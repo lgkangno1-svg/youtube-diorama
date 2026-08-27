@@ -5,7 +5,7 @@ audience: [teens, twenties]
 format: healing_microworld_pov
 food: yakiimo
 constraint: 12mm_sweet_potato
-length_target_seconds: 41
+length_target_seconds: 34
 hook: "この小ささで、焼きいも作れる？"
 title: "猫の前足で作る、12mmの焼きいも。"
 brand_identity:
@@ -27,7 +27,7 @@ camera_grammar:
   third_person_full_cat_is_fail: true
 runtime_strategy:
   mode: immersive_h40
-  target_final_runtime_seconds: [38, 46]
+  target_final_runtime_seconds: [32, 35]
   minimum_distinct_motion_beats: 4
   fourth_beat_value: "quiet world-resolution: slide the same tiny roasting tray with the finished yakiimo into its diorama stall position, then paws withdraw while steam remains"
   do_not_pad_to_runtime: true
@@ -98,7 +98,7 @@ scenes:
     action: "one paw slowly slides the same ceramic roasting tray holding the finished yakiimo into the already-visible miniature serving niche; both paws then withdraw a little while steam continues"
     action_guard: "use the exact same tray, warmer and serving niche already present in G1-G3; introduce no new plate, bowl, cookware, shelf or stall structure; this is a world-resolution beat, not runtime padding; no eating, no customer, no camera cut, no full cat"
 post_production:
-  preferred_final_runtime_seconds: [38, 46]
+  preferred_final_runtime_seconds: [32, 35]
   target_motion_density_pct_min: 82
   max_total_static_hold_seconds: 3
   preferred_playback_speed_range: [0.92, 1.00]
