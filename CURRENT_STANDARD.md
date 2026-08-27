@@ -1,6 +1,6 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-27 POV Paws Microworld + Planned Keyframe Continuity + Progressive Spend + Adaptive H30/H40**
+최신 적용 기준: **2026-08-28 POV Paws Microworld + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility**
 
 ## 1. 핵심 경험
 
@@ -79,7 +79,8 @@ output count = 1
 displayed cost = current UI truth
 ```
 
-2026-08-27 공식 Google Flow 도움말 재확인:
+2026-08-28 공식 Google Flow 도움말 재확인:
+- Google AI Pro = 1,000 credits/month
 - Veo 3.1 Lite 4/6/8s + Extend = non-Ultra 10 credits/generation
 - First + Last frames = Lite 4/6/8s 지원
 - Ingredients/References-to-Video = Lite 8s-only 가능
@@ -120,21 +121,32 @@ G1 PASS actual frame
 
 다음 scene의 First frame을 prettier planned KF로 대체하지 않는다.
 
-## 7. Runtime policy
+## 7. Runtime policy — H30/H40는 초가 아니라 credit tier
+
+`compact_h30` / `immersive_h40`의 30/40은 **현재 first-pass credit ceiling**을 뜻한다. 최종 영상 길이를 30초/40초 이상으로 억지로 맞추라는 뜻이 아니다.
 
 ### compact_h30
-- 정확히 3 × 8s Lite scenes
+- 정확히 3 × 8s Lite scenes = raw motion 24s
 - 현재 first-pass ceiling 30 credits
-- final 약 30~36s
+- 기본 final 약 **24~27s**
 - 3 beat로 scale reveal → making → payoff가 완결될 때
 
 ### immersive_h40
-- 정확히 4 × 8s Lite scenes
+- 정확히 4 × 8s Lite scenes = raw motion 32s
 - 현재 first-pass ceiling 40 credits
-- final 약 38~46s
+- 기본 final 약 **32~35s**
 - G4가 serving / world-resolution / afterglow의 독립 가치를 가질 때만
 
-48~60s는 실제 24h/72h retention과 engaged-views/credit가 지지할 때만 실험한다.
+자연스러운 slowdown은 manifest의 `preferred_playback_speed_range` 안에서만 사용한다. 정적 hold는 `editorial_seconds`에 **명시적으로 필요한 경우에만** 사용한다. `max_total_static_hold_seconds`는 허용 상한이지 자동으로 채워야 하는 시간 예산이 아니다.
+
+금지:
+- 3×8s 원본으로 30~36s를 맞추기 위해 임의 still/loop 생성
+- 4×8s 원본으로 38~46s를 맞추기 위해 과도한 slow/hold 사용
+- H30/H40 이름 때문에 runtime padding
+
+`tools/validate_current_standard.py`는 generated motion + 허용 slowdown + 명시된 editorial hold로 도달 불가능한 runtime target을 paid Flow 전에 차단한다.
+
+48~60s는 실제 24h/72h retention과 engaged-views/credit가 지지할 때만 별도 generation 전략으로 실험한다.
 
 ## 8. 8초 scene grammar
 
@@ -187,6 +199,7 @@ Score:
 
 - runtime: `immersive_h40`
 - 4 Lite scenes / 현재 40-credit first-pass ceiling
+- achievable final target: **32~35s**, nominal target 34s
 - KF0 = master planned anchor
 - KF1→KF4 = 이전 approved KF에서 edit/reference 파생
 - 같은 roasting tray / tabletop warmer / serving niche 유지

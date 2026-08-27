@@ -158,6 +158,8 @@ output count = 1
 
 ## Runtime / credit 선택
 
+**H30/H40의 숫자는 final seconds가 아니라 current first-pass credit ceiling이다.**
+
 ### compact_h30
 
 ```text
@@ -166,7 +168,8 @@ planned KF chain PASS
 PASS → G2 = +10
 PASS → G3 = +10
 first-pass ceiling = 30 credits
-final ≈ 30~36s
+raw motion = 24s
+기본 final ≈ 24~27s
 ```
 
 3개 독립 beat로 완결될 때 사용.
@@ -178,12 +181,17 @@ planned KF chain PASS
 → G1 → G2 → G3 모두 PASS
 독립적인 4번째 world-resolution beat가 있을 때만 G4 = +10
 first-pass ceiling = 40 credits
-final ≈ 38~46s
+raw motion = 32s
+기본 final ≈ 32~35s
 ```
 
 4번째 scene은 길이 패딩이 아니라 작은 세계의 여운/serving/resolution이어야 한다.
 
-48~60초는 실제 retention 데이터가 지지하기 전에는 기본 목표가 아니다.
+자연스러운 slowdown은 manifest가 허용한 범위 안에서만 쓴다. 정적/keyframe hold는 `editorial_seconds`에 실제 이유와 함께 명시된 경우에만 사용한다. `max_total_static_hold_seconds`는 자동으로 채우는 시간이 아니다.
+
+`tools/validate_current_standard.py`는 generated motion + 허용 slowdown + 명시된 hold로 도달 불가능한 runtime target을 사전에 차단한다.
+
+48~60초는 실제 retention 데이터가 지지하고 추가 독립 motion beat가 설계될 때만 실험한다.
 
 ## Actual-frame Sequential Chain
 
@@ -285,7 +293,7 @@ engaged views / credit
 subscribers / 100 credits
 ```
 
-특히 `30~36s compact_h30`과 `38~46s immersive_h40`을 비교해 실제 채널에 맞는 몰입 길이를 학습한다.
+`compact_h30`과 `immersive_h40`을 비교할 때는 이름에 적힌 숫자가 아니라 **실제 final runtime + beat 수 + credits**로 retention/efficiency를 학습한다.
 
 ## Handoff persistence gate
 

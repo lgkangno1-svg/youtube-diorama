@@ -132,21 +132,25 @@ ChatGPT 처리:
 
 ## 5. Runtime learning — H30 vs H40
 
+`H30/H40`의 숫자는 **현재 first-pass credit ceiling**을 뜻하며 final seconds를 약속하지 않는다.
+
 초기 prior:
 
 ```text
 compact_h30
-3×8s Lite raw motion
-→ final 약 30~36s
+3×8s Lite raw motion = 24s
+→ 기본 final 약 24~27s
 → 3개의 독립 beat로 완결
 
 immersive_h40
-4×8s Lite raw motion
-→ final 약 38~46s
+4×8s Lite raw motion = 32s
+→ 기본 final 약 32~35s
 → 4번째 beat가 world-resolution / serving / afterglow처럼 독립 가치가 있음
 ```
 
-G4는 단순 runtime padding이면 금지한다. 48~60초는 실제 channel retention data가 지지할 때만 실험한다.
+자연스러운 slowdown은 manifest의 허용 범위 안에서만 사용한다. 정적 hold는 `editorial_seconds`에 명시된 경우에만 runtime에 더할 수 있다. `max_total_static_hold_seconds`는 자동 패딩 예산이 아니다.
+
+`tools/validate_current_standard.py`는 generated motion + 허용 slowdown + 명시된 hold로 도달할 수 없는 target runtime을 paid Flow 전에 차단한다. G4는 단순 runtime padding이면 금지한다. 48~60초는 실제 channel retention data가 지지하고 더 많은 독립 motion beat를 설계할 때만 실험한다.
 
 학습 목표는 "긴 게 좋은가"가 아니라:
 - stayed-to-watch
@@ -160,7 +164,7 @@ G4는 단순 runtime padding이면 금지한다. 48~60초는 실제 channel rete
 
 생성 직전 official Flow docs + 실제 UI를 확인한다.
 
-현재 2026-08-26 재확인 기준:
+현재 2026-08-28 재확인 기준:
 - Google AI Pro: 1,000 credits / billing cycle
 - Veo 3.1 Lite 4/6/8s + Extend: non-Ultra 10 credits/generation
 - output_count=1

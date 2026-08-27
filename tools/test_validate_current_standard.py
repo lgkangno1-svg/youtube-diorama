@@ -270,6 +270,39 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         del data["flow_strategy"]["sequential_chain"]["g2_start_source"]
         self.assertEqual(validate(data), [])
 
+    def test_runtime_target_cannot_require_padding(self) -> None:
+        data = base_manifest()
+        data["runtime_strategy"]["target_final_runtime_seconds"] = [30, 36]
+        data["length_target_seconds"] = 33
+        data["post_production"] = {
+            "preferred_playback_speed_range": [0.92, 1.0],
+            "max_total_static_hold_seconds": 3,
+        }
+        errors = validate(data)
+        self.assertTrue(any("final runtime target is infeasible without padding" in error for error in errors))
+        self.assertTrue(any("length_target_seconds is infeasible without padding" in error for error in errors))
+
+    def test_runtime_target_may_use_natural_slowdown_without_padding(self) -> None:
+        data = base_manifest()
+        data["runtime_strategy"]["target_final_runtime_seconds"] = [24, 27]
+        data["length_target_seconds"] = 26
+        data["post_production"] = {
+            "preferred_playback_speed_range": [0.92, 1.0],
+            "max_total_static_hold_seconds": 3,
+        }
+        self.assertEqual(validate(data), [])
+
+    def test_only_explicit_editorial_holds_extend_feasible_runtime(self) -> None:
+        data = base_manifest()
+        data["runtime_strategy"]["target_final_runtime_seconds"] = [28, 29]
+        data["length_target_seconds"] = 28
+        data["post_production"] = {
+            "preferred_playback_speed_range": [0.92, 1.0],
+            "max_total_static_hold_seconds": 3,
+        }
+        data["editorial_seconds"] = {"opening_keyframe_hold": 2.0}
+        self.assertEqual(validate(data), [])
+
 
 if __name__ == "__main__":
     unittest.main()
