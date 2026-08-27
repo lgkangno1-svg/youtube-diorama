@@ -5,11 +5,13 @@ Usage:
   python tools/build_episode_bundle.py episodes/TK-001.yaml
 
 Pipeline:
-1. Run deterministic originality validation. Abort on failure.
-2. Build the Google Flow prompt pack.
-3. Build a deterministic healing edit plan.
-4. Build the YouTube publish pack.
-5. Write a compact bundle index with two human approval gates.
+1. Require the canonical repository manifest for the requested episode.
+2. Run deterministic current-production-standard validation. Abort on failure.
+3. Run deterministic originality validation. Abort on failure.
+4. Build the Google Flow prompt pack.
+5. Build a deterministic healing edit plan.
+6. Build the YouTube publish pack.
+7. Write a compact bundle index with two human approval gates.
 
 No API calls, LLM calls, Flow generations, or uploads are performed.
 """
@@ -31,6 +33,10 @@ def run(cmd: list[str]) -> None:
 
 def load_manifest(path: Path) -> dict[str, Any]:
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def canonical_manifest_path(root: Path, episode_id: str) -> Path:
+    return (root / "episodes" / f"{episode_id}.yaml").resolve()
 
 
 def runtime_guidance(data: dict[str, Any]) -> str:
@@ -64,28 +70,53 @@ def main() -> int:
     parser.add_argument("--generated-dir", type=Path, default=Path("generated"))
     args = parser.parse_args()
 
+    root = Path(__file__).resolve().parent.parent
     manifest = args.manifest
-    data = load_manifest(manifest)
-    episode_id = data.get("episode_id")
+    manifest_abs = (manifest if manifest.is_absolute() else root / manifest).resolve()
+    if not manifest_abs.exists():
+        print(f"ERROR: manifest not found: {manifest_abs}", file=sys.stderr)
+        return 2
+
+    data = load_manifest(manifest_abs)
+    episode_id = str(data.get("episode_id") or "").strip()
     if not episode_id:
         print("ERROR: manifest requires episode_id", file=sys.stderr)
         return 2
 
-    root = Path(__file__).resolve().parent.parent
-    generated_dir = args.generated_dir
-    if not generated_dir.is_absolute():
-        generated_dir = root / generated_dir
-    generated_dir.mkdir(parents=True, exist_ok=True)
+    # The bundle builder is a production entry point, so it must never accept a
+    # copied/temporary manifest that bypasses repository validation. The canonical
+    # episodes/TK-XXX.yaml file is the only production manifest source.
+    canonical = canonical_manifest_path(root, episode_id)
+    if manifest_abs != canonical:
+        print(
+            "BUILD STOPPED: production bundles must use the canonical repository manifest "
+            f"{canonical}. Received {manifest_abs}. No production pack was created.",
+            file=sys.stderr,
+        )
+        return 2
 
     python = sys.executable
     tools = root / "tools"
-    manifest_abs = manifest if manifest.is_absolute() else root / manifest
+
+    # Current-standard validation must live inside the bundle builder itself. This
+    # closes bypasses through direct `make_short.ps1` or direct Python invocation;
+    # callers do not get to opt out of POV/scale/runtime/credit/frame/action gates.
+    try:
+        run([python, str(tools / "validate_current_standard.py"), episode_id])
+    except subprocess.CalledProcessError:
+        print("\nBUILD STOPPED: current-production-standard validation failed. No production pack was created.", file=sys.stderr)
+        return 1
 
     try:
         run([python, str(tools / "validate_episode_originality.py"), str(manifest_abs)])
     except subprocess.CalledProcessError:
         print("\nBUILD STOPPED: originality validation failed. No production pack was created.", file=sys.stderr)
         return 1
+
+    generated_dir = args.generated_dir
+    if not generated_dir.is_absolute():
+        generated_dir = root / generated_dir
+    generated_dir.mkdir(parents=True, exist_ok=True)
 
     flow_pack = generated_dir / f"{episode_id}_flow_pack.md"
     edit_plan = generated_dir / f"{episode_id}_edit_plan.md"

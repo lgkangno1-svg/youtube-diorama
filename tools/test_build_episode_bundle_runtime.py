@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Small regression checks for manifest-aware runtime guidance."""
+"""Small regression checks for manifest-aware bundle guidance and source gating."""
 from __future__ import annotations
 
 import importlib.util
@@ -43,7 +43,20 @@ def main() -> int:
     assert "2 planned scene(s)" in adaptive
     assert "do not assume a fixed H30 or H40" in adaptive
 
-    print("PASS: runtime guidance follows manifest mode")
+    fake_root = Path("/tmp/tiny-cat-kitchen-test-root")
+    canonical = module.canonical_manifest_path(fake_root, "TK-005")
+    assert canonical == (fake_root / "episodes" / "TK-005.yaml").resolve()
+    assert canonical != (fake_root / "scratch" / "TK-005.yaml").resolve()
+
+    source = Path(module.__file__).read_text(encoding="utf-8")
+    standard_gate = 'run([python, str(tools / "validate_current_standard.py"), episode_id])'
+    originality_gate = 'run([python, str(tools / "validate_episode_originality.py"), str(manifest_abs)])'
+    assert standard_gate in source
+    assert originality_gate in source
+    assert source.index(standard_gate) < source.index(originality_gate)
+    assert source.index(originality_gate) < source.index("generated_dir.mkdir")
+
+    print("PASS: bundle runtime guidance and current-standard preflight ordering are enforced")
     return 0
 
 
