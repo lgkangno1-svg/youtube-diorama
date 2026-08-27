@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 EPISODES = ROOT / "episodes"
 CURRENT_NON_ULTRA_LITE_CREDITS_PER_GENERATION = 10
+KEYFRAME_INDEX_RE = re.compile(r"^KF(\d+)(?:_|$)")
 
 
 def load_episode(episode_id: str) -> dict[str, Any]:
@@ -25,6 +27,11 @@ def to_int(value: Any, *, default: int = 0) -> int:
         return int(value)
     except (TypeError, ValueError):
         return default
+
+
+def keyframe_index(name: str) -> int | None:
+    match = KEYFRAME_INDEX_RE.match(name)
+    return int(match.group(1)) if match else None
 
 
 def validate(data: dict[str, Any]) -> list[str]:
@@ -67,13 +74,24 @@ def validate(data: dict[str, Any]) -> list[str]:
     if to_int(flow.get("output_count")) != 1:
         errors.append("flow_strategy.output_count must be 1")
 
+    indexed_keyframes: dict[int, str] = {}
+    duplicate_keyframe_indices: set[int] = set()
     if not isinstance(keyframes, dict) or not keyframes:
         errors.append("manifest must define non-empty keyframes for approved free First/Last frame targets")
         keyframes = {}
     else:
         for keyframe_name, keyframe_prompt in keyframes.items():
-            if not str(keyframe_name or "").startswith("KF"):
-                errors.append(f"keyframe name must start with KF: {keyframe_name}")
+            name = str(keyframe_name or "")
+            index = keyframe_index(name)
+            if index is None:
+                errors.append(f"keyframe name must start with KF<number>: {keyframe_name}")
+            elif index in indexed_keyframes:
+                duplicate_keyframe_indices.add(index)
+                errors.append(
+                    f"keyframe numeric index KF{index} is duplicated by {indexed_keyframes[index]} and {name}"
+                )
+            else:
+                indexed_keyframes[index] = name
             if not str(keyframe_prompt or "").strip():
                 errors.append(f"keyframe {keyframe_name} must contain a non-empty prompt")
 
@@ -200,36 +218,36 @@ def validate(data: dict[str, Any]) -> list[str]:
                 if str(scene.get("start_frame") or "") != expected:
                     errors.append(f"G{index} must start from {expected}")
 
-    # When every paid scene uses First+Last framing, the planned KF map is not just
-    # a bag of valid names: its insertion order defines the approved destination
-    # chain that Gate A asks the operator to build sequentially. A manifest could
-    # previously reference an existing but wrong KF (for example G2 -> KF3), pass
-    # validation, and ask Veo to interpolate toward the wrong state. Fail closed on
-    # that mismatch before any credits are spent.
+    # For an all-First+Last manifest, KF numbers are the durable semantic sequence.
+    # YAML mapping insertion order is presentation detail and can change during a
+    # manual edit or formatter pass. Derive the chain from KF0..KFn numeric indices
+    # so harmless reordering does not change meaning, while duplicate/missing/extra
+    # indices fail before any paid generation.
     all_first_plus_last = bool(scenes) and all(
         str((scene or {}).get("generation_type") or "first_plus_last") == "first_plus_last"
         for scene in scenes
     )
-    if all_first_plus_last and keyframes:
-        ordered_kfs = [str(name) for name in keyframes.keys()]
-        expected_kf_count = scene_count + 1
-        if len(ordered_kfs) != expected_kf_count:
+    if all_first_plus_last and keyframes and not duplicate_keyframe_indices:
+        expected_indices = list(range(scene_count + 1))
+        actual_indices = sorted(indexed_keyframes)
+        if actual_indices != expected_indices:
             errors.append(
-                "all-first_plus_last manifests must define exactly one opening KF plus one ordered target KF per scene "
-                f"({expected_kf_count} expected for {scene_count} scenes; found {len(ordered_kfs)})"
+                "all-first_plus_last manifests must define contiguous planned keyframe indices "
+                f"KF0..KF{scene_count} exactly; found {actual_indices}"
             )
-        if ordered_kfs:
+        if all(index in indexed_keyframes for index in expected_indices):
             g1_start = str((scenes[0] or {}).get("start_frame") or "")
-            if g1_start != ordered_kfs[0]:
-                errors.append(f"G1 must start from the first planned keyframe {ordered_kfs[0]}")
+            expected_start = indexed_keyframes[0]
+            if g1_start != expected_start:
+                errors.append(f"G1 must start from planned keyframe index KF0 ({expected_start})")
             for index, scene in enumerate(scenes, 1):
-                if index < len(ordered_kfs):
-                    expected_end = ordered_kfs[index]
-                    actual_end = str((scene or {}).get("end_frame") or "")
-                    if actual_end != expected_end:
-                        errors.append(
-                            f"G{index} end_frame must follow planned keyframe order: expected {expected_end}, got {actual_end or '<missing>'}"
-                        )
+                expected_end = indexed_keyframes[index]
+                actual_end = str((scene or {}).get("end_frame") or "")
+                if actual_end != expected_end:
+                    errors.append(
+                        f"G{index} end_frame must target planned keyframe index KF{index}: "
+                        f"expected {expected_end}, got {actual_end or '<missing>'}"
+                    )
 
     serialized = yaml.safe_dump(data, allow_unicode=True).lower()
     for legacy_token in (
