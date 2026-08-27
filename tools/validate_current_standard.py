@@ -94,8 +94,6 @@ def validate(data: dict[str, Any]) -> list[str]:
     if scene_count > 4:
         errors.append("manifest must contain at most 4 first-pass production scenes")
 
-    # Spend plan must describe the exact manifest being prepared. A stale value here
-    # can make the operator stop too early or spend a scene that was not intended.
     if max_gens > 0 and max_gens != scene_count:
         errors.append(
             "flow_strategy.max_lite_generations_first_pass must equal the number of manifest scenes "
@@ -113,8 +111,8 @@ def validate(data: dict[str, Any]) -> list[str]:
 
     # The manifest itself must preserve the progressive-spend policy, not merely the
     # generated operator text. Otherwise a stale/hand-edited manifest can claim that
-    # G2/G3/G4 may proceed without the prior scene passing, which contradicts the
-    # repository's most important credit-safety rule.
+    # G2/G3/G4 may proceed without the prior scene passing, contradicting the most
+    # important credit-safety rule in the repository.
     progressive_gate = flow.get("progressive_spend_gate") or {}
     required_pass_gates = {
         "g2_requires_g1_pass": scene_count >= 2,
@@ -131,6 +129,9 @@ def validate(data: dict[str, Any]) -> list[str]:
     if progressive_gate.get("reroll_only_structural_failure") is not True:
         errors.append("flow_strategy.progressive_spend_gate.reroll_only_structural_failure must be true")
 
+    # Sequential-chain metadata is required only for scenes that actually use
+    # First+Last framing. Extend scenes continue from a source clip and therefore do
+    # not upload a saved still as their First frame.
     sequential_chain = flow.get("sequential_chain") or {}
     expected_chain_sources = {
         2: "save_actual_last_usable_frame_from_G1",
@@ -139,9 +140,11 @@ def validate(data: dict[str, Any]) -> list[str]:
     }
     for scene_index, expected_source in expected_chain_sources.items():
         if scene_count >= scene_index:
-            key = f"g{scene_index}_start_source"
-            if sequential_chain.get(key) != expected_source:
-                errors.append(f"flow_strategy.sequential_chain.{key} must be {expected_source}")
+            scene = scenes[scene_index - 1] or {}
+            if str(scene.get("generation_type") or "first_plus_last") == "first_plus_last":
+                key = f"g{scene_index}_start_source"
+                if sequential_chain.get(key) != expected_source:
+                    errors.append(f"flow_strategy.sequential_chain.{key} must be {expected_source}")
 
     if runtime_mode == "compact_h30":
         if scene_count != 3 or max_gens != 3:
@@ -154,8 +157,6 @@ def validate(data: dict[str, Any]) -> list[str]:
         if not str(runtime.get("fourth_beat_value") or "").strip():
             errors.append("immersive_h40 requires a documented fourth_beat_value; G4 cannot be padding")
     elif scene_count == 4 or max_gens == 4:
-        # Unknown/custom runtime modes are allowed, but a 4-generation plan still needs
-        # an explicit reason for the fourth spend.
         if not str(runtime.get("fourth_beat_value") or "").strip():
             errors.append("a 4-generation custom runtime requires a documented fourth_beat_value")
 
@@ -172,9 +173,6 @@ def validate(data: dict[str, Any]) -> list[str]:
         if to_int(scene.get("generation_seconds")) != 8:
             errors.append(f"{expected_id} generation_seconds must be 8")
 
-        # A paid scene without a concrete motion instruction or a guard can still
-        # produce a syntactically valid Flow Pack, but it leaves Veo to invent the
-        # action/constraints and creates avoidable reroll risk. Fail before credits.
         if not str(scene.get("action") or "").strip():
             errors.append(f"{expected_id} action must be non-empty before paid generation")
         if not str(scene.get("action_guard") or "").strip():
@@ -188,10 +186,6 @@ def validate(data: dict[str, Any]) -> list[str]:
             if not end_frame:
                 errors.append(f"{expected_id} first_plus_last requires end_frame")
 
-            # Any planned KF token shown in the generated Flow Pack must resolve to a
-            # real approved free keyframe in this manifest. Otherwise a typo such as
-            # KF2_CRCK can pass preparation and only fail when the operator is ready to
-            # spend credits.
             for role, frame_token in (("start_frame", start_frame), ("end_frame", end_frame)):
                 if frame_token.startswith("KF") and frame_token not in keyframes:
                     errors.append(
