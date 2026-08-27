@@ -87,8 +87,8 @@ def frame_input_instruction(frame_name: Any, *, role: str) -> str:
     if token.startswith(prefix):
         source_scene = token[len(prefix) :]
         return (
-            f"{role}: upload the ACTUAL saved last usable frame from {source_scene}. "
-            "Do not substitute a planned keyframe or regenerate the previous scene just to create a cleaner bridge."
+            f"{role}: use the ACTUAL frame saved from the QC-PASS {source_scene} clip with Flow's native `Save frame` action. "
+            "Do not substitute a planned keyframe, browser screenshot, re-encoded still, or regenerated previous scene just to create a cleaner bridge."
         )
 
     if token.startswith("KF"):
@@ -153,10 +153,11 @@ def build(data: dict[str, Any]) -> str:
         "",
         "## Sequential-frame operator rule",
         "",
-        "- A token like `ACTUAL_LAST_USABLE_FRAME_G1` is NOT an image to generate. It means: after G1 passes QC, save the real last usable frame from that generated clip and upload that saved image as the next scene's First frame.",
+        "- A token like `ACTUAL_LAST_USABLE_FRAME_G1` is NOT an image to generate. After G1 passes QC, open the PASS clip in Flow, pause on the exact last usable frame, hover that frame, and click Flow's native `Save frame`; use that saved project asset as the next scene's First frame.",
+        "- Prefer Flow's native saved frame over browser screenshots, screen captures, downloaded/re-encoded stills, or recreated frames so the bridge preserves the exact pixels/state Flow already produced.",
         "- Never replace an actual-frame token with the prettier planned target keyframe. Planned keyframes define destinations; actual saved frames carry continuity forward.",
         "- If the previous scene did not PASS, do not create its continuity frame for the purpose of unlocking the next spend. Fix/reroll only the failed scene first.",
-        "- When a next scene depends on the current scene's actual frame, save it immediately after PASS with a clear local filename such as `G1_last_usable.png`.",
+        "- Keep a clear operator label such as `G1_last_usable` when organizing the saved Flow project asset; a local export is optional backup, not the preferred bridge source.",
         "",
         "## Production-card approval",
         "",
@@ -237,9 +238,9 @@ def build(data: dict[str, Any]) -> str:
                 lines += [
                     f"**After {scene_id} PASS**",
                     "",
-                    f"- Save the actual last usable frame from {scene_id} now; the next scene requires it as First frame.",
-                    f"- Suggested local filename: `{scene_id}_last_usable.png`.",
-                    f"- Do not generate the next scene until this saved frame has been visually checked for POV, scale, paw anatomy, prop state and camera continuity.",
+                    f"- In Flow, open the QC-PASS {scene_id} clip → pause on the exact last usable frame → hover the frame → click `Save frame`.",
+                    f"- Use that native saved project asset as the next scene's First frame. Suggested operator label: `{scene_id}_last_usable`.",
+                    f"- Do not use a screenshot/re-encoded still when the native saved frame is available; visually check POV, scale, paw anatomy, prop state and camera continuity before the next spend.",
                     "",
                 ]
 
@@ -253,7 +254,7 @@ def build(data: dict[str, Any]) -> str:
         "- CAMERA FAIL: third-person chef composition",
         "- PADDING FAIL: extra generation adds duration but no independent beat",
         "- UI MODE FAIL: existing-video edit/Omni Flash edit was mistaken for a new Veo Lite scene",
-        "- FRAME CHAIN FAIL: next scene used a planned keyframe or wrong still instead of the previous PASS scene's actual saved last usable frame",
+        "- FRAME CHAIN FAIL: next scene used a planned keyframe, screenshot/re-encoded still, or wrong asset instead of the previous PASS scene's native saved actual frame",
         "",
         "## Failure escalation",
         "",
@@ -263,7 +264,7 @@ def build(data: dict[str, Any]) -> str:
         "4. Never generate G2/G3/G4 proactively before the previous generation passes.",
         "5. Do not buy G4 merely to reach a target duration; use it only for a distinct world-resolution or tactile payoff beat.",
         "6. If Flow opens an existing-video edit mode or Omni Flash video edit, return to new-video generation and re-check model/mode/cost before spending.",
-        "7. If the required previous-scene actual frame was not saved, recover it from the PASS clip before continuing; do not substitute the planned target frame.",
+        "7. If the required previous-scene actual frame was not saved, reopen the QC-PASS clip and recover it with Flow's native `Save frame` action before continuing; do not substitute the planned target frame or a screenshot.",
     ]
     return "\n".join(lines) + "\n"
 
