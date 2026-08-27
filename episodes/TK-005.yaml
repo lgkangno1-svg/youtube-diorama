@@ -59,11 +59,11 @@ references:
   - POV_PAWS_MICROWORLD_V1
   - KITCHEN_WORLD_V1
 keyframes:
-  KF0_OPEN: "true first-person cat POV looking down at a tiny wooden diorama workbench; only two cream-and-pale-ginger feline front paws at the bottom edges; between them sits one absurdly tiny 12mm purple sweet potato on a thumbnail-sized ceramic roasting tray; a miniature tabletop warmer is already present a short distance ahead of the tray, clearly separate and fixed in place from the opening frame; no cat face/head/body"
-  KF1_WARM: "same POV and paw positions; tiny 12mm sweet potato gently warmed on the same miniature ceramic roasting tray over the same already-present miniature tabletop warmer, skin slightly darker; object remains much smaller than either paw"
-  KF2_CRACK: "same POV; sweet potato skin has one small natural crack with a very thin curl of steam; one paw lightly steadies the same tiny roasting tray from the side, no gripping"
-  KF3_OPEN: "same POV and same tiny roasting tray; the tray now rests just away from the heat and the existing crack has widened naturally enough to reveal bright golden center and steam; paws remain only at bottom edges, food still under one third paw width"
-  KF4_SERVE: "same POV; the same thumbnail-sized ceramic roasting tray holding the finished 12mm yakiimo now rests inside a miniature stall serving niche; paws are beginning to withdraw, warm steam remains; no new plate or cookware appears"
+  KF0_OPEN: "true first-person cat POV looking down at a tiny wooden diorama workbench; only two cream-and-pale-ginger feline front paws at the bottom edges; between them sits one absurdly tiny 12mm purple sweet potato on a thumbnail-sized ceramic roasting tray; a miniature tabletop warmer is already present a short distance ahead of the tray, clearly separate and fixed in place; a tiny wooden serving niche is already visible at the far upper-right edge of the same workbench, fixed in the background and not yet used; no cat face/head/body"
+  KF1_WARM: "same POV, paw positions, workbench, same fixed tabletop warmer and same small serving niche at the far upper-right edge; tiny 12mm sweet potato gently warmed on the same miniature ceramic roasting tray over the already-present warmer, skin slightly darker; object remains much smaller than either paw"
+  KF2_CRACK: "same POV and same workbench; the same tabletop warmer remains fixed beneath or immediately beside the same roasting tray and the same serving niche remains visible at the far upper-right edge; sweet potato skin has one small natural crack with a very thin curl of steam; one paw lightly steadies the same tiny roasting tray from the side, no gripping"
+  KF3_OPEN: "same POV, same workbench, same fixed warmer now a short distance behind the tray after the tray has moved away from heat, and the same serving niche remains visible at the far upper-right edge; the existing crack has widened naturally enough to reveal bright golden center and steam; paws remain only at bottom edges, food still under one third paw width"
+  KF4_SERVE: "same POV and same workbench; the same already-visible serving niche at the far upper-right is now holding the same thumbnail-sized ceramic roasting tray with the finished 12mm yakiimo; the same warmer remains in its original location farther back on the workbench; paws are beginning to withdraw, warm steam remains; no new plate, cookware, shelf, or stall structure appears"
 scenes:
   - id: G1
     generation_type: first_plus_last
@@ -72,7 +72,7 @@ scenes:
     start_frame: KF0_OPEN
     end_frame: KF1_WARM
     action: "one front paw slowly nudges the thumbnail-sized roasting tray a few millimeters toward the already-present tiny tabletop warmer, then stops; the sweet potato itself barely moves"
-    action_guard: "true first-person POV; front paws only; no face/head/body; no tongs; no gripping; keep the 12mm sweet potato dramatically smaller than the paw; keep the warmer fixed and already present rather than creating it mid-shot; one calm action"
+    action_guard: "true first-person POV; front paws only; no face/head/body; no tongs; no gripping; keep the 12mm sweet potato dramatically smaller than the paw; keep both the warmer and serving niche fixed and already present rather than creating them mid-shot; one calm action"
   - id: G2
     generation_type: first_plus_last
     purpose: slow_roast_and_skin_crack
@@ -80,7 +80,7 @@ scenes:
     start_frame: ACTUAL_LAST_USABLE_FRAME_G1
     end_frame: KF2_CRACK
     action: "one paw gently presses the edge of the tiny tray to steady it while heat darkens the skin; a small crack slowly appears and a thin wisp of steam escapes"
-    action_guard: "no tool grip; paw does not pick up food; preserve exact first-person camera and miniature scale; one material transformation"
+    action_guard: "no tool grip; paw does not pick up food; preserve exact first-person camera and miniature scale; keep the same warmer and same distant serving niche fixed in their existing positions; one material transformation"
   - id: G3
     generation_type: first_plus_last
     purpose: golden_center_reveal
@@ -88,15 +88,15 @@ scenes:
     start_frame: ACTUAL_LAST_USABLE_FRAME_G2
     end_frame: KF3_OPEN
     action: "one paw slowly slides the same tiny roasting tray a few millimeters away from the heat, then stops; during the quiet hold the existing crack widens naturally from residual warmth and the golden center becomes visible"
-    action_guard: "one slide plus one passive material micro-beat; paw never touches or pinches the sweet potato; no fingers; no human-like squeeze; preserve the same tray, first-person camera and tiny scale"
+    action_guard: "one slide plus one passive material micro-beat; paw never touches or pinches the sweet potato; no fingers; no human-like squeeze; preserve the same tray, first-person camera, tiny scale, fixed warmer and already-visible serving niche"
   - id: G4
     generation_type: first_plus_last
     purpose: quiet_world_resolution
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G3
     end_frame: KF4_SERVE
-    action: "one paw slowly slides the same ceramic roasting tray holding the finished yakiimo into the miniature serving niche; both paws then withdraw a little while steam continues"
-    action_guard: "use the exact same tray already present in G1-G3; introduce no new plate, bowl or cookware; this is a world-resolution beat, not runtime padding; no eating, no customer, no camera cut, no full cat"
+    action: "one paw slowly slides the same ceramic roasting tray holding the finished yakiimo into the already-visible miniature serving niche; both paws then withdraw a little while steam continues"
+    action_guard: "use the exact same tray, warmer and serving niche already present in G1-G3; introduce no new plate, bowl, cookware, shelf or stall structure; this is a world-resolution beat, not runtime padding; no eating, no customer, no camera cut, no full cat"
 post_production:
   preferred_final_runtime_seconds: [38, 46]
   target_motion_density_pct_min: 82
