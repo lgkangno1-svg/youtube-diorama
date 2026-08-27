@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 EPISODES = ROOT / "episodes"
 CURRENT_NON_ULTRA_LITE_CREDITS_PER_GENERATION = 10
 KEYFRAME_INDEX_RE = re.compile(r"^KF(\d+)(?:_|$)")
+MAX_ALLOWED_VISUAL_CUTS_PER_8S = 1
 
 
 def load_episode(episode_id: str) -> dict[str, Any]:
@@ -73,6 +74,28 @@ def validate(data: dict[str, Any]) -> list[str]:
         errors.append("flow_strategy.primary_model must be veo-3.1-lite")
     if to_int(flow.get("output_count")) != 1:
         errors.append("flow_strategy.output_count must be 1")
+
+    # Calm long-take pacing is a production invariant, not just prompt copy.
+    # Require an explicit cut ceiling so a future manifest cannot silently omit
+    # the constraint, and reject >1 cut/8s before any paid Flow generation.
+    raw_max_cuts = flow.get("max_visual_cuts_per_8s_generation")
+    if raw_max_cuts is None:
+        errors.append("flow_strategy.max_visual_cuts_per_8s_generation must be explicitly declared (0 or 1)")
+    else:
+        try:
+            max_cuts = int(raw_max_cuts)
+            if isinstance(raw_max_cuts, bool) or max_cuts != raw_max_cuts:
+                raise ValueError
+            if max_cuts < 0 or max_cuts > MAX_ALLOWED_VISUAL_CUTS_PER_8S:
+                errors.append(
+                    "flow_strategy.max_visual_cuts_per_8s_generation must be 0 or 1 for calm long-take pacing"
+                )
+        except (TypeError, ValueError):
+            errors.append("flow_strategy.max_visual_cuts_per_8s_generation must be an integer 0 or 1")
+
+    preferred_actions = flow.get("preferred_action_count_per_generation")
+    if to_int(preferred_actions, default=-1) != 1:
+        errors.append("flow_strategy.preferred_action_count_per_generation must be 1")
 
     indexed_keyframes: dict[int, str] = {}
     duplicate_keyframe_indices: set[int] = set()
