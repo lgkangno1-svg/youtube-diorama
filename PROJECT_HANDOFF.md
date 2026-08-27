@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**  
-Baseline inspected before this change: `main@3ecece44258ebbab7abc0e49645d9e5a39e2ca85`
+Baseline inspected before this change: `main@b678680b2345d84084ef58104a2a2a15f6f672b5`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -56,14 +56,17 @@ Canonical identity docs:
 - `docs/24_hero_cat_brand_identity.md`
 - `docs/25_pov_paws_microworld_grammar.md`
 
-## Flow / Veo baseline
+## Current Flow / Veo baseline
 
 Official Google Flow Help rechecked **2026-08-28**:
 - Google AI Pro: 1,000 Flow credits/month
 - Veo 3.1 Lite 4s/6s/8s + Extend: non-Ultra 10 credits/generation
-- First + Last frames remain supported for the current Lite workflow
+- First + Last frames: Lite supports 4s/6s/8s
 - output count = 1
+- 1080p upscaling: 0 credits for Plus/Pro/Ultra
+- Ingredients/References to Video: Lite 8s-only
 - actual Flow UI active model/mode/output count/displayed cost is the generation-time source of truth
+- `Nano Banana 2 Lite` is currently described by Google as the default image generation/editing model available at no charge
 
 Do not confuse an existing-video edit / Omni Flash edit screen with standard new-video generation.
 
@@ -74,23 +77,35 @@ Canonical operator docs:
 
 ## Gate A — planned keyframe continuity
 
-Mandatory before paid G1:
+Mandatory before any paid G1:
 
 ```text
 verify image model + displayed cost in Flow
+→ use no-charge image path only when UI confirms it
 → create KF0 master visual anchor
 → QC POV / paws / scale / camera / fixed props / lighting
-→ derive KF1 from approved KF0
+→ derive KF1 from approved KF0 via edit/refine or reference/ingredient
 → derive KF2 from approved KF1
 → continue sequentially through all manifest-required KFs
 → all planned KFs PASS
 → only then generate G1
 ```
 
-KF1+ should not become independent fresh text-to-image lottery tickets when a previous approved KF can anchor continuity.
+KF1+ must not become independent fresh text-to-image lottery tickets when a previous approved KF can anchor continuity.
+
+Preserve across planned KFs:
+1. true first-person camera
+2. paw count/fur/anatomy
+3. hero-object-to-paw scale
+4. workbench geometry
+5. fixed major props + screen positions
+6. lighting/lens/DOF
+7. only the manifest-required food/object state should change
+
+If these drift, `KEYFRAME DRIFT FAIL` and repair before paid video.
 
 Important distinction:
-- planned KF = approved scene destination / target state
+- planned KF = destination / target state
 - actual saved video frame = next-scene continuity bridge
 
 ## Progressive Spend / actual-frame chain
@@ -101,8 +116,7 @@ planned KF chain PASS
 → QC
 → Flow native Save frame from actual last usable frame
 → G2 only after G1 PASS
-→ QC
-→ Save frame
+→ QC + Save frame
 → G3 only after G2 PASS
 → G4 only if immersive_h40 explicitly needs independent world-resolution value and G3 PASSed
 ```
@@ -123,6 +137,21 @@ Never substitute a prettier planned target KF for the actual previous PASS frame
 - G4 must add independent serving/world-resolution/afterglow value
 
 48–60s is not default until the channel's own retention + engaged-views-per-credit data supports it.
+
+## 8-second scene grammar
+
+Default:
+
+```text
+1 calm tactile primary action
++ optional 1 passive micro-payoff
+```
+
+Production manifests must explicitly declare:
+- `max_visual_cuts_per_8s_generation: 0` or `1`
+- `preferred_action_count_per_generation: 1`
+
+The normal Tiny Cat Kitchen style is 0-cut long take.
 
 ## Audio policy
 
@@ -149,7 +178,7 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - non-empty action/action_guard for every paid scene
 - explicit zero-cut prompt preservation
 - actual-last-frame First-frame mapping
-- Flow native Save frame bridge instructions
+- Flow native Save-frame bridge instructions
 - progressive-spend PASS dependency validation
 - sequential-chain metadata validation
 - novelty/authenticity gate against repeated recent fingerprints
@@ -157,24 +186,21 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - bundle-level current-standard validation
 - local handoff-update guard
 - regression tests for core production invariants
-- **long-take manifest guard: every production manifest must explicitly declare 0 or 1 visual cuts per 8-second generation and exactly one preferred primary action; values above 1 fail before paid generation**
+- long-take manifest guard: 0/1 cut max and exactly one preferred primary action
 
-## Latest fix — long-take manifest drift guard
+## Latest improvement — operator Gate A synchronization
 
 Problem found on **2026-08-28**:
-- the Flow Pack renderer correctly preserved `max_visual_cuts_per_8s_generation: 0`, but the current-standard validator did not require the field itself
-- a future manifest could omit the cut ceiling entirely or set it to `2+`, and still pass validation
-- the validator also did not require `preferred_action_count_per_generation: 1`, even though one primary action per 8s clip is a core reliability/relaxation rule
-- this would allow rapid pacing or multi-action scene drift to survive until a paid Veo generation
+- `CURRENT_STANDARD.md`, `docs/29_planned_keyframe_continuity_chain.md`, `START_HERE.md` and this handoff already required KF0→KF1→KF2... sequential edit/reference derivation
+- `docs/23_minimum_credit_operator_architecture.md`, one of the user's explicit operating-system files, still said only to generate the manifest-required KFs and QC them
+- that wording did not explicitly prohibit independent KF1/KF2 fresh generations and therefore left a practical continuity loophole in the primary operator architecture
 
 Fix:
-- require `flow_strategy.max_visual_cuts_per_8s_generation` to be explicitly present
-- permit only integer `0` or `1`; `0` remains preferred for TK-005 and the default long-take style, while `1` leaves a narrow non-montage exception
-- require `flow_strategy.preferred_action_count_per_generation: 1`
-- reject missing, malformed, negative, or 2+ cut limits before preparation
-- add focused regression coverage for missing cut limits, rapid-cut manifests, the 1-cut exception, and multi-action drift
+- Gate A in `docs/23_minimum_credit_operator_architecture.md` now explicitly requires KF0 as master anchor and every later KF to derive from the previous approved KF
+- it now includes the same `KEYFRAME DRIFT FAIL` criteria and planned-KF vs actual-saved-frame distinction as the newer standards
+- current official Flow pricing/features were rechecked and remain unchanged
 
-This is a 0-credit fail-closed improvement. It does not change TK-005 story, runtime, generation count, budget, or candidate ranking.
+This is a 0-credit documentation/operating-system correction. It does not change TK-005 story, runtime, generation count, budget, candidate ranking or NEXT_EPISODE.
 
 ## Research / idea policy
 
@@ -191,9 +217,9 @@ Never copy exact competitor title, plot, branded product/package or ending. Extr
 Evidence saturation rule: do not keep committing same-class seasonal retail/PR signals after a candidate is already well supported unless the new evidence changes ranking, NEXT_EPISODE, timing, evidence class, production mechanics, freshness, Flow assumptions or real Tiny Cat Kitchen learning.
 
 2026-08-28 research check:
-- official Flow pricing/features remain unchanged for the current Lite workflow
-- current Japanese sweet-potato/month-viewing/autumn retail signals are same-class evidence already represented in the repository
-- a Japanese miniature/fantasy ASMR reference with strong historical views was reviewed, but its useful mechanic (micro-world reveal / sensory texture) is already represented in the project; no candidate rank or production mechanic changes are justified
+- official Google Flow pricing/features remain unchanged for the current Lite workflow
+- current Japanese sweet-potato/month-viewing/autumn retail signals remain same-class evidence already represented in the repository
+- fresh search did not reveal a current AI-cat/miniature/ASMR mechanism strong enough to change candidate ranking or production mechanics
 - research/backlog files intentionally remain unchanged this run
 
 Current candidate state:
@@ -247,7 +273,6 @@ Continuity/action rules:
 - explicit action + action_guard in every G scene
 - `max_visual_cuts_per_8s_generation: 0`
 - `preferred_action_count_per_generation: 1`
-- numeric KF semantics are fixed by KF numbers, not YAML mapping order
 
 Highest-value next real-world step remains **approve TK-005 KF0→KF4 in real Flow, then generate G1 only and QC it.** Automation must not spend that credit.
 
@@ -331,6 +356,7 @@ Expand distinct worlds only after performance evidence, without repeating recent
 - no exact competitor copying
 - no third-person/full-cat regression
 - no paid G1 before full planned KF chain PASS
+- no independent fresh KF1+ when a previous approved planned KF can anchor it
 - no planned KF substituted for previous actual PASS frame
 - no undefined/malformed/duplicate KF sequence
 - no blank action/action_guard
@@ -364,20 +390,15 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-28 — long-take manifest drift guard
-Baseline `main@3ecece44258ebbab7abc0e49645d9e5a39e2ca85`.
+### 2026-08-28 — operator Gate A sequential-KF synchronization
+Baseline `main@b678680b2345d84084ef58104a2a2a15f6f672b5`.
 
 Changed:
-- require explicit 0/1 visual-cut ceiling in production manifests
-- fail closed on 2+ cuts, missing/malformed values, or multi-action defaults
-- require preferred primary action count = 1
-- add regression coverage
+- align `docs/23_minimum_credit_operator_architecture.md` with the already-adopted planned KF continuity architecture
+- require KF0 master anchor → KF1 from KF0 → KF2 from KF1 → ...
+- add KEYFRAME DRIFT FAIL criteria and planned-target vs actual-bridge distinction to the operator doc
+- refresh official Flow assumptions without changing production economics
 - synchronize this handoff
-
-Verified assumptions:
-- TK-005 already declares `max_visual_cuts_per_8s_generation: 0` and `preferred_action_count_per_generation: 1`
-- official Flow pricing/features remain unchanged on 2026-08-28
-- fresh research does not justify ranking/NEXT_EPISODE changes
 
 Unchanged:
 - NEXT_EPISODE = TK-005
@@ -387,6 +408,7 @@ Unchanged:
 - no paid generation or publishing
 
 ### Earlier 2026-08-28 work
+- long-take manifest drift guard
 - numeric planned-keyframe sequence gate
 - planned-keyframe scene-order gate
 - START_HERE / CURRENT_STANDARD synchronization
