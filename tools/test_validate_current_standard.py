@@ -150,6 +150,46 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         errors = validate(data)
         self.assertIn("keyframe KF2_TARGET must contain a non-empty prompt", errors)
 
+    def test_keyframe_name_requires_numeric_index(self) -> None:
+        data = base_manifest()
+        prompt = data["keyframes"].pop("KF2_TARGET")
+        data["keyframes"]["KF_TARGET_TWO"] = prompt
+        data["scenes"][1]["end_frame"] = "KF_TARGET_TWO"
+        errors = validate(data)
+        self.assertIn("keyframe name must start with KF<number>: KF_TARGET_TWO", errors)
+        self.assertTrue(any("contiguous planned keyframe indices" in error for error in errors))
+
+    def test_keyframe_numeric_index_must_be_unique(self) -> None:
+        data = base_manifest()
+        data["keyframes"]["KF2_ALT"] = "duplicate numeric target"
+        errors = validate(data)
+        self.assertIn(
+            "keyframe numeric index KF2 is duplicated by KF2_TARGET and KF2_ALT",
+            errors,
+        )
+
+    def test_keyframe_mapping_reorder_does_not_change_semantic_sequence(self) -> None:
+        data = base_manifest()
+        original = data["keyframes"]
+        data["keyframes"] = {
+            "KF2_TARGET": original["KF2_TARGET"],
+            "KF0_OPEN": original["KF0_OPEN"],
+            "KF3_TARGET": original["KF3_TARGET"],
+            "KF1_TARGET": original["KF1_TARGET"],
+        }
+        self.assertEqual(validate(data), [])
+
+    def test_missing_keyframe_index_fails_closed(self) -> None:
+        data = base_manifest()
+        data["keyframes"].pop("KF2_TARGET")
+        data["keyframes"]["KF4_TARGET"] = "wrong fourth target"
+        data["scenes"][1]["end_frame"] = "KF4_TARGET"
+        errors = validate(data)
+        self.assertIn(
+            "all-first_plus_last manifests must define contiguous planned keyframe indices KF0..KF3 exactly; found [0, 1, 3, 4]",
+            errors,
+        )
+
     def test_scene_action_must_not_be_empty(self) -> None:
         data = base_manifest()
         data["scenes"][0]["action"] = ""
