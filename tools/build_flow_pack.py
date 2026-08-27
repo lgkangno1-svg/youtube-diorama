@@ -194,7 +194,11 @@ def build(data: dict[str, Any]) -> str:
             if "healing" in pacing
             else "Keep motion simple, legible and physically plausible."
         )
-        cut_clause = f" Maximum visual cuts in this {seconds}s generation: {max_cuts}." if max_cuts else ""
+        cut_clause = (
+            f" Maximum visual cuts in this {seconds}s generation: {max_cuts}."
+            if max_cuts is not None
+            else ""
+        )
 
         if generation_type == "extend":
             source_scene = scene.get("source_scene", "previous 8s scene")
