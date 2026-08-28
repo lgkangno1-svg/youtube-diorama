@@ -2,7 +2,11 @@
 """Score Tiny Cat Kitchen production efficiency from analytics/learning_ledger.csv.
 
 The goal is not to reward the cheapest video. It highlights episodes that turn Flow credits
-into usable motion, engaged views, and subscribers while keeping rerolls and POV/scale failures low.
+into usable motion, engaged views, and subscribers while keeping rerolls and structural
+maker-view / character / scale / anatomy failures low.
+
+`pov_failure` is retained only as a legacy fallback for older ledgers that predate the
+Mini Forest-style maker-view correction. Literal first-person POV is not required.
 """
 from __future__ import annotations
 
@@ -29,6 +33,19 @@ def yn(row: dict[str, str], key: str) -> float:
 
 def boolish(row: dict[str, str], key: str) -> bool:
     return (row.get(key) or "").strip().lower() in {"1", "true", "yes", "y", "fail", "failed"}
+
+
+def structural_framing_failure(row: dict[str, str]) -> bool:
+    """Return current-semantic framing failure without treating non-first-person as failure.
+
+    New ledgers use maker_view_failure / character_failure. Older external ledgers may only
+    have pov_failure, so retain that field strictly as a compatibility fallback when neither
+    current-semantic column exists.
+    """
+    has_current_semantics = "maker_view_failure" in row or "character_failure" in row
+    if has_current_semantics:
+        return boolish(row, "maker_view_failure") or boolish(row, "character_failure")
+    return boolish(row, "pov_failure")
 
 
 def first_pass_rate(row: dict[str, str]) -> float:
@@ -72,12 +89,12 @@ def main() -> int:
         subs_per_100 = (subs / credits * 100.0) if credits else 0.0
         first_pass = first_pass_rate(row)
 
-        pov_fail = boolish(row, "pov_failure")
+        framing_fail = structural_framing_failure(row)
         scale_fail = boolish(row, "scale_failure")
         anatomy_fail = boolish(row, "anatomy_failure")
 
         expected_ceiling = 40 if runtime_mode == "immersive_h40" else 30
-        if pov_fail or scale_fail or anatomy_fail:
+        if framing_fail or scale_fail or anatomy_fail:
             note = "FIX_VISUAL_GRAMMAR"
         elif credits > expected_ceiling and rerolls > 0:
             note = "CUT_REROLLS"
@@ -99,7 +116,7 @@ def main() -> int:
     print("\nInterpretation:")
     print("- Optimize engaged views and subscribers per credit, not credits/video alone.")
     print("- Compare compact_h30 and immersive_h40 at the same observation horizon before changing the runtime prior.")
-    print("- POV, scale, or anatomy failure is structural even when the footage is visually pretty.")
+    print("- Maker-view/character, scale, or anatomy failure is structural; a non-first-person camera is not a failure by itself.")
     print("- A low first-pass rate means the next episode should simplify paw actions/keyframes before buying more generations.")
     return 0
 
