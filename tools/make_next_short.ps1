@@ -17,9 +17,9 @@ Write-Host "Tiny Cat Kitchen — next episode: $EpisodeId" -ForegroundColor Cyan
 Write-Host "This command spends 0 Flow credits. It only prepares local production files." -ForegroundColor DarkGray
 Write-Host ""
 
-python (Join-Path $PSScriptRoot "validate_current_standard.py") $EpisodeId
+python (Join-Path $PSScriptRoot "validate_maker_view_manifest.py") $EpisodeId
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Episode manifest is stale or incompatible with CURRENT_STANDARD.md. Ask ChatGPT: 다음 영상 준비해줘"
+    Write-Error "Episode manifest is stale or incompatible with the current Mini Forest-style maker-view standard. Ask ChatGPT: 다음 영상 준비해줘"
     exit $LASTEXITCODE
 }
 
