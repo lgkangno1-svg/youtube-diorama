@@ -149,7 +149,8 @@ FREE planned KF chain
 - actual Flow credits
 - rerolls
 - G1~G4 first-pass success
-- maker-view/camera failure
+- `maker_view_failure` — 작업대/공정 중심 Mini Forest-style maker composition이 무너진 구조적 실패
+- `character_failure` — face/head/body/full-cat 또는 human-job character-performance 회귀
 - scale failure
 - anatomy failure
 - continuity issue
@@ -162,6 +163,8 @@ FREE planned KF chain
 - engaged views
 - subscribers
 - comments
+
+`pov_failure`는 과거 ledger 호환을 위해 남겨둔 deprecated field다. 새 관측에서 **non-first-person maker view라는 이유만으로 true로 기록하지 않는다.** `maker_view_failure` / `character_failure`가 존재하면 현재 scorer는 이 둘을 우선하며 legacy `pov_failure`는 무시한다. 오래된 외부 ledger처럼 새 필드 자체가 없을 때만 compatibility fallback으로 사용한다.
 
 placeholder zero를 실제 관측값으로 학습하지 않는다.
 
