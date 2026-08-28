@@ -1,78 +1,66 @@
 # 24 — Hero Cat Brand Identity
 
-목표: Tiny Cat Kitchen의 고양이 identity는 유지하되, **채널 자산의 full-cat 표현과 Shorts의 first-person paw-only 표현을 분리**한다.
+목표: 고양이 identity는 유지하되 **Shorts에서는 고양이 캐릭터를 보여주지 않고 앞발만 작업 손처럼 사용**한다.
 
-Shorts framing의 세부 source of truth는 `docs/25_pov_paws_microworld_grammar.md`다.
+Shorts framing의 source of truth는 `docs/25_pov_paws_microworld_grammar.md`다.
 
-## HERO_CAT_V1 — 고정 주인공 identity
+## HERO_CAT_V1
 
-채널의 기본 hero cat 외형:
-
+브랜드 자산용 전체 외형:
 - cream fur base
 - soft pale ginger/orange markings
-- round amber/dark eyes with clear catchlights
+- round amber/dark eyes
 - small pink nose
 - soft round face
 - beige/light-linen apron
-- 실제 고양이 발 구조: human fingers/thumbs 금지
+- real feline paws, no human fingers/thumbs
 
-짧은 full-cat reference phrase:
+프로필/배너에서는 얼굴/전신을 보여줄 수 있다.
 
-```text
-HERO_CAT_V1: one cream-and-pale-ginger cat, round amber eyes, pink nose, soft round face, beige linen apron, real feline paws, no human fingers or thumbs
-```
+## Shorts용 identity
 
-## Channel assets vs Shorts
-
-### 프로필 / 배너
-
-- HERO_CAT_V1 얼굴/전신을 보여줄 수 있다.
-- 현재 프로필/배너의 따뜻한 miniature Japanese kitchen identity를 유지한다.
-- full-cat portrait는 **브랜드 자산용**이다.
-
-### 기본 Shorts
-
-- `POV_PAWS_MICROWORLD_V1`을 사용한다.
-- camera = true first-person cat POV.
-- 화면에는 cream + pale ginger **앞발 1~2개만** 보인다.
-- 얼굴, 눈, 귀, 머리, 몸통, 꼬리, full body는 보이지 않는다.
-- 앞치마도 화면에 억지로 노출시키지 않는다.
-- 주인공은 고양이 얼굴이 아니라 **앞발과 비교되는 초소형 음식/물체**다.
-
-Shorts용 짧은 paw reference phrase:
+Shorts에서 중요한 identity는 얼굴이 아니라 **같은 앞발의 털색/패턴/해부학적 일관성**이다.
 
 ```text
-HERO_CAT_V1_PAWS: one or two cream-and-pale-ginger real feline front paws only, entering from the bottom edge in true first-person cat POV; no face, head, torso, full body, human fingers, thumbs or human-like grip
+HERO_CAT_V1_PAWS: one or two cream-and-pale-ginger real feline front paws only; no face, head, torso, tail or full body; no human fingers, thumbs or human-like grip
 ```
 
-## KITCHEN_WORLD_V1 — 고정 세계
+### 최신 framing 원칙
 
-- cozy miniature Japanese-inspired wooden workbench/kitchen
+- Mini Forest류 miniature cooking에서 사람 손이 들어오는 자리에 feline paws가 들어온다.
+- true first-person cat-eye camera는 필수가 아니다.
+- 기본은 high-oblique maker view.
+- top-down / tabletop macro / side-oblique macro도 허용.
+- cat face/head/body/full cat은 Shorts에서 보이지 않는다.
+- 앞치마도 Shorts에 억지로 노출하지 않는다.
+- 고양이 직업극/캐릭터 연기보다 **작은 것을 실제로 만드는 과정**이 주인공이다.
+
+## KITCHEN_WORLD_V1
+
+- cozy handcrafted miniature Japanese-inspired workbench/kitchen
 - warm honey/cream palette
-- small ceramic cookware and wooden diorama props
+- tiny ceramic cookware and wooden diorama props
 - soft natural/window light
 - uncluttered composition
 - calm premium healing mood
+- real miniature craftsmanship over toy-like plastic appearance
 
-중요: Shorts에서는 **주방 전체보다 작업대의 초소형 물체가 우선**이다. 넓은 주방 establishing shot 때문에 물체가 커 보이거나 scale contrast가 약해지면 FAIL이다.
+넓은 주방 establishing shot보다 작업대의 작은 재료와 앞발 동작이 우선이다.
 
 ## Continuity priority — Shorts
 
-Flow 생성 전 무료 frame/reference 검수 순서:
+1. front paws only; face/head/body hidden
+2. real feline paw anatomy
+3. Mini Forest-style maker-view composition
+4. hero object clearly smaller than paw
+5. same camera/workbench geometry
+6. miniature cookware/prop continuity
+7. lighting/material language
+8. episode-specific food state
 
-1. true first-person cat POV
-2. front paws only; face/head/body hidden
-3. real feline paw anatomy
-4. hero food/object가 앞발보다 명확하게 작음
-5. miniature cookware/prop scale
-6. KITCHEN_WORLD_V1 lighting/material language
-7. episode-specific food/action
-
-음식이 예뻐도 3인칭 full-cat chef shot이면 FAIL이다.
+음식이 예뻐도 full-cat chef shot이면 FAIL이다.
 
 ## Paw action rule
-
-고양이 발은 사람 손처럼 도구를 `grip`하지 않는다.
 
 선호:
 - nudge
@@ -82,37 +70,37 @@ Flow 생성 전 무료 frame/reference 검수 순서:
 - steady
 - slide
 - tap
+- push
 
 피함:
-- chopsticks/tongs/knife를 손가락처럼 잡기
-- thumb/index-finger pinch
+- chopsticks/tongs/knife human grip
+- thumb/index pinch
 - human wrist twist
 
-필요한 도구는 넓은 손잡이를 발바닥으로 눌러 움직이거나, 작은 그릇/판을 밀어 간접적으로 조작하는 동작을 우선한다.
+사람 손이 하던 복잡한 조작은 고양이 발에 그대로 복제하지 말고 feline-safe push/press/slide 동작으로 바꾼다.
 
 ## Prompt rule
 
-각 새 episode의 G1/독립 keyframe에는 `HERO_CAT_V1_PAWS + POV_PAWS_MICROWORLD_V1 + KITCHEN_WORLD_V1` 의미를 명시한다.
+각 독립 keyframe/G1에는 다음 의미를 유지한다.
 
-G2/G3/G4는 직전 actual last usable frame을 First frame으로 넘겨 다음을 계승한다.
+```text
+realistic miniature cooking maker-view; only HERO_CAT_V1 front paws replace human hands; no face/head/body/full cat; absurdly tiny food/object; handcrafted miniature set; calm tactile realism
+```
+
+G2/G3/G4는 previous PASS clip의 actual saved frame으로 다음을 계승한다.
 - paw fur pattern
-- camera POV
-- workbench position
+- camera position
+- workbench
 - miniature scale
 - food state
 - light/material language
 
-텍스트로 full-cat identity를 반복해 얼굴이 다시 생성되게 하지 않는다.
-
-## Channel asset rule
-
-프로필·배너는 같은 HERO_CAT_V1의 얼굴을 보여주는 branding reference다. Shorts에서 얼굴이 안 보이는 것은 identity 충돌이 아니라 **의도된 촬영 문법**이다.
-
 ## Versioning
 
-현재:
+현재 machine-compatible labels:
 - character identity: `HERO_CAT_V1`
-- Shorts camera/scale grammar: `POV_PAWS_MICROWORLD_V1`
+- Shorts legacy enum: `POV_PAWS_MICROWORLD_V1`
+- semantic visual intent: `mini_forest_style_paws_only_miniature_making`
 - world identity: `KITCHEN_WORLD_V1`
 
-실제 Flow 결과에서 재현성이 낮은 특징이 반복되면 production data를 근거로 version을 올린다.
+legacy enum 이름에 `POV`가 남아 있어도 **true first-person을 다시 강제하지 않는다.** 실제 production semantics는 CURRENT_STANDARD와 docs/25가 우선한다.

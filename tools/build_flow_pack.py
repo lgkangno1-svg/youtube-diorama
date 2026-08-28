@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Build a low-token Google Flow prompt pack from one episode YAML manifest.
+"""Build a deterministic low-token Google Flow prompt pack from one episode manifest.
 
-The output is deterministic. It never spends Flow credits.
+The output never spends Flow credits. Current visual intent: realistic Mini Forest-style
+miniature making, with feline front paws replacing human hands. A true cat-eye POV is
+allowed but no longer mandatory.
 """
 from __future__ import annotations
 
@@ -12,18 +14,20 @@ from typing import Any
 
 import yaml
 
-POV_STYLE = (
-    "True first-person POV of the cat itself, vertical 9:16, camera at the cat's working position looking slightly down at the tabletop. "
-    "Only one or two cream-and-pale-ginger real feline front paws may enter from the bottom edge. "
+MAKER_STYLE = (
+    "Realistic Mini Forest-style miniature making shot, vertical 9:16. "
+    "The camera observes a tiny handcrafted workbench from a high-oblique, top-down macro, or close tabletop angle chosen to make the making action easy to read. "
+    "Only one or two cream-and-pale-ginger real feline front paws may enter the frame where human hands normally would. "
     "Never show the cat's face, eyes, ears, head, chest, torso, tail or full body. "
     "The hero food or object must look absurdly tiny compared with one paw, preferably about 15-50 percent of visible paw width. "
-    "Macro miniature diorama workbench, shallow depth of field, warm natural light, tactile realistic materials and physics. "
-    "No human hands, no fingers, no thumbs, no extra limbs, no text, no logos, no watermark. "
-    "Feline paws nudge, press, pat, roll, steady, slide or tap; they do not grip tools like human hands."
+    "Use real-looking miniature materials, shallow depth of field, warm natural light, tactile realistic food physics and handcrafted diorama detail. "
+    "No human hands, fingers, thumbs, extra limbs, text, logos or watermark. "
+    "Feline paws may nudge, press, pat, roll, steady, slide, tap or push; they do not grip tools like human hands. "
+    "The process of making the tiny object is the subject; do not turn this into a cat character-performance shot."
 )
 
 LOCK = (
-    "Preserve exact paw fur pattern, first-person camera position, cookware, hero-object scale, workbench layout, lighting and food/object state. "
+    "Preserve exact paw fur pattern, camera position, cookware, hero-object scale, workbench layout, lighting and food/object state. "
     "Do not enlarge the hero object, reveal the cat's body, create human-like gripping, duplicate props, or morph ingredients unless the action explicitly requires it."
 )
 
@@ -46,12 +50,6 @@ def get_scene_seconds(scene: dict[str, Any]) -> int:
 
 
 def ordered_keyframes(data: dict[str, Any]) -> list[str]:
-    """Return planned keyframes in authoritative KF-number order.
-
-    Validator semantics already define KF0..KFn as the durable sequence. Keep the
-    generated operator pack aligned with that rule so YAML mapping reordering can
-    never change which image is treated as the master anchor or previous KF.
-    """
     explicit = list((data.get("keyframes") or {}).keys())
     if not explicit:
         return ["KF0_OPEN", "KF1_TRANSFORM", "KF2_PAYOFF", "KF3_WORLD_RESOLUTION"]
@@ -101,7 +99,6 @@ def scale_clause(data: dict[str, Any]) -> str:
 
 
 def frame_input_instruction(frame_name: Any, *, role: str) -> str:
-    """Turn manifest frame tokens into explicit operator input instructions."""
     token = str(frame_name or "").strip()
     if not token:
         return f"{role}: not specified in manifest — STOP and repair the manifest before spending credits."
@@ -128,11 +125,10 @@ def next_scene_uses_actual_frame(scenes: list[dict[str, Any]], index: int, scene
 
 
 def keyframe_creation_instruction(kfs: list[str], index: int) -> str:
-    """Tell the operator how to preserve continuity across planned image keyframes."""
     current = kfs[index]
     if index == 0:
         return (
-            f"Create `{current}` as the master visual anchor first. Approve its POV, paw anatomy, tiny scale, camera, lighting and fixed-prop layout before deriving any later KF."
+            f"Create `{current}` as the master visual anchor first. Approve its maker-view composition, paw anatomy, tiny scale, camera, lighting and fixed-prop layout before deriving any later KF."
         )
     previous = kfs[index - 1]
     return (
@@ -167,9 +163,9 @@ def build(data: dict[str, Any]) -> str:
         "- If the selected image model shows a non-zero cost, STOP rather than assuming the keyframe is free; switch back to the no-charge image option or re-check current official Flow model/cost guidance.",
         f"- Create/approve only the {len(kfs)} planned keyframes needed by this manifest; do not make decorative alternatives just because image generation is free.",
         "- Build planned keyframes as a continuity chain, not independent lottery tickets: create KF0 as the approved master anchor, then derive each later KF by editing/refining the prior approved KF or adding that prior KF back to the image prompt as a reference/ingredient.",
-        "- For KF1+, change only the state required by the manifest. Preserve paw fur pattern, first-person camera, workbench layout, fixed props, lighting and hero-object scale unless that KF explicitly requires a state change.",
+        "- For KF1+, change only the state required by the manifest. Preserve paw fur pattern, maker-view camera, workbench layout, fixed props, lighting and hero-object scale unless that KF explicitly requires a state change.",
         "- If a later KF drifts in camera, paw identity, scale or fixed-prop placement, reject/repair it while image generation is still no-charge instead of asking paid Veo to interpolate between incompatible endpoints.",
-        "- Reject a free frame before video spend if POV, paw-only anatomy, tiny scale, fixed-prop layout, or premise is structurally wrong.",
+        "- Reject a free frame before video spend if paw-only anatomy, Mini Forest-style making composition, tiny scale, fixed-prop layout, or premise is structurally wrong.",
         "",
         "## Flow UI preflight — do this before every paid generation",
         "",
@@ -187,7 +183,7 @@ def build(data: dict[str, Any]) -> str:
         "- Video output count: 1",
         "- Aspect ratio: 9:16",
         "- Preferred generation length: 8s",
-        "- Shorts visual grammar: POV_PAWS_MICROWORLD_V1",
+        "- Shorts visual intent: Mini Forest-style paw-only miniature making (legacy enum retained for compatibility)",
         f"- Frame mode: {humanize(strategy.get('frame_mode') or 'sequential actual end frame plus target last')}",
         f"- References: {refs}",
         f"- Pacing: {pacing}",
@@ -195,7 +191,7 @@ def build(data: dict[str, Any]) -> str:
         f"- Narration policy: {narration_policy}",
         f"- Audio policy: {audio_policy}",
         f"- Scale gate: {scale}",
-        "- A beautiful third-person full-cat chef shot is a FAIL for this channel's default Shorts grammar.",
+        "- A cat face/full-body chef shot is a FAIL; the process and tiny workbench must stay the subject.",
         "- Keep First+Last continuity shots on Lite; do not spend the next generation until the previous one passes QC.",
         "",
         "## Sequential-frame operator rule",
@@ -226,7 +222,7 @@ def build(data: dict[str, Any]) -> str:
             f"- {keyframe_creation_instruction(kfs, index)}",
             "",
             "```text",
-            f"{frame_text(data, kf)}. {scale} {POV_STYLE}",
+            f"{frame_text(data, kf)}. {scale} {MAKER_STYLE}",
             "```",
             "",
         ]
@@ -259,8 +255,7 @@ def build(data: dict[str, Any]) -> str:
                 "- Spend gate: do not extend a failed or merely planned scene.",
                 "",
                 "```text",
-                f"Continue seamlessly from the supplied source clip. Action: {action}. Guard: {guard}. {pacing_clause}{cut_clause} "
-                f"{scale} {LOCK} {POV_STYLE} No dialogue. No music. Keep only tiny close ASMR appropriate to the visible action.",
+                f"Continue seamlessly from the supplied source clip. Action: {action}. Guard: {guard}. {pacing_clause}{cut_clause} {scale} {LOCK} {MAKER_STYLE} No dialogue. No music. Keep only tiny close ASMR appropriate to the visible action.",
                 "```",
                 "",
             ]
@@ -277,9 +272,7 @@ def build(data: dict[str, Any]) -> str:
                 "- Re-check: Veo 3.1 Lite / 9:16 / output 1 / displayed cost / correct new-video generation mode.",
                 "",
                 "```text",
-                f"Animate naturally from the supplied first frame to the supplied last frame in {seconds} seconds. Action: {action}. Guard: {guard}. "
-                f"{pacing_clause}{cut_clause} {scale} {LOCK} {POV_STYLE} "
-                "No dialogue. No music. Quiet room tone with only small close tactile ASMR if it renders cleanly.",
+                f"Animate naturally from the supplied first frame to the supplied last frame in {seconds} seconds. Action: {action}. Guard: {guard}. {pacing_clause}{cut_clause} {scale} {LOCK} {MAKER_STYLE} No dialogue. No music. Quiet room tone with only small close tactile ASMR if it renders cleanly.",
                 "```",
                 "",
             ]
@@ -289,18 +282,18 @@ def build(data: dict[str, Any]) -> str:
                     "",
                     f"- In Flow, open the QC-PASS {scene_id} clip → pause on the exact last usable frame → hover the frame → click `Save frame`.",
                     f"- Use that native saved project asset as the next scene's First frame. Suggested operator label: `{scene_id}_last_usable`.",
-                    f"- Do not use a screenshot/re-encoded still when the native saved frame is available; visually check POV, scale, paw anatomy, prop state and camera continuity before the next spend.",
+                    "- Do not use a screenshot/re-encoded still when the native saved frame is available; visually check maker-view composition, scale, paw anatomy, prop state and camera continuity before the next spend.",
                     "",
                 ]
 
     lines += [
         "## QC shorthand",
         "",
-        "- POV PASS: first-person + paws only + tiny object reads instantly",
+        "- MAKER VIEW PASS: hand-centric miniature making composition + paws only + tiny object reads instantly",
         "- SCALE FAIL: hero object is not dramatically smaller than the paw",
         "- CHARACTER FAIL: face/head/body/full cat becomes visible",
         "- ANATOMY FAIL: fingers/thumbs/human grip",
-        "- CAMERA FAIL: third-person chef composition",
+        "- CAMERA FAIL: cat character-performance shot replaces the miniature-making composition",
         "- PADDING FAIL: extra generation adds duration but no independent beat",
         "- UI MODE FAIL: existing-video edit/Omni Flash edit was mistaken for a new Veo Lite scene",
         "- KEYFRAME DRIFT FAIL: a planned later KF was generated independently and no longer preserves the approved anchor's paw identity, camera, scale, lighting or fixed-prop layout",
@@ -309,7 +302,7 @@ def build(data: dict[str, Any]) -> str:
         "## Failure escalation",
         "",
         "1. Minor timing/audio defect: repair in edit; do not reroll good motion.",
-        "2. POV/scale/anatomy structural defect: reroll only that scene after repairing the relevant first/last frame or simplifying the action.",
+        "2. Camera/scale/anatomy structural defect: reroll only that scene after repairing the relevant first/last frame or simplifying the action.",
         "3. If a paw must grip like a hand for the concept to work, redesign the action to nudge/press/slide instead of spending more credits.",
         "4. Never generate G2/G3/G4 proactively before the previous generation passes.",
         "5. Do not buy G4 merely to reach a target duration; use it only for a distinct world-resolution or tactile payoff beat.",
