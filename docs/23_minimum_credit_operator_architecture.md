@@ -1,6 +1,6 @@
 # 23 — Minimum-Credit Operator Architecture
 
-목표: 사용자가 매번 주제/대본/Flow 프롬프트/편집 순서를 고민하지 않고 **한 문장 → free planned-KF preflight → 필요한 generation만 순차 실행 → 실제 성과 학습**으로 끝내게 한다.
+목표: 사용자가 매번 주제/대본/Flow 프롬프트/편집 순서를 고민하지 않고 **한 문장 → free planned-KF preflight → 필요한 generation만 순차 실행 → PASS clip 화질 개선 → 실제 성과 학습**으로 끝내게 한다.
 
 ## 사용자 인터페이스
 
@@ -14,8 +14,6 @@
 ```
 
 ## Visual production intent
-
-최신 Shorts 방향:
 
 > **Mini Forest-style miniature making shot + human hands replaced by feline front paws only.**
 
@@ -69,18 +67,18 @@ displayed cost = current UI truth
 
 기존 영상 edit/Omni Flash 상태면 새 generation 화면으로 돌아간다.
 
-## Current Flow credit eligibility note — 2026-08-28
+## Current Flow credit eligibility note — 2026-08-29
 
 Google Flow 공식 도움말 기준:
 - 비구독 계정은 50 Flow credits/day를 무료로 받으며 Veo 3.1 Lite/Fast/Quality generation에 사용할 수 있다.
 - 무료 daily credits는 유료 Plus/Pro/Ultra 계정에 추가로 stack되지 않는다.
-- 유료 플랜으로 업그레이드하면 남은 무료 credits는 소멸하고 해당 플랜의 월간 credits로 대체된다.
 - Veo 3.1 Lite는 non-Ultra 10 credits/generation, Ultra 5 credits/generation이다.
+- **1080p upscale은 Plus/Pro/Ultra에서 현재 0 credits이며, 비구독 계정에는 제공되지 않는다.**
 
 운영 원칙:
 - TK-005 같은 `immersive_h40`은 non-Ultra 기준 first pass 40 credits가 그대로다.
-- 비구독 무료 tier를 쓰는 경우에도 "공짜니까 여러 장 뽑기"를 하지 않는다. 같은 Progressive Spend / previous-scene PASS gate를 유지한다.
-- 계정의 실제 subscription state와 Flow UI displayed cost가 언제나 최종 truth다.
+- 무료 tier를 쓰더라도 여러 output/reroll을 미리 생성하지 않는다.
+- 실제 subscription state와 Flow UI displayed cost가 언제나 최종 truth다.
 
 ## Progressive Spend
 
@@ -94,7 +92,19 @@ planned KF chain PASS
 → G4 only if immersive_h40 + G3 PASS + independent world-resolution value
 ```
 
-다음 scene First frame은 previous PASS clip의 actual saved frame.
+다음 scene First frame은 previous PASS clip의 actual native saved frame이다.
+
+## PASS-only 1080p finishing step
+
+공식 문서상 Plus/Pro/Ultra에서 1080p upscale이 0 credits이므로, quality-per-credit를 높이는 후단 단계로 사용한다.
+
+규칙:
+- QC-PASS clip만 대상으로 한다.
+- 가능하면 전체 continuity chain이 끝난 뒤 upscale한다.
+- 다음 scene의 First frame은 upscaled/re-encoded export가 아니라 기존 QC-PASS clip의 native Save frame을 계속 사용한다.
+- FAIL/reroll 예정 clip은 upscale하지 않는다.
+- 실행 직전 UI가 실제로 0 credits를 표시할 때만 한다.
+- upscale은 reroll이나 추가 generation을 정당화하지 않는다.
 
 ## QC priorities
 
@@ -162,18 +172,6 @@ Production manifest:
 
 좋은 motion + 나쁜 audio라면 video reroll보다 edit replacement.
 
-## QC shorthand
-
-- `MAKER VIEW PASS`
-- `SCALE FAIL`
-- `CHARACTER FAIL`
-- `ANATOMY FAIL`
-- `CAMERA FAIL`
-- `KEYFRAME DRIFT FAIL`
-- `FRAME CHAIN FAIL`
-- `PROP CONTINUITY FAIL`
-- `PADDING FAIL`
-
 ## Learning
 
 실제 값만 기록:
@@ -195,4 +193,4 @@ subscribers / 100 credits
 
 핵심 원칙:
 
-> **무료 단계에서 continuity와 camera/scale 문제를 해결하고, paid Veo에서는 Mini Forest식 미니어처 제작 감성을 사람 손 대신 고양이 앞발로 구현한다.**
+> **무료 단계에서 continuity 문제를 제거하고, paid Veo는 PASS-gated로 최소화하며, 이미 통과한 결과는 현재 무료인 1080p upscale을 활용해 generation 추가 없이 전달 화질을 높인다.**

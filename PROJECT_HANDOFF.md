@@ -1,9 +1,9 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected before this iteration: `main@738175d39467280f831642c96cb288778e189aea`
+Baseline inspected before this iteration: `main@ffba0bde59ac67d282ce459265b77b03288cd3b5`
 
-Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change updates this file in the same branch/PR. True NO-OP research does not churn it.
+Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research must not churn it.
 
 ## Start-of-run contract
 
@@ -28,7 +28,7 @@ Sync policy:
 
 ## Durable product intent
 
-Tiny Cat Kitchen is a Japanese-target healing Shorts system for realistic miniature cooking/making where **human hands are naturally replaced by feline front paws**.
+Tiny Cat Kitchen is a Japanese-target healing Shorts system for realistic miniature cooking/making where human hands are naturally replaced by feline front paws.
 
 Non-negotiable:
 - cream/pale-ginger front paws only, normally 1–2
@@ -43,7 +43,7 @@ Non-negotiable:
 - literal cat-eye first-person POV is not mandatory
 - no AI-cat human-job/character-performance regression
 
-Primary optimization is not minimum credits/video. Prefer **usable motion/credit, engaged views/credit, subscribers/100 credits** while protecting quality and explicit user control.
+Primary optimization is **usable motion/credit, engaged views/credit, subscribers/100 credits**, not simply minimum credits/video.
 
 ## Current production state
 
@@ -70,79 +70,60 @@ Paid continuity:
 - G3: actual saved G2 PASS frame → KF3
 - G4 only if still justified: actual saved G3 PASS frame → KF4
 
-## New material correction — bundle builder validator bypass
+## Material improvement in this iteration — zero-credit 1080p finishing
 
-A second-stage regression remained after the earlier maker-view validator fix.
+Official Google Flow Help rechecked 2026-08-29 documents:
+- Veo 3.1 Lite: non-Ultra 10 credits/generation, Ultra 5 credits/generation
+- non-subscriber: 50 free Flow credits/day
+- **1080p upscale: 0 credits for Google AI Plus / Pro / Ultra subscribers**
+- 1080p upscale is unavailable to non-subscribers
+- actual Flow UI displayed cost remains final truth at execution time
 
-Observed path before this iteration:
+This is materially useful because it improves delivered visual quality without increasing paid generation count.
 
-```text
-make_next_short.ps1
-→ validate_maker_view_manifest.py PASS
-→ make_short.ps1
-→ build_episode_bundle.py
-→ validate_current_standard.py DIRECTLY
-```
+New operator rule:
+- use 1080p upscale only on QC-PASS clips
+- preferably wait until the continuity chain is complete, or until that clip is no longer needed as a continuity source
+- before clicking, verify the active account is eligible and Flow currently displays 0 credits
+- do not upscale FAIL/reroll candidates
+- do not use an upscaled/re-encoded export as the next scene First frame
+- next-scene continuity remains the previous PASS clip's **native Save frame**
+- 1080p upscale never justifies extra generation, padding, or weaker QC
 
-The direct legacy structural validator still requires compatibility-only fields such as the old `stop_if_pov_scale_anatomy_or_premise_fails` gate. TK-005 intentionally uses the current `stop_if_maker_view_scale_anatomy_or_premise_fails` gate, so the normal command could pass the first maker-view preflight and then be rejected while building the bundle. Direct `build_episode_bundle.py` invocation had the same regression risk.
-
-Corrected behavior:
-- `build_episode_bundle.py` now calls `validate_maker_view_manifest.py` as its canonical production-standard preflight
-- the maker-view adapter validates current semantics first
-- only inside that adapter are compatibility-only fields translated before delegating mature runtime/credit/keyframe/sequential-chain checks to `validate_current_standard.py`
-- `build_episode_bundle.py` no longer calls the legacy structural validator directly
-- regression test now asserts the canonical maker-view gate exists and the direct legacy call does not
-- originality validation still runs after current-standard validation and before any generated files are created
-
-Why this matters:
-- the user's intended one-command interface must actually reach production-pack generation with a current valid manifest
-- a validator architecture that passes at the shell entry point but fails deeper in the same command is operationally equivalent to a broken workflow
-- this change does not weaken structural validation; it only routes it through the current semantic adapter
+Updated in the same change:
+- `tools/make_next_short.ps1` now surfaces the PASS-only 1080p finishing rule to the normal operator path
+- `CURRENT_STANDARD.md` now makes the rule executable production policy
+- `docs/23_minimum_credit_operator_architecture.md` now includes the finishing step and continuity guard
+- this handoff synchronized in the same branch
 
 Production impact:
-- TK-005 selection/content/runtime/credit budget unchanged
+- no change to TK-005 content, runtime, H40, scene count, keyframes, Progressive Spend, or 40-credit non-Ultra first-pass ceiling
 - no Flow credits spent
 - no publishing
 
-## Candidate selector safety gate
+## Canonical validation / selection state
 
-`tools/select_next_episode.py` is fail-closed on current candidate mechanics.
-
-Current behavior:
+Candidate selection:
+- `tools/select_next_episode.py` is fail-closed
+- hero-scale ratio max must be <=0.50 paw width
+- paw actions must stay in `nudge / press / pat / roll / steady / slide / tap / push`
+- unsupported human-dexterity actions are rejected before ranking
 - legacy `POV_PAWS_MICROWORLD_V1` is compatibility-only
-- candidate `hero_scale` must declare a paw-width ratio with maximum <=0.50
-- `paw_action_family` must remain within `nudge / press / pat / roll / steady / slide / tap / push`
-- unsupported actions such as `pinch` are rejected before ranking
-- runtime prior must be `compact_h30` or `immersive_h40`
-- evidence/trend/novelty gates remain active
 
-## Manifest validation state
-
-The canonical production semantic gate is `tools/validate_maker_view_manifest.py`.
-
-Current semantics require:
-- `visual_intent = mini_forest_style_paws_only_miniature_making`
-- `semantic_override = mini_forest_style_observational_maker_view`
-- `first_person_required = false`
-- preferred angles include `high_oblique_maker_view`
-- `stop_if_maker_view_scale_anatomy_or_premise_fails = true`
-- legacy `stop_if_pov...` gate is not active
-
-All production bundle entry points must route through this adapter. `validate_current_standard.py` is an internal structural/runtime validator behind the adapter, not a direct current-semantic production entry point.
-
-Legacy `first_person_cat_pov` / `POV_PAWS_MICROWORLD_V1` values can remain only as compatibility data and must never restore literal first-person as a creative requirement.
+Manifest / bundle validation:
+- canonical production semantic gate is `tools/validate_maker_view_manifest.py`
+- all production bundle entry points route through it
+- `validate_current_standard.py` is internal structural/runtime validation behind the adapter, not a direct current-semantic entry point
+- legacy POV values may remain only as compatibility data and cannot restore mandatory literal first-person framing
 
 ## Flow / spend baseline
 
-Current repository baseline remains:
+Current baseline:
 - Veo 3.1 Lite
 - output count 1
-- non-Ultra: 10 credits/generation
-- Ultra: 5 credits/generation
-- non-subscriber baseline: 50 free Flow credits/day under the currently documented free route
-- actual active Flow UI model/mode/output count/displayed cost is generation-time final truth
-
-This run rechecked current public information and found no sufficiently verified official change that justifies altering production assumptions. Third-party discussion of temporary subscriber bonus credits was not promoted into repository truth without direct official verification.
+- non-Ultra 10 credits/generation
+- Ultra 5 credits/generation
+- actual UI model/mode/output count/displayed cost = generation-time final truth
 
 Progressive Spend:
 
@@ -154,6 +135,8 @@ free/no-charge planned KF chain PASS
 → G2 only after G1 PASS
 → G3 only after G2 PASS
 → G4 only if runtime/manifest still justifies independent final value
+→ continuity chain complete
+→ eligible subscription + UI shows 0 credits: QC-PASS clips may be upscaled to 1080p
 ```
 
 Never spend Flow credits, generate paid video, or publish without explicit user action.
@@ -179,37 +162,30 @@ Primary benchmark class:
 - handcrafted tiny-food process
 - relaxing tactile ASMR
 
-AI-cat channels are secondary only for narrow paw/anatomy/reliability evidence. Never copy exact title, plot, branded product/package, distinctive set/dish styling, or ending.
+AI-cat channels remain secondary only for narrow paw/anatomy/reliability evidence. Never copy exact title, plot, branded product/package, distinctive set/dish styling, or ending.
 
 Evidence saturation remains active. Same-class promotional/retail signals do not justify commits unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual production learning.
 
-Fresh 2026-08-29 checks:
-- current miniature-cooking channels remain large and active, supporting the existing tactile miniature benchmark class rather than introducing a new production mechanic
-- sweet-potato/yakiimo evidence remains saturated across behavioral/search/preference/activation classes
-- no stronger creator-performance or seasonal evidence changed TK-005 ranking in this run
-- no research/backlog churn was justified
+2026-08-29 cross-check:
+- sweet-potato/yakiimo evidence remains saturated and still supports TK-005
+- no stronger current creator-performance or Japanese seasonal signal changed candidate ordering
+- benchmark/backlog were intentionally not churned
+- official Flow 1080p upscale eligibility/cost is a new platform-cost/quality mechanic and therefore did justify this material change
 
 Candidate state:
 - TK-005 / IDEA-009 remains current production choice
 - IDEA-001 月見 and IDEA-010 新米塩むすび remain strong future seasonal candidates
-- no ranking change justified without stronger creator-performance, behavioral demand, or Tiny Cat Kitchen production evidence
-
-## Legacy artifact caution
-
-TK-001–TK-004 may contain pre-correction concepts/statuses. They are history, not authority over the current maker-view standard.
-
-Do not revive an old manifest solely from `ready-for-flow`/`planned` status. Refresh it through current candidate + maker-view validation first.
 
 ## Current roadmap / next priorities
 
-1. Keep all production entry points routed through `validate_maker_view_manifest.py`; do not reintroduce direct legacy structural validation.
-2. Run the current maker-view manifest validation/bundle path for TK-005 locally when the user executes the command.
+1. Keep all production entry points routed through `validate_maker_view_manifest.py`.
+2. Run current maker-view manifest/bundle path for TK-005 when the user executes `./tools/make_next_short.ps1`.
 3. Create/approve TK-005 KF0 master anchor in real Flow.
-4. Confirm genuine miniature making with paws replacing hands, not an AI-cat character scene.
-5. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
-6. Generate G1 only after planned KF chain passes.
-7. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
-8. PASS → save actual usable final frame → continue progressively.
+4. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
+5. Generate G1 only after planned KF chain passes.
+6. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
+7. PASS → save actual native usable final frame → continue progressively.
+8. After chain completion, if eligible and UI shows 0 credits, upscale QC-PASS clips to 1080p before final editing/export.
 9. Record actual credits, rerolls, usable motion, G-stage pass/fail, failure class.
 10. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
 11. Use accumulated real evidence to adjust actions, runtimes, scores, and spend strategy.
@@ -226,48 +202,52 @@ Do not revive an old manifest solely from `ready-for-flow`/`planned` status. Ref
 - no unsafe candidate paw-action family through selector
 - no paid G1 before planned KF continuity passes
 - no next paid scene after prior structural failure
-- actual previous PASS frame is the continuity bridge
+- actual previous PASS native saved frame is the continuity bridge
+- upscaled/re-encoded exports are not continuity bridges
 - non-first-person maker view is not a failure by itself
 - no direct production entry point to legacy structural validator
-- no runtime padding for its own sake
+- no runtime padding
 - no research churn after saturation
 - no unrelated repository modifications
 - every material change synchronizes this handoff
 
 ## Change log
 
-### 2026-08-29 — canonical bundle maker-view validation path
-Baseline: `main@738175d39467280f831642c96cb288778e189aea`.
+### 2026-08-29 — zero-credit 1080p PASS finishing
+Baseline: `main@ffba0bde59ac67d282ce459265b77b03288cd3b5`.
 
 Changed:
-- fixed `tools/build_episode_bundle.py` to invoke `validate_maker_view_manifest.py` instead of `validate_current_standard.py` directly
-- preserved legacy structural/runtime validation behind the adapter rather than bypassing it
-- updated bundle regression test to reject reintroduction of the direct legacy gate
-- synchronized `CURRENT_STANDARD.md` and this handoff
+- documented official Plus/Pro/Ultra 1080p upscale at current 0-credit cost
+- added PASS-only, post-continuity upscale rule to `CURRENT_STANDARD.md`
+- added same finishing rule to `docs/23_minimum_credit_operator_architecture.md`
+- surfaced the rule in `tools/make_next_short.ps1`
+- synchronized this handoff
 
 Why:
-- the normal one-command path could otherwise pass maker-view validation and then fail during bundle creation on the obsolete POV stop-gate requirement
+- this increases delivered resolution without increasing paid generation count, while protecting native saved-frame continuity and Progressive Spend
 
 Production impact:
-- no change to TK-005, NEXT_EPISODE, H40, 40-credit non-Ultra first-pass ceiling, current manifest actions, keyframes, audio, or Flow settings
+- TK-005 remains H40 / four Lite generations / 40-credit non-Ultra first-pass ceiling
+- no content/ranking/keyframe/action changes
 - no credits spent; no publishing
 
+### 2026-08-29 — canonical bundle maker-view validation path
+- routed bundle creation through `validate_maker_view_manifest.py`
+- preserved structural/runtime validation behind the current-semantic adapter
+
 ### 2026-08-29 — candidate selector maker-view safety gates
-- strengthened `tools/select_next_episode.py` production compatibility gate
-- enforced explicit <=0.50 paw-width scale declaration and feline-safe action allowlist
-- synchronized `CURRENT_STANDARD.md` and handoff
+- enforced <=0.50 paw-width scale and feline-safe action allowlist before ranking
 
 ### 2026-08-29 — canonical maker-view manifest validator
-- added `validate_maker_view_manifest.py`
-- aligned shell entry preflight with current maker-view semantics
+- aligned one-command manifest validation with Mini Forest-style maker-view semantics
 
 ### 2026-08-29 — TK-005 maker-view spend-gate correction
-- renamed active progressive spend gate from stale POV wording to maker-view semantics
+- replaced stale active POV stop-gate wording with maker-view semantics
 
 ### 2026-08-29 — sweet-potato search-demand evidence
-- added new search-behavior evidence class for `さつまいもスイーツ`; TK-005 remained top-ranked
+- added a distinct search-behavior evidence class; TK-005 remained top-ranked
 
 ### 2026-08-28 — product governance
 - added `PRODUCT_CHARTER.md`
-- wired charter into improvement loop
+- wired charter into the improvement loop
 - established Mini Forest-style miniature making + feline front paws replacing human hands as canonical visual identity

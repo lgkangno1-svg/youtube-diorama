@@ -1,6 +1,6 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-29 Mini Forest-style Paw-Only Miniature Making + Fail-Closed Candidate/Manifest Validation + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility**
+최신 적용 기준: **2026-08-29 Mini Forest-style Paw-Only Miniature Making + Fail-Closed Candidate/Manifest Validation + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility + PASS-only 1080p Upscale**
 
 ## 0. 문서 거버넌스
 
@@ -132,9 +132,23 @@ displayed cost = current UI truth
 - non-Ultra Veo 3.1 Lite: 10 credits/generation
 - Ultra: 5 credits/generation
 - non-subscriber: 50 free Flow credits/day, paid plan과 stack되지 않음
+- Plus / Pro / Ultra: 1080p upscale currently 0 credits
+- non-subscriber: 1080p upscale unavailable
 - actual UI model/mode/output count/displayed cost가 생성 시점 최종 truth
 
 무료 tier가 있어도 batch/reroll discipline을 느슨하게 하지 않는다.
+
+### PASS-only 1080p upscale rule
+
+공식 Flow 도움말에서 Plus/Pro/Ultra의 1080p upscale이 현재 0 credits로 문서화되어 있으므로, **유료 generation을 늘리지 않고 최종 전달 화질을 개선하는 후단 단계**로 사용할 수 있다.
+
+운영 원칙:
+- continuity chain이 끝난 뒤, 또는 적어도 해당 clip이 더 이상 다음 scene의 continuity source로 필요하지 않은 시점에만 적용
+- QC-PASS clip만 upscale; FAIL/reroll 후보에는 쓰지 않음
+- 실행 직전 Flow UI가 실제로 `1080p upscale = 0 credits`를 표시하는지 확인
+- upscaled/re-encoded export를 다음 scene First frame으로 사용하지 않음
+- next-scene bridge는 계속 previous PASS clip의 **native Save frame** 사용
+- upscale 자체가 새 paid generation이나 reroll을 정당화하지 않음
 
 ## 6. Progressive Spend
 
@@ -146,6 +160,8 @@ FREE planned KF chain PASS
 → G2 only after G1 PASS
 → G3 only after G2 PASS
 → G4 only if immersive_h40 + G3 PASS + independent world-resolution value
+→ chain complete
+→ eligible subscription + UI shows 0 credits: QC-PASS clips may be upscaled to 1080p
 ```
 
 구조적 FAIL 후 다음 paid scene 금지.
@@ -249,6 +265,7 @@ Evidence saturation: ranking/timing/mechanics/freshness/Flow assumption/actual p
 3. G1만 생성
 4. maker-view / paws-only / scale / anatomy / fixed props / zero-cut QC
 5. PASS → Save frame → G2
+6. chain 완료 후 eligible subscription에서 UI가 0 credits를 표시할 때 QC-PASS clip만 1080p upscale
 
 ## 12. Learning
 

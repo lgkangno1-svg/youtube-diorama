@@ -36,5 +36,6 @@ Write-Host "C. After each PASS, save that scene's actual last usable frame when 
 Write-Host "D. Continue one scene at a time. Never spend G2 before G1 PASS or G3 before G2 PASS."
 Write-Host "E. If the manifest/runtime is compact_h30, normally finish at G3. If it is immersive_h40, G4 is allowed only after G3 PASS and only for its documented independent world-resolution beat."
 Write-Host "F. generated/${EpisodeId}_flow_pack.md and ${EpisodeId}_bundle.md are the episode-specific source of truth for scene count, frame inputs, and runtime intent."
+Write-Host "G. After the continuity chain is complete, Plus/Pro/Ultra users may upscale QC-PASS clips to 1080p only when Flow currently shows 0 credits. Do not upscale rejects, and never use an upscaled/re-encoded export as the next-scene continuity bridge; the native saved PASS frame remains the bridge."
 Write-Host ""
 Write-Host "Do not force every episode into H30 or H40. Follow the current manifest and stop rather than pad." -ForegroundColor Green
