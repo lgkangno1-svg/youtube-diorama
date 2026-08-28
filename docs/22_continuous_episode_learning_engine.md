@@ -3,8 +3,9 @@
 목표: **Mini Forest류 miniature-making benchmark → 일본 시즌 선행 신호 → paw-only 아이디어 → 저실패 Flow 제작 → 24h/72h 성과 → 다음 episode**가 한 저장소에서 누적되게 한다.
 
 Source of truth:
-- `PROJECT_HANDOFF.md`
-- `CURRENT_STANDARD.md`
+- `PROJECT_HANDOFF.md` — current state / decisions / failures / next priorities
+- `PRODUCT_CHARTER.md` — durable product intent / creative identity / improvement decision standard
+- `CURRENT_STANDARD.md` — current executable production rules
 - `docs/23_minimum_credit_operator_architecture.md`
 - `docs/24_hero_cat_brand_identity.md`
 - `docs/25_pov_paws_microworld_grammar.md`
@@ -15,12 +16,15 @@ Source of truth:
 ## 0. Before every loop
 
 1. latest main SHA + recent commits/PRs
-2. PROJECT_HANDOFF
-3. START_HERE / CURRENT_STANDARD / NEXT_EPISODE / current manifest / analytics
-4. latest merged state가 stale chat/automation보다 우선
-5. material change면 same branch/PR에서 PROJECT_HANDOFF 업데이트
+2. `PROJECT_HANDOFF.md`
+3. `PRODUCT_CHARTER.md` — durable intent와 10-question improvement test 확인
+4. START_HERE / CURRENT_STANDARD / NEXT_EPISODE / current manifest / analytics
+5. latest explicit user direction + merged state가 stale chat/automation보다 우선
+6. material change면 same branch/PR에서 PROJECT_HANDOFF 업데이트
+7. executable production rule이 바뀌면 CURRENT_STANDARD도 동기화
+8. durable product purpose/identity/economics philosophy가 바뀌는 경우에만 PRODUCT_CHARTER 업데이트
 
-NO-OP 연구는 handoff를 억지로 수정하지 않는다.
+NO-OP 연구는 handoff/charter/current standard를 억지로 수정하지 않는다.
 
 ## 1. Research loop
 
@@ -188,15 +192,23 @@ subscribers / 100 credits
 
 성공한 음식 자체를 복제하지 않고 성공한 scale hook / tactile action / maker-view composition / pacing / ASMR / payoff만 다음 prior에 반영한다.
 
+`PRODUCT_CHARTER.md`의 decision test가 최상위 개선 필터다. 단순히 credits/video를 낮추는 변경은 paws-only miniature-making identity, healing/tactile quality, viewer outcome per credit, 또는 user control을 해치면 개선으로 간주하지 않는다.
+
 최종 목표:
 
 > **Mini Forest의 손-중심 미니어처 제작 감성을 유지하면서 사람 손만 고양이 앞발로 바꾼 듯한 Shorts를 가장 적은 실패 generation으로 만든다.**
 
-## 10. Handoff persistence
+## 10. Documentation persistence
 
-CURRENT_STANDARD, production mechanics, NEXT_EPISODE/manifest, research decision, analytics, tools, Flow assumption 등 material change가 있으면 같은 branch/PR에서 `PROJECT_HANDOFF.md`를 갱신한다.
+Material change 때 문서 역할에 따라 동기화한다.
 
-로컬 가능 시:
+- 항상: `PROJECT_HANDOFF.md` — 현재 상태/결정/학습/다음 단계
+- production/QC/Flow 실행 규칙 변경: `CURRENT_STANDARD.md`
+- durable purpose/creative identity/economics or improvement philosophy 변경: `PRODUCT_CHARTER.md`
+
+로컬 git 가능 시:
 ```powershell
 python tools/validate_handoff_update.py --base origin/main
 ```
+
+로컬 git이 불가능하면 최신 main에서 분기한 branch/PR diff로 same-change handoff 포함 여부를 검증한다.

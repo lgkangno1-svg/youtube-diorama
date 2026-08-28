@@ -2,6 +2,28 @@
 
 최신 적용 기준: **2026-08-28 Mini Forest-style Paw-Only Miniature Making + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility**
 
+## 0. 문서 거버넌스
+
+이 문서는 **현재 실행 규칙**이다. 장기 제품 목적과 개선 판단 기준은 `PRODUCT_CHARTER.md`, 현재 상태/최근 결정/실패/다음 우선순위는 `PROJECT_HANDOFF.md`를 따른다.
+
+모든 material 개선 전에 최소한 다음을 함께 확인한다.
+
+```text
+latest explicit user direction
+→ latest merged repository state + PROJECT_HANDOFF.md
+→ PRODUCT_CHARTER.md
+→ CURRENT_STANDARD.md + specialized docs
+→ current manifest / benchmark / backlog / ledger
+```
+
+변경 시 동기화 원칙:
+- material repository change → `PROJECT_HANDOFF.md` 같은 branch/PR에서 갱신
+- production/QC/Flow 실행 규칙 변경 → 이 `CURRENT_STANDARD.md` 갱신
+- durable purpose / creative identity / economics / improvement philosophy 변경 → `PRODUCT_CHARTER.md`도 갱신
+- true NO-OP → 문서 churn 금지
+
+비용 절감만으로는 개선이 아니다. `PRODUCT_CHARTER.md`의 판단 기준에 따라 paws-only miniature-making identity, tactile/healing quality, audience outcome per credit, user control을 함께 보호한다.
+
 ## 1. 핵심 경험
 
 Tiny Cat Kitchen은 AI 고양이 캐릭터를 보여주는 채널이 아니다.
@@ -168,6 +190,8 @@ AI-cat 채널은 고양이 캐릭터 스토리 구조의 1차 기준이 아니�
 - calm pacing
 - material payoff
 
+연구량 자체가 목표가 아니다. 이미 포화된 evidence class는 ranking/timing/mechanics/freshness/production learning을 실제로 바꾸지 않는 한 추가 commit하지 않는다.
+
 ## 10. 현재 제작 상태
 
 `production/NEXT_EPISODE.txt` = **TK-005**
@@ -216,7 +240,7 @@ subscribers / 100 credits
 다음 영상 준비해줘
 ```
 
-ChatGPT가 research/history 확인 → novelty-safe episode 선택 → manifest/NEXT_EPISODE/handoff 준비.
+ChatGPT가 `PROJECT_HANDOFF.md` + `PRODUCT_CHARTER.md` + 현재 production/research/history 확인 → novelty-safe episode 선택 → manifest/NEXT_EPISODE/handoff 준비.
 
 사용자 로컬:
 ```powershell

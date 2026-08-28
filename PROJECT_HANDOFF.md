@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**
-Baseline inspected before this iteration: `main@24ae7e6bdfe5ab9892a8895de9952dc657df706a`
+Baseline inspected before this iteration: `main@a866cb6ab98e96376c90695a2a08227ff7c27dfc`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -11,10 +11,21 @@ Before every material run:
 1. inspect latest `main` SHA
 2. inspect recent commits/PRs
 3. read this handoff
-4. cross-check `PRODUCT_CHARTER.md`, `START_HERE.md`, `CURRENT_STANDARD.md`, docs/22/23/27, `production/NEXT_EPISODE.txt`, benchmark/backlog/ledger, and recent manifests
-5. newest explicit user direction and merged repository state override stale prompts
+4. read `PRODUCT_CHARTER.md` for durable product intent and improvement judgment
+5. cross-check `START_HERE.md`, `CURRENT_STANDARD.md`, docs/22/23/27, `production/NEXT_EPISODE.txt`, benchmark/backlog/ledger, and recent manifests
+6. newest explicit user direction and merged repository state override stale prompts
 
-`PRODUCT_CHARTER.md` is now the durable statement of **why/what we are building and how future improvements are judged**. This handoff remains the source for **where the project is now, what changed, failures/learnings, and next priorities**.
+Document roles:
+- `PROJECT_HANDOFF.md` = where the project is now / what changed / failures / learnings / next priorities
+- `PRODUCT_CHARTER.md` = why/what we are building / durable identity / economics and improvement criteria
+- `CURRENT_STANDARD.md` = how production is currently executed
+- manifests + ledgers = episode plan + observed evidence
+
+Sync policy for future material changes:
+- always update this handoff
+- update `CURRENT_STANDARD.md` when executable production/QC/Flow rules change
+- update `PRODUCT_CHARTER.md` only when durable product purpose, creative identity, economics philosophy, or improvement philosophy changes
+- true NO-OP: do not churn any of these documents
 
 ## Durable product intent
 
@@ -114,6 +125,11 @@ Abstract mechanics only. Never copy exact competitor title, plot, branded produc
 
 Evidence saturation remains active: do not commit repeated same-class promotional/retail signals unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual Tiny Cat Kitchen learning.
 
+Fresh recheck on 2026-08-28 late KST:
+- current Japanese Tsukimi/yakiimo/autumn signals still support the already-ranked seasonal ideas
+- no new evidence changed TK-005 ranking, production timing, Flow mechanic, or candidate ordering
+- therefore benchmark/backlog were intentionally not churned in this iteration
+
 ## Normal user interface
 
 The intended routine remains extremely simple:
@@ -161,6 +177,29 @@ The user should not need to manually research topics, engineer prompts, remember
 - every material repository change synchronizes this handoff
 
 ## Change log
+
+### 2026-08-28 — product charter governance wiring
+Baseline: `main@a866cb6ab98e96376c90695a2a08227ff7c27dfc`.
+
+Changed:
+- added `PRODUCT_CHARTER.md` to `START_HERE.md` mandatory start-of-run reading and Source of truth
+- added explicit document precedence and role separation to `START_HERE.md`
+- wired `PRODUCT_CHARTER.md` into every `docs/22_continuous_episode_learning_engine.md` loop
+- added documentation persistence rules: handoff always for material changes, CURRENT_STANDARD for executable rule changes, PRODUCT_CHARTER only for durable intent/philosophy changes
+- added document-governance section to `CURRENT_STANDARD.md` so cost-only or technically clever changes cannot bypass the durable product criteria
+- synchronized this handoff in the same branch
+
+Why:
+- PR #53 created the durable charter, but `START_HERE.md` and docs/22 still omitted it from their Source-of-truth lists, allowing a fresh AI/developer to run the operational loop without reading the user's durable product goal
+- this change turns the charter from passive documentation into a mandatory decision gate without changing current production mechanics
+
+Production impact:
+- no change to TK-005, NEXT_EPISODE, H40 runtime, 4-generation/40-credit first-pass ceiling, visual grammar, candidate ranking, or Progressive Spend
+- no Flow credits spent; no publishing
+
+Validation:
+- branch is based directly on latest inspected main `a866cb6ab98e96376c90695a2a08227ff7c27dfc`, serving as the equivalent valid base because local git clone was unavailable in the runtime
+- fresh Japanese seasonal/adjacent research did not cross the evidence-saturation threshold for any ranking/mechanics change
 
 ### 2026-08-28 — durable product charter
 Baseline: `main@24ae7e6bdfe5ab9892a8895de9952dc657df706a`.
