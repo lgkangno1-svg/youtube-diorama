@@ -30,6 +30,13 @@ def to_int(value: Any, *, default: int = 0) -> int:
         return default
 
 
+def strict_manifest_int(value: Any) -> int | None:
+    """Accept only YAML/Python integer scalars; reject bools, floats and numeric strings."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
+
+
 def to_float(value: Any, *, default: float = 0.0) -> float:
     try:
         return float(value)
@@ -93,27 +100,23 @@ def validate(data: dict[str, Any]) -> list[str]:
 
     if flow.get("primary_model") != "veo-3.1-lite":
         errors.append("flow_strategy.primary_model must be veo-3.1-lite")
-    if to_int(flow.get("output_count")) != 1:
-        errors.append("flow_strategy.output_count must be 1")
+
+    output_count = strict_manifest_int(flow.get("output_count"))
+    if output_count != 1:
+        errors.append("flow_strategy.output_count must be the integer 1")
 
     raw_max_cuts = flow.get("max_visual_cuts_per_8s_generation")
-    if raw_max_cuts is None:
-        errors.append("flow_strategy.max_visual_cuts_per_8s_generation must be explicitly declared (0 or 1)")
-    else:
-        try:
-            max_cuts = int(raw_max_cuts)
-            if isinstance(raw_max_cuts, bool) or max_cuts != raw_max_cuts:
-                raise ValueError
-            if max_cuts < 0 or max_cuts > MAX_ALLOWED_VISUAL_CUTS_PER_8S:
-                errors.append(
-                    "flow_strategy.max_visual_cuts_per_8s_generation must be 0 or 1 for calm long-take pacing"
-                )
-        except (TypeError, ValueError):
-            errors.append("flow_strategy.max_visual_cuts_per_8s_generation must be an integer 0 or 1")
+    max_cuts = strict_manifest_int(raw_max_cuts)
+    if max_cuts is None:
+        errors.append("flow_strategy.max_visual_cuts_per_8s_generation must be an integer 0 or 1")
+    elif max_cuts < 0 or max_cuts > MAX_ALLOWED_VISUAL_CUTS_PER_8S:
+        errors.append(
+            "flow_strategy.max_visual_cuts_per_8s_generation must be 0 or 1 for calm long-take pacing"
+        )
 
-    preferred_actions = flow.get("preferred_action_count_per_generation")
-    if to_int(preferred_actions, default=-1) != 1:
-        errors.append("flow_strategy.preferred_action_count_per_generation must be 1")
+    preferred_actions = strict_manifest_int(flow.get("preferred_action_count_per_generation"))
+    if preferred_actions != 1:
+        errors.append("flow_strategy.preferred_action_count_per_generation must be the integer 1")
 
     indexed_keyframes: dict[int, str] = {}
     duplicate_keyframe_indices: set[int] = set()
@@ -140,8 +143,22 @@ def validate(data: dict[str, Any]) -> list[str]:
         errors.append("manifest must contain at least one production scene")
         scenes = []
 
-    max_gens = to_int(flow.get("max_lite_generations_first_pass"))
-    declared_budget = to_int(flow.get("non_ultra_credit_budget_first_pass"), default=-1)
+    raw_max_gens = flow.get("max_lite_generations_first_pass")
+    max_gens_value = strict_manifest_int(raw_max_gens)
+    if max_gens_value is None:
+        errors.append("flow_strategy.max_lite_generations_first_pass must be an integer")
+        max_gens = 0
+    else:
+        max_gens = max_gens_value
+
+    raw_budget = flow.get("non_ultra_credit_budget_first_pass")
+    budget_value = strict_manifest_int(raw_budget)
+    if budget_value is None:
+        errors.append("flow_strategy.non_ultra_credit_budget_first_pass must be an integer")
+        declared_budget = -1
+    else:
+        declared_budget = budget_value
+
     runtime_mode = str(runtime.get("mode") or "compact_h30")
     scene_count = len(scenes)
 
@@ -204,7 +221,10 @@ def validate(data: dict[str, Any]) -> list[str]:
     elif runtime_mode == "immersive_h40":
         if scene_count != 4 or max_gens != 4:
             errors.append("immersive_h40 must declare exactly 4 scenes and 4 first-pass Lite generations")
-        if to_int(runtime.get("minimum_distinct_motion_beats")) < 4:
+        minimum_beats = strict_manifest_int(runtime.get("minimum_distinct_motion_beats"))
+        if minimum_beats is None:
+            errors.append("runtime_strategy.minimum_distinct_motion_beats must be an integer")
+        elif minimum_beats < 4:
             errors.append("immersive_h40 requires minimum_distinct_motion_beats >=4")
         if not str(runtime.get("fourth_beat_value") or "").strip():
             errors.append("immersive_h40 requires a documented fourth_beat_value; G4 cannot be padding")
@@ -222,8 +242,9 @@ def validate(data: dict[str, Any]) -> list[str]:
         if generation_type not in allowed_generation_types:
             errors.append(f"{expected_id} generation_type must be first_plus_last or extend")
 
-        if to_int(scene.get("generation_seconds")) != 8:
-            errors.append(f"{expected_id} generation_seconds must be 8")
+        generation_seconds = strict_manifest_int(scene.get("generation_seconds"))
+        if generation_seconds != 8:
+            errors.append(f"{expected_id} generation_seconds must be the integer 8")
 
         if not str(scene.get("action") or "").strip():
             errors.append(f"{expected_id} action must be non-empty before paid generation")
