@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected before this iteration: `main@80500b2dc295ad9dec6f2723bebdbcd7b5e4e0f5`
+Baseline inspected for this iteration: `main@ddcaf7f8bd54c376920fc3f8f3ba0b9b2a638a43`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research must not churn it.
 
@@ -62,7 +62,7 @@ Visual intent:
 - same tray / warmer / serving niche through KF0→KF4
 - zero-cut calm long takes
 - one active paw-safe action per generation + optional passive payoff
-- explicit scene action families: G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide`
+- scene action families: G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide`
 - G4 = tray slide, then passive steam only
 
 Paid continuity:
@@ -71,30 +71,32 @@ Paid continuity:
 - G3: actual saved G2 PASS frame → KF3
 - G4 only if still justified: actual saved G3 PASS frame → KF4
 
-## Material improvement in this iteration — scene-level paw-action fail-closed gate
+## Material improvement in this iteration — learning failure semantics
 
-A production safety gap was found after candidate-level action gating was added:
-- `tools/select_next_episode.py` already rejects unsafe candidate mechanics such as pinch/twist/grip.
-- But an episode manifest can be edited after candidate selection.
-- Before this change, `validate_maker_view_manifest.py` did not independently require a machine-readable safe action family for every paid G scene.
-- Therefore a later manifest edit could reintroduce a human-dexterity action or multiple active paw actions and still reach the paid-generation boundary.
+A post-production learning regression risk was found in `tools/score_credit_efficiency.py` and the ledger schema.
+
+Problem:
+- production has already moved from mandatory literal first-person POV to Mini Forest-style observational maker-view semantics.
+- `analytics/learning_ledger.csv` still exposed only `pov_failure` for framing failures.
+- `tools/score_credit_efficiency.py` directly treated `pov_failure=true` as a structural visual-grammar failure and printed that `POV` failure is structural.
+- A future operator could therefore mark a valid non-first-person maker-view as failed and teach the optimization loop to regress toward obsolete cat-eye POV.
 
 Corrected:
-- `validate_maker_view_manifest.py` now requires every scene to declare `paw_action_family` with **exactly one** active action.
-- Allowed set: `nudge / press / pat / roll / steady / slide / tap / push`.
-- Missing action family, more than one active action, or unsupported action such as `pinch` now fails closed before Flow preparation.
-- Passive material payoffs such as steam/crack/gloss are not counted as active paw actions.
-- `episodes/TK-005.yaml` now declares G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide` explicitly.
-- regression tests cover missing, multi-action and unsafe-action failures.
-- `CURRENT_STANDARD.md` synchronized in the same branch.
+- ledger now adds `maker_view_failure` and `character_failure` as current-semantic structural fields.
+- `pov_failure` remains only for backward compatibility with older ledgers/history.
+- scorer now prefers `maker_view_failure` / `character_failure` whenever those columns exist.
+- legacy `pov_failure` is consulted only when current-semantic columns are absent entirely.
+- interpretation text now explicitly says a non-first-person camera is not a failure by itself.
+- the existing preflight failure is marked as maker-view + character + scale failure because the real issue was full-cat/body character framing and weak miniature scale, not observer camera angle.
+- regression tests cover current-semantic PASS/failure behavior and legacy fallback.
 
 Why this matters:
-- candidate safety alone is insufficient because manifests are durable/editable artifacts.
-- the final paid-generation boundary now enforces the core `one calm tactile primary action + optional passive payoff` rule structurally rather than relying only on prose.
-- this reduces avoidable anatomy/tool-use failures and reroll credits.
+- the learning loop now matches the accepted visual identity instead of silently rewarding obsolete literal POV.
+- actual camera experiments can use high-oblique/top-down/side-oblique maker views without being mislabeled as structural failures.
+- historical ledgers remain readable.
 
 Production impact:
-- no change to TK-005 story, selection, H40, keyframes, Flow model, scene count or 40-credit non-Ultra ceiling.
+- no change to TK-005 story, ranking, runtime, keyframes, scene count, Flow model, credit budget or Progressive Spend.
 - no Flow credits spent.
 - no publishing.
 
@@ -113,6 +115,11 @@ Manifest / bundle validation:
 - every paid scene must declare exactly one safe `paw_action_family`
 - `validate_current_standard.py` is internal structural/runtime validation behind the adapter, not a direct current-semantic entry point
 - legacy POV values may remain only as compatibility data and cannot restore mandatory literal first-person framing
+
+Learning semantics:
+- current structural camera/framing fields are `maker_view_failure` and `character_failure`
+- scale/anatomy/continuity remain separate failure classes
+- `pov_failure` is deprecated compatibility data, not a statement that non-first-person is wrong
 
 ## Flow / spend baseline
 
@@ -146,9 +153,11 @@ One real preflight failure remains recorded:
 - hero scale too large
 - human-like tool-use risk
 
-Correct interpretation:
-- observer/maker-view itself is not a failure
-- body reveal + character-performance framing + weak miniature scale is the failure
+Current interpretation:
+- observer/non-first-person maker-view itself is not a failure
+- full-cat/body character framing is `character_failure`
+- workbench/process framing that stops reading like Mini Forest-style miniature making is `maker_view_failure`
+- weak tiny scale is `scale_failure`
 - maker-view + paws-only + tiny workpiece is desirable
 
 No trustworthy public 24h/72h Tiny Cat Kitchen performance sample yet. Do not learn from placeholders/theoretical zeros.
@@ -166,9 +175,9 @@ Evidence saturation remains active. Same-class promotional/retail signals do not
 
 2026-08-29 cross-check:
 - sweet-potato/yakiimo evidence remains saturated and still supports TK-005
-- fresh 月見 product/event signals confirm IDEA-001 timing but do not outrank or invalidate the current prepared TK-005 production state
-- benchmark/backlog were intentionally not churned
-- official Flow pricing remains: Lite 10 non-Ultra / 5 Ultra; 1080p upscale 0 for paid Plus/Pro/Ultra
+- 月見 remains a strong next seasonal class but does not invalidate the already prepared TK-005 production state
+- benchmark/backlog intentionally unchanged in this iteration
+- official Flow pricing remains Lite 10 non-Ultra / 5 Ultra and paid-plan 1080p upscale 0 credits
 
 Candidate state:
 - TK-005 / IDEA-009 remains current production choice
@@ -178,16 +187,17 @@ Candidate state:
 
 1. Keep all production entry points routed through `validate_maker_view_manifest.py`.
 2. Keep one-safe-action-per-scene manifest validation fail-closed.
-3. Run current maker-view manifest/bundle path for TK-005 when the user executes `./tools/make_next_short.ps1`.
-4. Create/approve TK-005 KF0 master anchor in real Flow.
-5. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
-6. Generate G1 only after planned KF chain passes.
-7. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
-8. PASS → save actual native usable final frame → continue progressively.
-9. After chain completion, if eligible and UI shows 0 credits, upscale QC-PASS clips to 1080p before final editing/export.
-10. Record actual credits, rerolls, usable motion, G-stage pass/fail, failure class.
-11. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
-12. Use accumulated real evidence to adjust actions, runtimes, scores, and spend strategy.
+3. Use `maker_view_failure` / `character_failure` for new production learning; do not classify ordinary observer camera as POV failure.
+4. Run current maker-view manifest/bundle path for TK-005 when the user executes `./tools/make_next_short.ps1`.
+5. Create/approve TK-005 KF0 master anchor in real Flow.
+6. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
+7. Generate G1 only after planned KF chain passes.
+8. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
+9. PASS → save actual native usable final frame → continue progressively.
+10. After chain completion, if eligible and UI shows 0 credits, upscale QC-PASS clips to 1080p before final editing/export.
+11. Record actual credits, rerolls, usable motion, G-stage pass/fail, failure class.
+12. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
+13. Use accumulated real evidence to adjust actions, runtimes, scores, and spend strategy.
 
 ## Safety / invariants
 
@@ -205,6 +215,7 @@ Candidate state:
 - actual previous PASS native saved frame is the continuity bridge
 - upscaled/re-encoded exports are not continuity bridges
 - non-first-person maker view is not a failure by itself
+- no future learning that equates observer camera with structural POV failure
 - no direct production entry point to legacy structural validator
 - no runtime padding
 - no research churn after saturation
@@ -213,22 +224,27 @@ Candidate state:
 
 ## Change log
 
-### 2026-08-29 — scene-level paw-action fail-closed validation
-Baseline: `main@80500b2dc295ad9dec6f2723bebdbcd7b5e4e0f5`.
+### 2026-08-29 — learning maker-view failure semantics
+Baseline: `main@ddcaf7f8bd54c376920fc3f8f3ba0b9b2a638a43`.
 
 Changed:
-- required exactly one machine-readable safe `paw_action_family` per paid scene in `validate_maker_view_manifest.py`
-- added regression coverage for missing, multiple and unsafe action families
-- annotated TK-005 G1/G2/G3/G4 with `nudge / press / slide / slide`
-- synchronized `CURRENT_STANDARD.md` and this handoff
+- added `maker_view_failure` and `character_failure` to `analytics/learning_ledger.csv`
+- retained `pov_failure` only as legacy compatibility data
+- updated `tools/score_credit_efficiency.py` to score current-semantic framing failures and ignore stale POV flags when current fields are available
+- added regression tests for current semantics and legacy fallback
+- synchronized this handoff
 
 Why:
-- prevents post-selection manifest edits from reintroducing human-dexterity or multi-action prompts immediately before paid Flow generation
+- prevents valid non-first-person maker views from being mislabeled as structural failures and steering future optimization back toward obsolete mandatory POV
 
 Production impact:
 - TK-005 remains H40 / four Lite generations / 40-credit non-Ultra first-pass ceiling
-- no content/ranking/keyframe/runtime changes
+- no episode/ranking/keyframe/runtime changes
 - no credits spent; no publishing
+
+### 2026-08-29 — scene-level paw-action fail-closed validation
+- required exactly one machine-readable safe `paw_action_family` per paid scene
+- annotated TK-005 G1/G2/G3/G4 with `nudge / press / slide / slide`
 
 ### 2026-08-29 — zero-credit 1080p PASS finishing
 - documented official Plus/Pro/Ultra 1080p upscale at current 0-credit cost
@@ -236,16 +252,12 @@ Production impact:
 
 ### 2026-08-29 — canonical bundle maker-view validation path
 - routed bundle creation through `validate_maker_view_manifest.py`
-- preserved structural/runtime validation behind the current-semantic adapter
 
 ### 2026-08-29 — candidate selector maker-view safety gates
 - enforced <=0.50 paw-width scale and feline-safe action allowlist before ranking
 
 ### 2026-08-29 — canonical maker-view manifest validator
 - aligned one-command manifest validation with Mini Forest-style maker-view semantics
-
-### 2026-08-29 — TK-005 maker-view spend-gate correction
-- replaced stale active POV stop-gate wording with maker-view semantics
 
 ### 2026-08-29 — sweet-potato search-demand evidence
 - added a distinct search-behavior evidence class; TK-005 remained top-ranked
