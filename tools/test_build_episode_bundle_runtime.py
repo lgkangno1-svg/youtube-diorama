@@ -49,14 +49,16 @@ def main() -> int:
     assert canonical != (fake_root / "scratch" / "TK-005.yaml").resolve()
 
     source = Path(module.__file__).read_text(encoding="utf-8")
-    standard_gate = 'run([python, str(tools / "validate_current_standard.py"), episode_id])'
+    maker_view_gate = 'run([python, str(tools / "validate_maker_view_manifest.py"), episode_id])'
+    legacy_direct_gate = 'run([python, str(tools / "validate_current_standard.py"), episode_id])'
     originality_gate = 'run([python, str(tools / "validate_episode_originality.py"), str(manifest_abs)])'
-    assert standard_gate in source
+    assert maker_view_gate in source
+    assert legacy_direct_gate not in source
     assert originality_gate in source
-    assert source.index(standard_gate) < source.index(originality_gate)
+    assert source.index(maker_view_gate) < source.index(originality_gate)
     assert source.index(originality_gate) < source.index("generated_dir.mkdir")
 
-    print("PASS: bundle runtime guidance and current-standard preflight ordering are enforced")
+    print("PASS: bundle runtime guidance and canonical maker-view preflight ordering are enforced")
     return 0
 
 
