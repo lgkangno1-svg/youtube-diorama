@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**  
-Baseline inspected before this iteration: `main@c9be6b5db17808ca7f464b775fb739628cbcb0ab`
+Baseline inspected before this iteration: `main@904a045f9f3cd5b084af6492fa6e71141231be84`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research must not churn it.
 
@@ -180,27 +180,37 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - long-take manifest guard: 0/1 cut max and exactly one preferred primary action
 - runtime-feasibility no-padding gate
 - edit-plan explicit-holds-only rule
-- **full playback-speed-range integrity gate**
+- full playback-speed-range integrity gate
+- **strict integer scalar gate for paid-generation control fields**
 - local handoff-update guard
 - regression tests for core production invariants
 
-## Latest material change — playback-speed-range integrity
+## Latest material change — strict integer manifest scalars
 
-Problem found after PR #44:
-- runtime feasibility used the first value of `preferred_playback_speed_range`
-- validator did not require exactly two elements
-- it did not validate the maximum speed
-- it did not reject a reversed range such as `[1.0, 0.92]`
-- a malformed future manifest could therefore pass with contradictory edit metadata or let runtime math rely on a misleading slowdown declaration
+Problem found after PR #45:
+- several production-critical fields still passed through Python `int(...)` coercion
+- `True` becomes integer `1`
+- `1.5` truncates to integer `1`
+- `3.5` truncates to integer `3`
+- `8.0` becomes integer `8`
+- therefore malformed YAML could silently pass controls such as output count, preferred action count, generation count, credit budget or generation duration
 
-Fix in branch `fix/playback-speed-range-validation`:
-- require exactly `[min,max]`
-- require both values numeric
-- require `0 < min <= max <= 1.0`
-- invalid speed metadata falls back to conservative 1.0x for feasibility math while still returning validation errors
-- add focused regression coverage for valid, reversed, >1.0, malformed-length and non-numeric ranges
+This is especially dangerous because those fields control paid-generation behavior and runtime/credit arithmetic.
 
-This does not change TK-005 because its current `[0.92, 1.00]` range is valid.
+Fix in branch `fix/strict-integer-manifest-scalars`:
+- add `strict_manifest_int()` accepting only actual integer scalars
+- reject booleans, floats and numeric strings instead of coercing them
+- apply strict integer semantics to:
+  - `flow_strategy.output_count`
+  - `flow_strategy.max_visual_cuts_per_8s_generation`
+  - `flow_strategy.preferred_action_count_per_generation`
+  - `flow_strategy.max_lite_generations_first_pass`
+  - `flow_strategy.non_ultra_credit_budget_first_pass`
+  - `runtime_strategy.minimum_distinct_motion_beats` for immersive H40
+  - every scene `generation_seconds`
+- add regression coverage for boolean/fractional/float cases that previously could coerce into valid-looking values
+
+TK-005 already uses real YAML integers for all these fields, so its production state does not change.
 
 ## Research / idea policy
 
@@ -218,8 +228,9 @@ Evidence saturation rule: do not keep committing same-class seasonal retail/PR s
 
 2026-08-28 research check:
 - official Flow pricing/features remain unchanged for the current Lite workflow
-- a new Niigata rice fair beginning 2026-08-29 reinforces new-rice season visibility, but IDEA-010 already has current reservation/arrival behavior; this does not change ranking, evidence class, NEXT_EPISODE or mechanics, so no research/backlog churn
-- newly surfaced miniature/AI-cat channel statistics reinforce that miniature/ASMR and recognizable Japanese-food/worldbuilding mechanics remain viable, but do not provide a stronger causal signal than evidence already recorded
+- current Japanese 月見 activation remains strong: additional 2026-08-26 traditional moon-dumpling announcements and a 2026-09-02 nationwide cafe moon/yakiimo campaign reinforce recognition
+- these are same-class seasonal activation signals already represented by existing saturated 月見/yakiimo evidence, so they do **not** justify new benchmark rows, candidate-score changes, ranking changes or NEXT_EPISODE changes
+- current AI-cat/miniature/ASMR discovery still supports calm food/worldbuilding mechanics but does not provide stronger causal evidence than the existing benchmark memory
 
 Current candidate state:
 - `IDEA-009` yakiimo → realized as TK-005; blocked as future repeat
@@ -270,9 +281,14 @@ Continuity/action rules:
 - KF1→KF4 = sequential edit/reference derivations from previous approved planned KF
 - G2/G3/G4 First = actual saved frame from previous PASS clip
 - explicit action + action_guard in every G scene
-- `max_visual_cuts_per_8s_generation: 0`
-- `preferred_action_count_per_generation: 1`
-- `preferred_playback_speed_range: [0.92, 1.00]` is valid under the new range gate
+- `output_count: 1` is a true integer
+- `max_lite_generations_first_pass: 4` is a true integer
+- `non_ultra_credit_budget_first_pass: 40` is a true integer
+- `max_visual_cuts_per_8s_generation: 0` is a true integer
+- `preferred_action_count_per_generation: 1` is a true integer
+- every `generation_seconds: 8` is a true integer
+- `minimum_distinct_motion_beats: 4` is a true integer
+- `preferred_playback_speed_range: [0.92, 1.00]` remains valid
 - no invented editorial holds merely to push runtime toward 40s
 
 Highest-value next real-world step remains **approve TK-005 KF0→KF4 in real Flow, then generate G1 only and QC it.** Automation must not spend that credit.
@@ -365,7 +381,8 @@ Expand distinct worlds only after performance evidence, without repeating recent
 - no blank action/action_guard
 - no missing cut ceiling
 - no >1 visual cut per 8s production scene plan
-- no preferred action count other than 1
+- no preferred action count other than integer 1
+- no boolean/float/string coercion for paid-generation integer controls
 - no next-scene spend after previous-scene failure
 - no scene-count/runtime/credit mismatch
 - no padding G4
@@ -396,24 +413,24 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-28 — Playback speed range integrity
-Baseline `main@c9be6b5db17808ca7f464b775fb739628cbcb0ab`.
+### 2026-08-28 — Strict integer manifest scalar integrity
+Baseline `main@904a045f9f3cd5b084af6492fa6e71141231be84`.
 
 Changed:
-- close validator gap around `preferred_playback_speed_range`
-- require exactly two numeric values
-- require `0 < min <= max <= 1.0`
-- use conservative 1.0x runtime math when speed metadata itself is invalid
-- add focused regression test file
+- close validator coercion gap where bools/floats/numeric strings could masquerade as integer production controls
+- add `strict_manifest_int()`
+- enforce exact integer scalar semantics for output count, cut ceiling, action count, first-pass generation count, credit budget, immersive-H40 motion-beat count and scene generation duration
+- add regression coverage for `True`, `0.0`, `1.5`, `3.5`, `30.0`, `8.0`
 - synchronize this handoff in the same branch
 
 Verified assumptions:
-- TK-005 `[0.92, 1.00]` remains valid
+- TK-005 uses correct integer scalars and remains unchanged
 - official Google Flow credit baseline remains Pro 1,000/month and Veo 3.1 Lite 10 credits/generation for non-Ultra
-- new-rice and adjacent benchmark findings do not change candidate rank/NEXT_EPISODE under evidence-saturation rules
+- newly surfaced 月見/yakiimo signals are same-class saturated evidence and do not change ranking/NEXT_EPISODE
 - no Flow credits spent, no paid generation, no publishing
 
 ### Earlier 2026-08-28 work
+- playback-speed-range integrity
 - runtime feasibility / no-padding correction
 - Flow Pack numeric KF-order alignment
 - operator Gate A sequential-KF synchronization
