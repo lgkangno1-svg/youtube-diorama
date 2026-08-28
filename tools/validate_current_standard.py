@@ -255,11 +255,35 @@ def validate(data: dict[str, Any]) -> list[str]:
         raw_motion = sum(max(0.0, to_float((scene or {}).get("generation_seconds"), default=0.0)) for scene in scenes)
         speed_range = post.get("preferred_playback_speed_range", [1.0, 1.0])
         min_speed = 1.0
-        if isinstance(speed_range, list) and len(speed_range) >= 1:
-            min_speed = to_float(speed_range[0], default=1.0)
-        if min_speed <= 0 or min_speed > 1.0:
-            errors.append("post_production.preferred_playback_speed_range minimum must be >0 and <=1.0")
+        max_speed = 1.0
+        speed_range_valid = True
+        if not (isinstance(speed_range, list) and len(speed_range) == 2):
+            errors.append("post_production.preferred_playback_speed_range must be [min,max]")
+            speed_range_valid = False
+        else:
+            try:
+                min_speed = float(speed_range[0])
+                max_speed = float(speed_range[1])
+            except (TypeError, ValueError):
+                errors.append("post_production.preferred_playback_speed_range must contain numbers")
+                speed_range_valid = False
+
+        if speed_range_valid:
+            if min_speed <= 0 or min_speed > 1.0:
+                errors.append("post_production.preferred_playback_speed_range minimum must be >0 and <=1.0")
+                speed_range_valid = False
+            if max_speed <= 0 or max_speed > 1.0:
+                errors.append("post_production.preferred_playback_speed_range maximum must be >0 and <=1.0")
+                speed_range_valid = False
+            if min_speed > max_speed:
+                errors.append("post_production.preferred_playback_speed_range must satisfy min <= max")
+                speed_range_valid = False
+
+        if not speed_range_valid:
+            # Invalid playback metadata must never increase the calculated runtime
+            # allowance. Fall back to 1.0x for conservative feasibility math.
             min_speed = 1.0
+
         max_static = max(0.0, to_float(post.get("max_total_static_hold_seconds"), default=0.0))
         explicit_holds = explicit_editorial_hold_seconds(data, max_static)
         feasible_max = (raw_motion / min_speed if min_speed > 0 else raw_motion) + explicit_holds
