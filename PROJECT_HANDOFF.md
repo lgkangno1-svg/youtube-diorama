@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**  
-Baseline inspected before this iteration: `main@18b707ea116e8413d55085eef233b17213a8d7e3`
+Baseline inspected before this iteration: `main@c9be6b5db17808ca7f464b775fb739628cbcb0ab`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Another AI/developer must be able to continue from GitHub without prior chat history. Every material repository change must update this file in the same branch/PR. True NO-OP research must not churn it.
 
@@ -10,16 +10,14 @@ This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`.
 `AGENTS.md` is authoritative.
 
 - repository development is performed directly by the active Chat/Codex session
-- do not delegate coding/planning/debugging/refactoring/review/test repair/architecture/repository exploration to OpenCode Go
 - inspect latest main SHA + recent commits/PRs before every run
 - latest merged repository state overrides stale chat or scheduled-prompt details
 - modify only `lgkangno1-svg/youtube-diorama`; do not touch Cali or unrelated repositories
+- do not spend Flow credits, generate paid video, or publish to YouTube without explicit user action
 
 ## Mission
 
-Build a Japanese-target Shorts operating system, not merely an AI-cat generator.
-
-Normal user interface:
+Build a Japanese-target Shorts operating system around a simple user interface:
 
 ```text
 다음 영상 준비해줘
@@ -32,8 +30,6 @@ User local entrypoint:
 ```powershell
 ./tools/make_next_short.ps1
 ```
-
-Never spend Flow credits, generate paid video, or publish to YouTube without explicit user action.
 
 ## Viewer-facing identity
 
@@ -64,6 +60,7 @@ Official Google Flow Help rechecked **2026-08-28**:
 - Veo 3.1 Lite 4s/6s/8s + Extend: non-Ultra 10 credits/generation
 - First + Last frames: Lite supports 4s/6s/8s
 - output count = 1
+- 1080p upscale = 0 credits for Plus/Pro/Ultra
 - actual Flow UI active model/mode/output count/displayed cost is the generation-time source of truth
 
 Do not confuse an existing-video edit / Omni Flash edit screen with standard new-video generation.
@@ -107,36 +104,32 @@ planned KF chain PASS
 
 Never substitute a prettier planned target KF for the actual previous PASS frame.
 
-## Runtime policy — corrected 2026-08-28
+## Runtime policy
 
-Important correction: `compact_h30` / `immersive_h40` numbers refer to the **current 30/40-credit first-pass ceilings**, not promised final seconds.
+`compact_h30` / `immersive_h40` numbers refer to the **current 30/40-credit first-pass ceilings**, not promised final seconds.
 
 ### compact_h30
 - exactly 3 × 8s Lite scenes = raw motion 24s
 - current first-pass ceiling = 30 credits
-- default final target ≈ **24–27s**
+- default final target ≈ 24–27s
 - use when three independent beats complete scale reveal → making → payoff
 
 ### immersive_h40
 - exactly 4 × 8s Lite scenes = raw motion 32s
 - current first-pass ceiling = 40 credits
-- default final target ≈ **32–35s**
+- default final target ≈ 32–35s
 - G4 must add independent serving/world-resolution/afterglow value
 
-Why this changed:
-- previous docs/manifest advertised compact 30–36s and immersive 38–46s despite only 24s/32s of generated raw motion
-- TK-005 allowed playback only down to 0.92x and declared no explicit editorial holds
-- therefore the previous 38s minimum for TK-005 was physically unreachable without invented stills/loops or slower-than-declared retiming
-- that contradicted `do_not_pad_to_runtime`, healing pacing, and the G4 no-padding rule
-
-New invariant:
-- natural slowdown may be used only inside the manifest's playback-speed range
+Runtime invariants:
+- natural slowdown only inside `post_production.preferred_playback_speed_range`
+- playback-speed range must be exactly `[min,max]`, numeric, `0 < min <= max <= 1.0`
+- malformed/reversed/>1.0 speed ranges fail closed before paid generation
 - static/keyframe holds count only when explicitly declared in `editorial_seconds`
 - `max_total_static_hold_seconds` is a ceiling, not an automatic padding budget
-- if generated motion + allowed slowdown + explicit holds cannot reach the requested minimum, the manifest fails before paid Flow generation
+- if generated motion + allowed slowdown + explicit holds cannot reach requested minimum, validation fails
 - accept a shorter natural Short rather than inventing runtime padding
 
-`tools/validate_current_standard.py` now enforces this feasibility rule. `tools/build_healing_edit_plan.py` no longer fabricates default hero/loop holds when the manifest did not request them.
+`tools/validate_current_standard.py` enforces runtime feasibility and playback-speed range integrity. `tools/build_healing_edit_plan.py` does not fabricate default hero/loop holds when the manifest did not request them.
 
 ## 8-second scene grammar
 
@@ -185,10 +178,29 @@ If motion is good and audio alone is bad, replace audio in edit rather than rero
 - novelty/authenticity gate against repeated recent fingerprints
 - seasonal evidence saturation/no-churn gate
 - long-take manifest guard: 0/1 cut max and exactly one preferred primary action
-- **runtime-feasibility no-padding gate**
-- **edit-plan explicit-holds-only rule**
+- runtime-feasibility no-padding gate
+- edit-plan explicit-holds-only rule
+- **full playback-speed-range integrity gate**
 - local handoff-update guard
 - regression tests for core production invariants
+
+## Latest material change — playback-speed-range integrity
+
+Problem found after PR #44:
+- runtime feasibility used the first value of `preferred_playback_speed_range`
+- validator did not require exactly two elements
+- it did not validate the maximum speed
+- it did not reject a reversed range such as `[1.0, 0.92]`
+- a malformed future manifest could therefore pass with contradictory edit metadata or let runtime math rely on a misleading slowdown declaration
+
+Fix in branch `fix/playback-speed-range-validation`:
+- require exactly `[min,max]`
+- require both values numeric
+- require `0 < min <= max <= 1.0`
+- invalid speed metadata falls back to conservative 1.0x for feasibility math while still returning validation errors
+- add focused regression coverage for valid, reversed, >1.0, malformed-length and non-numeric ranges
+
+This does not change TK-005 because its current `[0.92, 1.00]` range is valid.
 
 ## Research / idea policy
 
@@ -205,15 +217,14 @@ Never copy exact competitor title, plot, branded product/package or ending. Extr
 Evidence saturation rule: do not keep committing same-class seasonal retail/PR signals after a candidate is already well supported unless the new evidence changes ranking, NEXT_EPISODE, timing, evidence class, production mechanics, freshness, Flow assumptions or real Tiny Cat Kitchen learning.
 
 2026-08-28 research check:
-- official Google Flow pricing/features remain unchanged for the current Lite workflow
-- current sweet-potato / 月見 / new-rice autumn evidence remains same-class evidence already represented in the repository
-- no new benchmark signal justified changing candidate ranking or NEXT_EPISODE
-- research/backlog files intentionally remain unchanged this iteration
+- official Flow pricing/features remain unchanged for the current Lite workflow
+- a new Niigata rice fair beginning 2026-08-29 reinforces new-rice season visibility, but IDEA-010 already has current reservation/arrival behavior; this does not change ranking, evidence class, NEXT_EPISODE or mechanics, so no research/backlog churn
+- newly surfaced miniature/AI-cat channel statistics reinforce that miniature/ASMR and recognizable Japanese-food/worldbuilding mechanics remain viable, but do not provide a stronger causal signal than evidence already recorded
 
 Current candidate state:
 - `IDEA-009` yakiimo → realized as TK-005; blocked as future repeat
 - `IDEA-001` 8mm 月見だんご → priority future candidate
-- `IDEA-010` 8mm 新米塩むすび → future candidate backed by current reservation/arrival behavior
+- `IDEA-010` 8mm 新米塩むすび → priority future candidate backed by current reservation/arrival behavior
 - `IDEA-002` gummy → blocked against recent equivalent conflict/ending structure
 
 ## Current production state
@@ -229,7 +240,7 @@ Title:
 Manifest: `episodes/TK-005.yaml`  
 Runtime mode: `immersive_h40`  
 First-pass ceiling: 4 Lite generations / current 40 credits  
-Corrected final target: **32–35s**, nominal `length_target_seconds: 34`
+Final target: **32–35s**, nominal `length_target_seconds: 34`
 
 Planned KFs:
 1. `KF0_OPEN`
@@ -261,6 +272,7 @@ Continuity/action rules:
 - explicit action + action_guard in every G scene
 - `max_visual_cuts_per_8s_generation: 0`
 - `preferred_action_count_per_generation: 1`
+- `preferred_playback_speed_range: [0.92, 1.00]` is valid under the new range gate
 - no invented editorial holds merely to push runtime toward 40s
 
 Highest-value next real-world step remains **approve TK-005 KF0→KF4 in real Flow, then generate G1 only and QC it.** Automation must not spend that credit.
@@ -299,7 +311,7 @@ subscribers / 100 credits
 5. QC POV / scale / anatomy / camera / action / cut count / fixed-prop continuity
 6. on PASS, native Save frame
 7. continue G2 → G3 → justified G4 through progressive gates
-8. edit to the best natural runtime; do not force 38–46s
+8. edit to the best natural runtime
 9. record actual credits, rerolls, usable seconds, failure type
 
 ### Phase B — first public Shorts learning
@@ -357,8 +369,9 @@ Expand distinct worlds only after performance evidence, without repeating recent
 - no next-scene spend after previous-scene failure
 - no scene-count/runtime/credit mismatch
 - no padding G4
-- **no impossible final-runtime target that requires undeclared padding**
-- **no invented still/loop hold merely to satisfy H30/H40 naming**
+- no impossible final-runtime target that requires undeclared padding
+- no malformed/reversed/>1.0 playback-speed range
+- no invented still/loop hold merely to satisfy H30/H40 naming
 - no reroll of good motion for audio-only defects
 - no placeholder analytics treated as real observations
 - do not modify Cali or unrelated repositories
@@ -383,31 +396,29 @@ Success is measured by first-pass success, usable motion/credit, engaged views/c
 
 ## Change log
 
-### 2026-08-28 — Runtime feasibility / no-padding correction
-Baseline `main@18b707ea116e8413d55085eef233b17213a8d7e3`.
+### 2026-08-28 — Playback speed range integrity
+Baseline `main@c9be6b5db17808ca7f464b775fb739628cbcb0ab`.
 
 Changed:
-- identify arithmetic mismatch between 24s/32s generated motion and the previous 30–36s/38–46s final targets
-- redefine H30/H40 explicitly as 30/40-credit first-pass tiers, not promised final seconds
-- set default natural targets to compact 24–27s and immersive 32–35s
-- correct TK-005 from 41s / 38–46s to nominal 34s / 32–35s without changing its four-beat story or 40-credit ceiling
-- add validator runtime-feasibility gate using generated motion + allowed slowdown + explicitly declared editorial holds
-- update healing edit-plan builder so it does not manufacture default hero/loop holds
-- add regression tests for infeasible targets, natural slowdown, explicit holds, and no invented edit padding
-- synchronize START_HERE / CURRENT_STANDARD / docs22 / docs23 / this handoff
+- close validator gap around `preferred_playback_speed_range`
+- require exactly two numeric values
+- require `0 < min <= max <= 1.0`
+- use conservative 1.0x runtime math when speed metadata itself is invalid
+- add focused regression test file
+- synchronize this handoff in the same branch
 
 Verified assumptions:
+- TK-005 `[0.92, 1.00]` remains valid
 - official Google Flow credit baseline remains Pro 1,000/month and Veo 3.1 Lite 10 credits/generation for non-Ultra
-- NEXT_EPISODE remains TK-005
-- candidate ranking/evidence remains unchanged due research saturation
+- new-rice and adjacent benchmark findings do not change candidate rank/NEXT_EPISODE under evidence-saturation rules
 - no Flow credits spent, no paid generation, no publishing
 
 ### Earlier 2026-08-28 work
+- runtime feasibility / no-padding correction
 - Flow Pack numeric KF-order alignment
 - operator Gate A sequential-KF synchronization
 - long-take manifest drift guard
 - numeric planned-keyframe sequence gate
 - planned-keyframe scene-order gate
-- START_HERE / CURRENT_STANDARD synchronization
 - planned keyframe continuity chain
 - Flow native Save-frame chain guidance
