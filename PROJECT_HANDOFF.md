@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**
-Baseline inspected before this iteration: `main@f3c72c9bf8db8bee3a1a047f79008f5ed7db92a1`
+Baseline inspected before this iteration: `main@f515c3469df8d35cd5ffd55b78dd0d3ff9768011`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -278,6 +278,8 @@ Hard response:
 - feline-safe action family
 - one active paw action per 8-second generation by default
 
+The ledger's historical hypothesis remains preserved as observed history, but its actionable `next_learning` now reflects the corrected Mini Forest-style maker-view standard rather than forcing first-person cat-eye POV.
+
 There is still no trustworthy public 24h/72h Tiny Cat Kitchen performance sample.
 
 Long-term KPIs:
@@ -365,6 +367,25 @@ Success is measured by usable motion/credit, engaged views/credit, subscribers/c
 
 ## Change log
 
+### 2026-08-28 — learning-ledger maker-view correction
+Baseline: `main@f515c3469df8d35cd5ffd55b78dd0d3ff9768011`.
+
+Changed:
+- preserved the original POV preflight observation/hypothesis as historical evidence
+- corrected only the actionable `next_learning` field that still said `force true first-person camera`
+- new learning now requires Mini Forest-style maker view, paws only, no cat body, tiny scale, and feline-safe actions
+- synchronized this handoff in the same branch
+
+Why:
+- the stale ledger instruction could feed future learning/selection logic and accidentally regress the user-directed Mini Forest-style maker-view standard even though canonical docs had already been corrected
+
+Verified:
+- NEXT_EPISODE remains TK-005
+- no episode/runtime/credit-budget change
+- fresh miniature/seasonal research remains same-class/saturated and does not justify backlog or benchmark churn
+- official Google Flow Help still lists non-Ultra Veo 3.1 Lite 4/6/8s + Extend at 10 credits/generation
+- no Flow credits spent and no YouTube publishing
+
 ### 2026-08-28 — TK-005 G4 single-action correction
 Baseline: `main@f3c72c9bf8db8bee3a1a047f79008f5ed7db92a1`.
 
@@ -378,26 +399,3 @@ Verified:
 - NEXT_EPISODE remains TK-005
 - Mini Forest-style paw-only maker-view direction remains canonical
 - immersive_h40 / four Lite generations / current 40-credit first-pass ceiling unchanged
-- official Google Flow Help rechecked 2026-08-28: non-Ultra Veo 3.1 Lite remains 10 credits/generation; Google AI Pro remains 1,000 Flow credits/month
-- no paid Flow generation / no YouTube publishing
-
-### 2026-08-28 — Mini Forest paw-only visual correction
-Baseline: `main@f2a1950358b799056631c13c2339a04986a110c5`
-
-Changed:
-- corrected channel identity from mandatory first-person cat POV to Mini Forest-style hand-centric miniature making
-- human hands are replaced by feline front paws only
-- full cat/face/body remains forbidden
-- updated CURRENT_STANDARD, START_HERE, docs/22, docs/23, docs/24, docs/25
-- replaced Flow Pack's hardcoded first-person prompt with maker-view prompt grammar
-- retargeted TK-005 keyframes/actions/guards to stable high-oblique miniature-making composition
-- preserved current legacy enum/camera labels temporarily so validator/selector/backlog compatibility is not broken before real Flow proof
-
-Unchanged:
-- NEXT_EPISODE = TK-005
-- yakiimo story and 12mm scale
-- immersive_h40 / four Lite scenes / current 40-credit first-pass ceiling
-- planned-KF chain
-- actual Save-frame continuity
-- progressive spend
-- no paid generation / no publishing
