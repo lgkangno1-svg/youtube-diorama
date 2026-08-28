@@ -80,6 +80,21 @@ latest explicit user direction
 
 그 뒤 구조 validator가 Flow model/output count, H30/H40 scene/credit ceiling, keyframe completeness, actual saved-frame chaining, progressive PASS gates, cut/action limits, runtime feasibility, narration을 검증한다.
 
+**모든 production bundle entry point도 같은 canonical maker-view validator를 사용해야 한다.** `tools/build_episode_bundle.py`가 `validate_current_standard.py`를 직접 호출하면 안 된다. legacy structural validator는 maker-view adapter 내부 구현으로만 사용하며, adapter가 current semantics를 검증한 뒤 compatibility fields를 안전하게 번역해서 구조 검증을 위임한다.
+
+따라서 현재 production preflight는 다음과 같다.
+
+```text
+make_next_short.ps1 / make_short.ps1 / direct build_episode_bundle.py
+→ validate_maker_view_manifest.py
+→ current maker-view semantic gate
+→ legacy structural validator internally via adapter
+→ originality gate
+→ generated production pack
+```
+
+직접 bundle builder를 실행해도 current maker-view manifest가 legacy `stop_if_pov...` 요구 때문에 뒤늦게 거부되어서는 안 된다.
+
 ## 4. Planned keyframe continuity
 
 Paid Veo 전:

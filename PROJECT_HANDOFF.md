@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected before this iteration: `main@269152e782cdfd506c82079616c219c74e1a3eba`
+Baseline inspected before this iteration: `main@738175d39467280f831642c96cb288778e189aea`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change updates this file in the same branch/PR. True NO-OP research does not churn it.
 
@@ -70,36 +70,57 @@ Paid continuity:
 - G3: actual saved G2 PASS frame → KF3
 - G4 only if still justified: actual saved G3 PASS frame → KF4
 
-## New material correction — candidate selector safety gate
+## New material correction — bundle builder validator bypass
 
-A regression risk was found in `tools/select_next_episode.py`.
+A second-stage regression remained after the earlier maker-view validator fix.
 
-Before this iteration, `production_compatible()` treated the legacy token `POV_PAWS_MICROWORLD_V1` plus the presence of any paw-action list/hero-scale text as enough for production compatibility. Because that enum remains only for tooling compatibility, a future stale candidate could keep the legacy token while reintroducing human-like manipulation or weak miniature scale and still pass the selection stage.
+Observed path before this iteration:
+
+```text
+make_next_short.ps1
+→ validate_maker_view_manifest.py PASS
+→ make_short.ps1
+→ build_episode_bundle.py
+→ validate_current_standard.py DIRECTLY
+```
+
+The direct legacy structural validator still requires compatibility-only fields such as the old `stop_if_pov_scale_anatomy_or_premise_fails` gate. TK-005 intentionally uses the current `stop_if_maker_view_scale_anatomy_or_premise_fails` gate, so the normal command could pass the first maker-view preflight and then be rejected while building the bundle. Direct `build_episode_bundle.py` invocation had the same regression risk.
 
 Corrected behavior:
-- legacy `POV_PAWS_MICROWORLD_V1` is explicitly named a compatibility token, not current creative semantics
-- candidate `hero_scale` must declare a paw-width ratio and its maximum must be <=0.50
-- candidate `paw_action_family` must be entirely inside the current feline-safe allowlist
-- current allowlist: `nudge / press / pat / roll / steady / slide / tap / push`
-- unsupported actions such as `pinch` now fail closed before ranking
-- output now labels the field `visual_grammar_token` and explains that it is legacy compatibility only
-- user-facing no-candidate message now says `paws-only miniature maker-view`, not `POV paw-only`
-- regression tests cover current pass, unsafe action rejection, >0.50 paw-width rejection, missing ratio rejection, and compact runtime pass
+- `build_episode_bundle.py` now calls `validate_maker_view_manifest.py` as its canonical production-standard preflight
+- the maker-view adapter validates current semantics first
+- only inside that adapter are compatibility-only fields translated before delegating mature runtime/credit/keyframe/sequential-chain checks to `validate_current_standard.py`
+- `build_episode_bundle.py` no longer calls the legacy structural validator directly
+- regression test now asserts the canonical maker-view gate exists and the direct legacy call does not
+- originality validation still runs after current-standard validation and before any generated files are created
 
 Why this matters:
-- candidate selection is upstream of manifest creation; preventing stale mechanics here is cheaper than discovering anatomy/scale problems after a Flow prompt or paid generation exists
-- this directly protects the user's `다음 영상 준비해줘` workflow from legacy enum regression
+- the user's intended one-command interface must actually reach production-pack generation with a current valid manifest
+- a validator architecture that passes at the shell entry point but fails deeper in the same command is operationally equivalent to a broken workflow
+- this change does not weaken structural validation; it only routes it through the current semantic adapter
 
 Production impact:
 - TK-005 selection/content/runtime/credit budget unchanged
 - no Flow credits spent
 - no publishing
 
+## Candidate selector safety gate
+
+`tools/select_next_episode.py` is fail-closed on current candidate mechanics.
+
+Current behavior:
+- legacy `POV_PAWS_MICROWORLD_V1` is compatibility-only
+- candidate `hero_scale` must declare a paw-width ratio with maximum <=0.50
+- `paw_action_family` must remain within `nudge / press / pat / roll / steady / slide / tap / push`
+- unsupported actions such as `pinch` are rejected before ranking
+- runtime prior must be `compact_h30` or `immersive_h40`
+- evidence/trend/novelty gates remain active
+
 ## Manifest validation state
 
-The normal `./tools/make_next_short.ps1` path already uses `tools/validate_maker_view_manifest.py`.
+The canonical production semantic gate is `tools/validate_maker_view_manifest.py`.
 
-Current semantic gate requires:
+Current semantics require:
 - `visual_intent = mini_forest_style_paws_only_miniature_making`
 - `semantic_override = mini_forest_style_observational_maker_view`
 - `first_person_required = false`
@@ -107,16 +128,21 @@ Current semantic gate requires:
 - `stop_if_maker_view_scale_anatomy_or_premise_fails = true`
 - legacy `stop_if_pov...` gate is not active
 
+All production bundle entry points must route through this adapter. `validate_current_standard.py` is an internal structural/runtime validator behind the adapter, not a direct current-semantic production entry point.
+
 Legacy `first_person_cat_pov` / `POV_PAWS_MICROWORLD_V1` values can remain only as compatibility data and must never restore literal first-person as a creative requirement.
 
 ## Flow / spend baseline
 
-Official Google Flow help rechecked 2026-08-29:
+Current repository baseline remains:
 - Veo 3.1 Lite
+- output count 1
 - non-Ultra: 10 credits/generation
 - Ultra: 5 credits/generation
-- non-subscriber: 50 free Flow credits/day; does not stack with paid Plus/Pro/Ultra allocation
+- non-subscriber baseline: 50 free Flow credits/day under the currently documented free route
 - actual active Flow UI model/mode/output count/displayed cost is generation-time final truth
+
+This run rechecked current public information and found no sufficiently verified official change that justifies altering production assumptions. Third-party discussion of temporary subscriber bonus credits was not promoted into repository truth without direct official verification.
 
 Progressive Spend:
 
@@ -158,9 +184,10 @@ AI-cat channels are secondary only for narrow paw/anatomy/reliability evidence. 
 Evidence saturation remains active. Same-class promotional/retail signals do not justify commits unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual production learning.
 
 Fresh 2026-08-29 checks:
-- official Flow credit/eligibility assumptions remain consistent with repository baseline
-- 2026-08-27 Yakiimo Fest Tokyo/Osaka announcement adds another tactile-texture promotional signal, but it does not change TK-005 ranking or justify copying crunchy menu mechanics; benchmark/backlog intentionally not churned
-- sweet-potato/yakiimo demand evidence is already saturated across search behavior + event/activation signals
+- current miniature-cooking channels remain large and active, supporting the existing tactile miniature benchmark class rather than introducing a new production mechanic
+- sweet-potato/yakiimo evidence remains saturated across behavioral/search/preference/activation classes
+- no stronger creator-performance or seasonal evidence changed TK-005 ranking in this run
+- no research/backlog churn was justified
 
 Candidate state:
 - TK-005 / IDEA-009 remains current production choice
@@ -175,8 +202,8 @@ Do not revive an old manifest solely from `ready-for-flow`/`planned` status. Ref
 
 ## Current roadmap / next priorities
 
-1. Keep `select_next_episode.py` fail-closed on tiny scale + feline-safe mechanics before future manifest creation.
-2. Run current maker-view manifest validation for TK-005.
+1. Keep all production entry points routed through `validate_maker_view_manifest.py`; do not reintroduce direct legacy structural validation.
+2. Run the current maker-view manifest validation/bundle path for TK-005 locally when the user executes the command.
 3. Create/approve TK-005 KF0 master anchor in real Flow.
 4. Confirm genuine miniature making with paws replacing hands, not an AI-cat character scene.
 5. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
@@ -201,6 +228,7 @@ Do not revive an old manifest solely from `ready-for-flow`/`planned` status. Ref
 - no next paid scene after prior structural failure
 - actual previous PASS frame is the continuity bridge
 - non-first-person maker view is not a failure by itself
+- no direct production entry point to legacy structural validator
 - no runtime padding for its own sake
 - no research churn after saturation
 - no unrelated repository modifications
@@ -208,29 +236,30 @@ Do not revive an old manifest solely from `ready-for-flow`/`planned` status. Ref
 
 ## Change log
 
-### 2026-08-29 — candidate selector maker-view safety gates
-Baseline: `main@269152e782cdfd506c82079616c219c74e1a3eba`.
+### 2026-08-29 — canonical bundle maker-view validation path
+Baseline: `main@738175d39467280f831642c96cb288778e189aea`.
 
 Changed:
-- strengthened `tools/select_next_episode.py` production compatibility gate
-- legacy visual grammar is now explicitly treated as compatibility-only
-- enforced explicit <=0.50 paw-width scale declaration
-- enforced feline-safe action allowlist
-- corrected stale POV-centric selector wording
-- added regression tests
+- fixed `tools/build_episode_bundle.py` to invoke `validate_maker_view_manifest.py` instead of `validate_current_standard.py` directly
+- preserved legacy structural/runtime validation behind the adapter rather than bypassing it
+- updated bundle regression test to reject reintroduction of the direct legacy gate
 - synchronized `CURRENT_STANDARD.md` and this handoff
 
 Why:
-- legacy enum presence alone was too weak a safety signal and could allow future stale/human-like candidate mechanics back into the normal next-episode workflow
+- the normal one-command path could otherwise pass maker-view validation and then fail during bundle creation on the obsolete POV stop-gate requirement
 
 Production impact:
-- no change to TK-005, NEXT_EPISODE, H40, 40-credit first-pass ceiling, current manifest actions, keyframes, audio, or Flow settings
+- no change to TK-005, NEXT_EPISODE, H40, 40-credit non-Ultra first-pass ceiling, current manifest actions, keyframes, audio, or Flow settings
 - no credits spent; no publishing
+
+### 2026-08-29 — candidate selector maker-view safety gates
+- strengthened `tools/select_next_episode.py` production compatibility gate
+- enforced explicit <=0.50 paw-width scale declaration and feline-safe action allowlist
+- synchronized `CURRENT_STANDARD.md` and handoff
 
 ### 2026-08-29 — canonical maker-view manifest validator
 - added `validate_maker_view_manifest.py`
-- fixed one-command workflow so current TK-005 is not rejected by obsolete `stop_if_pov...` validation
-- added regression tests and synchronized current standard
+- aligned shell entry preflight with current maker-view semantics
 
 ### 2026-08-29 — TK-005 maker-view spend-gate correction
 - renamed active progressive spend gate from stale POV wording to maker-view semantics
