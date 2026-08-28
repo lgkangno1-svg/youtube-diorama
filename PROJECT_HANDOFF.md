@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected before this iteration: `main@6ced3691d587c43ecfdd0033c552e2423e82eb17`
+Baseline inspected before this iteration: `main@de2545d4cfa1c6ea1f25e74ba76fedb35cedc4d6`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -70,6 +70,20 @@ Paid continuity chain:
 - G3: actual saved G2 PASS frame → KF3
 - G4 only if still justified: actual saved G3 PASS frame → KF4
 
+### TK-005 manifest gate correction — 2026-08-29
+
+The manifest still contained a stale progressive-spend field named `stop_if_pov_scale_anatomy_or_premise_fails`. Although the current tool does not consume that key and the manifest already had `first_person_required: false`, the field name could mislead a future AI/operator into treating non-first-person maker-view framing as a structural failure.
+
+Corrected it to:
+- `stop_if_maker_view_scale_anatomy_or_premise_fails: true`
+
+Interpretation:
+- observational/high-oblique maker view is valid and preferred by default
+- stop spending when miniature-making composition, paws-only identity, tiny scale, anatomy, or premise structurally fails
+- do **not** stop merely because the camera is not literal first-person
+
+No camera enum/schema migration was attempted: `camera_grammar.mode: first_person_cat_pov` and `POV_PAWS_MICROWORLD_V1` remain temporarily for compatibility and are explicitly overridden by maker-view semantics. Do not migrate those piecemeal without validating tooling/schema impact.
+
 ## Flow / spend baseline
 
 Generation-time Flow UI is final truth. Current documented assumption:
@@ -120,26 +134,17 @@ AI-cat channels are secondary evidence only for narrow paw/anatomy/reliability q
 
 Evidence saturation remains active. Same-class promotional/retail signals do not justify commits unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual production learning.
 
-### Fresh evidence accepted — 2026-08-29
+Accepted current demand evidence:
+- 2026-08-19 Maruyanagi release citing Google Trends reports Japanese `さつまいもスイーツ` search interest rising September–December and roughly 9× summer levels in October; treat as directional because raw Trends data was not independently reproduced
+- existing survey, behavioral event attendance, and multiple nationwide activations already make sweet-potato/yakiimo research saturated
 
-A Maruyanagi official release dated 2026-08-19 cites Google Trends and reports that Japanese search volume for `さつまいもスイーツ` rises strongly from September through December and reaches roughly **9× summer levels in October**.
+Fresh 2026-08-29 research check found additional late-August sweet-potato/月見 product launches, but they are the same nationwide/promotional evidence class and do not change ranking, timing, production mechanics, or Flow assumptions. They were intentionally **not** added to the benchmark log.
 
-Why this was accepted despite saturation:
-- it is a **search-behavior evidence class**, not another same-class product-launch announcement
-- it strengthens the seasonal demand curve behind yakiimo/oimo concepts through early autumn
-- it supports keeping TK-005 timing rather than replacing it with a fresher but weaker promotional signal
-
-Caution:
-- raw Google Trends query data was not independently reproduced in this runtime
-- treat the quoted 9× figure as directional evidence from the cited company release, not a universal population estimate
-- no branded product/campaign mechanics are copied
-
-Candidate re-evaluation:
+Candidate state:
 - TK-005 / IDEA-009 remains the strongest current production choice
-- no backlog score/rank change was made because IDEA-009 was already priority-ranked with maximum benchmark/visual/reliability/credit-efficiency signals, and the new source improves confidence more than relative ordering
-- 月見, グミの日, 栗ご飯 candidates remain secondary; no evidence justified replacing the current episode
-
-`research/benchmark_log.csv` now contains this new evidence row.
+- IDEA-001 月見 remains a strong secondary seasonal candidate
+- IDEA-002 グミの日 and IDEA-006 栗ご飯 remain secondary candidates
+- no score/rank change justified without stronger creator-performance, behavioral demand, or Tiny Cat Kitchen production evidence
 
 ## Current roadmap / next priorities
 
@@ -166,6 +171,7 @@ Candidate re-evaluation:
 - no paid G1 before planned KF continuity passes
 - no next paid scene after prior structural failure
 - actual previous PASS frame is the continuity bridge
+- non-first-person maker view is not a failure by itself
 - no runtime padding for its own sake
 - no research churn after saturation
 - no unrelated repository modifications
@@ -173,25 +179,26 @@ Candidate re-evaluation:
 
 ## Change log
 
-### 2026-08-29 — sweet-potato search-demand evidence
-Baseline: `main@6ced3691d587c43ecfdd0033c552e2423e82eb17`.
+### 2026-08-29 — TK-005 maker-view spend-gate semantic correction
+Baseline: `main@de2545d4cfa1c6ea1f25e74ba76fedb35cedc4d6`.
 
 Changed:
-- added one new `research/benchmark_log.csv` row for a search-behavior evidence class: a 2026-08-19 Maruyanagi release citing Google Trends for `さつまいもスイーツ`
-- recorded the reported September–December rise and roughly 9× October-vs-summer search level as directional evidence
+- renamed TK-005 manifest progressive-spend key from legacy `stop_if_pov_scale_anatomy_or_premise_fails` to `stop_if_maker_view_scale_anatomy_or_premise_fails`
 - synchronized this handoff in the same branch
 
 Why:
-- unlike repeated retail-launch evidence, this adds a different behavioral/search-demand class and improves confidence in the current yakiimo seasonal timing
+- the old field name could reintroduce the superseded assumption that literal first-person POV is mandatory even though current accepted production grammar prefers Mini Forest-style observational maker view
 
 Production impact:
-- no change to TK-005, NEXT_EPISODE, H40 runtime, four-generation/40-credit first-pass ceiling, visual grammar, Flow assumptions, candidate ranking, or Progressive Spend
+- no change to TK-005 episode choice, H40 runtime, 4-generation/40-credit first-pass ceiling, action sequence, keyframes, audio, Flow settings, or NEXT_EPISODE
 - no Flow credits spent; no publishing
 
-Validation:
-- latest main/commits/PRs/handoff inspected first
-- START_HERE, docs/22, docs/23, NEXT_EPISODE, backlog, learning ledger and TK-005 manifest cross-checked
-- local git validation was attempted but network resolution prevented cloning; branch was created directly from inspected `main@6ced3691...`, and both material files are included in the same branch
+Research verification:
+- additional 2026-08-27/28 sweet-potato and 月見 launches are same-class promotional/nationwide activation evidence for already saturated candidates, so benchmark/backlog were not churned
+
+### 2026-08-29 — sweet-potato search-demand evidence
+- added a new search-behavior evidence class for `さつまいもスイーツ` seasonality
+- TK-005 remained top-ranked; no production-rule change
 
 ### 2026-08-28 — product charter governance wiring
 - made `PRODUCT_CHARTER.md` mandatory in the improvement loop

@@ -52,7 +52,7 @@ flow_strategy:
     g2_requires_g1_pass: true
     g3_requires_g2_pass: true
     g4_requires_g3_pass: true
-    stop_if_pov_scale_anatomy_or_premise_fails: true
+    stop_if_maker_view_scale_anatomy_or_premise_fails: true
     reroll_only_structural_failure: true
   sequential_chain:
     g2_start_source: save_actual_last_usable_frame_from_G1
