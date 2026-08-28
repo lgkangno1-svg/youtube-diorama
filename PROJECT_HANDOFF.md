@@ -1,37 +1,34 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
-Last update: **2026-08-28 KST**
-Baseline inspected before this iteration: `main@a866cb6ab98e96376c90695a2a08227ff7c27dfc`
+Last update: **2026-08-29 KST**
+Baseline inspected before this iteration: `main@6ced3691d587c43ecfdd0033c552e2423e82eb17`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
 ## Start-of-run contract
 
 Before every material run:
-1. inspect latest `main` SHA
-2. inspect recent commits/PRs
-3. read this handoff
-4. read `PRODUCT_CHARTER.md` for durable product intent and improvement judgment
-5. cross-check `START_HERE.md`, `CURRENT_STANDARD.md`, docs/22/23/27, `production/NEXT_EPISODE.txt`, benchmark/backlog/ledger, and recent manifests
-6. newest explicit user direction and merged repository state override stale prompts
+1. inspect latest `main` SHA and recent commits/PRs
+2. read this handoff
+3. read `PRODUCT_CHARTER.md`
+4. cross-check `START_HERE.md`, `CURRENT_STANDARD.md`, docs/22/23/27, `production/NEXT_EPISODE.txt`, current manifest, benchmark/backlog/ledger
+5. newest explicit user direction and merged repository state override stale scheduled-prompt wording
 
 Document roles:
-- `PROJECT_HANDOFF.md` = where the project is now / what changed / failures / learnings / next priorities
-- `PRODUCT_CHARTER.md` = why/what we are building / durable identity / economics and improvement criteria
-- `CURRENT_STANDARD.md` = how production is currently executed
+- `PROJECT_HANDOFF.md` = current state / decisions / failures / learning / next priorities
+- `PRODUCT_CHARTER.md` = durable product purpose / identity / economics and improvement criteria
+- `CURRENT_STANDARD.md` = executable production/QC/Flow rules
 - manifests + ledgers = episode plan + observed evidence
 
-Sync policy for future material changes:
-- always update this handoff
-- update `CURRENT_STANDARD.md` when executable production/QC/Flow rules change
-- update `PRODUCT_CHARTER.md` only when durable product purpose, creative identity, economics philosophy, or improvement philosophy changes
-- true NO-OP: do not churn any of these documents
+Sync policy:
+- every material change updates this handoff
+- executable production/QC/Flow rule changes also update `CURRENT_STANDARD.md`
+- durable purpose/identity/economics philosophy changes also update `PRODUCT_CHARTER.md`
+- true NO-OP does not churn docs
 
 ## Durable product intent
 
-Tiny Cat Kitchen is a Japanese-target healing Shorts production system for realistic miniature cooking/making where **the human hands are naturally replaced by feline front paws**.
-
-Creative shorthand: Mini Forest-like realistic miniature making mechanics, without copying exact creative expression.
+Tiny Cat Kitchen is a Japanese-target healing Shorts system for realistic miniature cooking/making where **human hands are naturally replaced by feline front paws**.
 
 Non-negotiable identity:
 - cream/pale-ginger front paws only; normally 1–2
@@ -42,11 +39,11 @@ Non-negotiable identity:
 - handcrafted miniature workbench/diorama realism
 - process-first tactile making
 - calm long-take ASMR
-- high-oblique maker view default; top-down/side-oblique allowed
-- literal first-person cat-eye POV is not mandatory
+- default high-oblique maker view; top-down/side-oblique allowed
+- literal first-person cat-eye POV is **not mandatory**
 - no AI-cat human-job/character-performance regression
 
-Primary optimization target is not simply minimum credits/video. Prefer **usable motion/credit, engaged views/credit, and subscribers/100 credits**, while protecting creative quality and user control.
+Primary optimization is not minimum credits/video. Prefer **usable motion/credit, engaged views/credit, and subscribers/100 credits** while protecting quality and explicit user control.
 
 ## Current production state
 
@@ -56,11 +53,11 @@ Title: `猫の前足で作る、12mmの焼きいも。`
 Manifest: `episodes/TK-005.yaml`
 Runtime tier: `immersive_h40`
 Current non-Ultra first-pass ceiling: 4 Veo 3.1 Lite generations / 40 credits
-Expected final: ~32–35s when all four scenes are justified and usable
+Expected final: ~32–35s when all four beats remain independently useful
 
 Visual intent:
 - stable Mini Forest-style high-oblique maker view
-- front paws enter only where hands normally would
+- only front paws enter where hands normally would
 - 12mm yakiimo dramatically smaller than paw
 - same tray/warmer/serving niche through KF0→KF4
 - zero-cut calm long takes
@@ -71,7 +68,7 @@ Paid continuity chain:
 - G1: KF0 → KF1
 - G2: actual saved G1 PASS frame → KF2
 - G3: actual saved G2 PASS frame → KF3
-- G4 only when still justified: actual saved G3 PASS frame → KF4
+- G4 only if still justified: actual saved G3 PASS frame → KF4
 
 ## Flow / spend baseline
 
@@ -100,7 +97,7 @@ Never spend Flow credits, generate paid video, or publish to YouTube without exp
 
 ## Current learning
 
-One real preflight failure is recorded in `analytics/learning_ledger.csv`:
+One real preflight failure remains recorded in `analytics/learning_ledger.csv`:
 - full cat/body visible
 - hero scale too large
 - human-like tool-use risk
@@ -110,41 +107,39 @@ Correct interpretation:
 - body reveal + character-performance framing + weak miniature scale is the failure
 - maker-view + paws-only + tiny workpiece is desirable
 
-There is not yet a trustworthy public 24h/72h Tiny Cat Kitchen performance sample. Do not pretend theoretical assumptions are audience evidence.
+There is still no trustworthy public 24h/72h Tiny Cat Kitchen performance sample. Do not treat placeholders or theoretical assumptions as audience evidence.
 
-## Research policy
+## Research / candidate state
 
 Primary benchmark class:
 - realistic miniature cooking/making
 - handcrafted tiny-food process
 - relaxing tactile ASMR
 
-AI-cat channels are secondary evidence only for narrow paw/anatomy/reliability questions.
+AI-cat channels are secondary evidence only for narrow paw/anatomy/reliability questions. Never copy exact competitor title, plot, branded product/package, distinctive set, dish styling, or ending.
 
-Abstract mechanics only. Never copy exact competitor title, plot, branded product/package, distinctive set, or ending.
+Evidence saturation remains active. Same-class promotional/retail signals do not justify commits unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual production learning.
 
-Evidence saturation remains active: do not commit repeated same-class promotional/retail signals unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual Tiny Cat Kitchen learning.
+### Fresh evidence accepted — 2026-08-29
 
-Fresh recheck on 2026-08-28 late KST:
-- current Japanese Tsukimi/yakiimo/autumn signals still support the already-ranked seasonal ideas
-- no new evidence changed TK-005 ranking, production timing, Flow mechanic, or candidate ordering
-- therefore benchmark/backlog were intentionally not churned in this iteration
+A Maruyanagi official release dated 2026-08-19 cites Google Trends and reports that Japanese search volume for `さつまいもスイーツ` rises strongly from September through December and reaches roughly **9× summer levels in October**.
 
-## Normal user interface
+Why this was accepted despite saturation:
+- it is a **search-behavior evidence class**, not another same-class product-launch announcement
+- it strengthens the seasonal demand curve behind yakiimo/oimo concepts through early autumn
+- it supports keeping TK-005 timing rather than replacing it with a fresher but weaker promotional signal
 
-The intended routine remains extremely simple:
+Caution:
+- raw Google Trends query data was not independently reproduced in this runtime
+- treat the quoted 9× figure as directional evidence from the cited company release, not a universal population estimate
+- no branded product/campaign mechanics are copied
 
-```text
-User: 다음 영상 준비해줘
-```
+Candidate re-evaluation:
+- TK-005 / IDEA-009 remains the strongest current production choice
+- no backlog score/rank change was made because IDEA-009 was already priority-ranked with maximum benchmark/visual/reliability/credit-efficiency signals, and the new source improves confidence more than relative ordering
+- 月見, グミの日, 栗ご飯 candidates remain secondary; no evidence justified replacing the current episode
 
-ChatGPT/system should inspect current state and evidence, choose the next original episode, prepare/update manifest and prompt pack, update `production/NEXT_EPISODE.txt`, synchronize this handoff when material state changes, and leave the repo ready for:
-
-```powershell
-./tools/make_next_short.ps1
-```
-
-The user should not need to manually research topics, engineer prompts, remember Flow settings, or administer repository state. The user retains explicit control over paid generation, QC acceptance, and publishing.
+`research/benchmark_log.csv` now contains this new evidence row.
 
 ## Current roadmap / next priorities
 
@@ -178,60 +173,36 @@ The user should not need to manually research topics, engineer prompts, remember
 
 ## Change log
 
-### 2026-08-28 — product charter governance wiring
-Baseline: `main@a866cb6ab98e96376c90695a2a08227ff7c27dfc`.
+### 2026-08-29 — sweet-potato search-demand evidence
+Baseline: `main@6ced3691d587c43ecfdd0033c552e2423e82eb17`.
 
 Changed:
-- added `PRODUCT_CHARTER.md` to `START_HERE.md` mandatory start-of-run reading and Source of truth
-- added explicit document precedence and role separation to `START_HERE.md`
-- wired `PRODUCT_CHARTER.md` into every `docs/22_continuous_episode_learning_engine.md` loop
-- added documentation persistence rules: handoff always for material changes, CURRENT_STANDARD for executable rule changes, PRODUCT_CHARTER only for durable intent/philosophy changes
-- added document-governance section to `CURRENT_STANDARD.md` so cost-only or technically clever changes cannot bypass the durable product criteria
+- added one new `research/benchmark_log.csv` row for a search-behavior evidence class: a 2026-08-19 Maruyanagi release citing Google Trends for `さつまいもスイーツ`
+- recorded the reported September–December rise and roughly 9× October-vs-summer search level as directional evidence
 - synchronized this handoff in the same branch
 
 Why:
-- PR #53 created the durable charter, but `START_HERE.md` and docs/22 still omitted it from their Source-of-truth lists, allowing a fresh AI/developer to run the operational loop without reading the user's durable product goal
-- this change turns the charter from passive documentation into a mandatory decision gate without changing current production mechanics
+- unlike repeated retail-launch evidence, this adds a different behavioral/search-demand class and improves confidence in the current yakiimo seasonal timing
 
 Production impact:
-- no change to TK-005, NEXT_EPISODE, H40 runtime, 4-generation/40-credit first-pass ceiling, visual grammar, candidate ranking, or Progressive Spend
+- no change to TK-005, NEXT_EPISODE, H40 runtime, four-generation/40-credit first-pass ceiling, visual grammar, Flow assumptions, candidate ranking, or Progressive Spend
 - no Flow credits spent; no publishing
 
 Validation:
-- branch is based directly on latest inspected main `a866cb6ab98e96376c90695a2a08227ff7c27dfc`, serving as the equivalent valid base because local git clone was unavailable in the runtime
-- fresh Japanese seasonal/adjacent research did not cross the evidence-saturation threshold for any ranking/mechanics change
+- latest main/commits/PRs/handoff inspected first
+- START_HERE, docs/22, docs/23, NEXT_EPISODE, backlog, learning ledger and TK-005 manifest cross-checked
+- local git validation was attempted but network resolution prevented cloning; branch was created directly from inspected `main@6ced3691...`, and both material files are included in the same branch
+
+### 2026-08-28 — product charter governance wiring
+- made `PRODUCT_CHARTER.md` mandatory in the improvement loop
+- synchronized START_HERE, docs/22, CURRENT_STANDARD and handoff governance
 
 ### 2026-08-28 — durable product charter
-Baseline: `main@24ae7e6bdfe5ab9892a8895de9952dc657df706a`.
+- added `PRODUCT_CHARTER.md` as the stable product-purpose and decision-standard document
 
-Changed:
-- added `PRODUCT_CHARTER.md` as the stable product-purpose and decision-standard document requested by the user
-- codified the durable goal, visual identity, audience strategy, production economics, credit philosophy, continuity philosophy, anti-goals, success definition, development philosophy, and a 10-question merge decision test
-- explicitly separated durable intent (`PRODUCT_CHARTER.md`) from current state (`PROJECT_HANDOFF.md`) and executable operating rules (`CURRENT_STANDARD.md`)
-- synchronized this handoff in the same branch
-
-Why:
-- repeated incremental corrections showed that future AI/developers need a single durable document explaining the user's actual desired product, not only transient episode state or implementation rules
-- this reduces regressions from stale scheduled prompts, legacy POV enum names, isolated benchmarks, or cost-only optimization
-
-Production impact:
-- no change to TK-005 selection, manifest, NEXT_EPISODE, H40 runtime, current 40-credit first-pass ceiling, or Progressive Spend
-- future improvements should be rejected when they save credits or add automation but damage paws-only miniature-making identity, tactile healing quality, or user control
-
-### 2026-08-28 — Flow free-tier eligibility clarification
-- persisted official no-subscription 50 credits/day eligibility and non-stacking behavior
-- TK-005 remained H40 / current 40-credit non-Ultra first-pass ceiling
-
-### 2026-08-28 — operator maker-view QC correction
+### 2026-08-28 — Flow / operator / maker-view corrections
+- clarified Flow free-tier eligibility without changing H40 spend discipline
 - removed stale operator wording that treated non-first-person camera as failure
-
-### 2026-08-28 — backlog/learning semantic correction
-- removed mandatory true-first-person and cat-job-world semantics from actionable planning
-- preserved maker-view, paws-only, tiny-scale intent
-
-### 2026-08-28 — TK-005 G4 correction
-- reduced G4 to one active tray-slide action followed by passive steam
-
-### 2026-08-28 — canonical Mini Forest paw-only correction
-- established realistic miniature making + feline front paws replacing human hands as the channel grammar
-- demoted literal first-person POV from mandatory to optional
+- removed mandatory first-person/cat-job semantics from actionable backlog/learning
+- reduced TK-005 G4 to one active tray-slide action + passive steam
+- established Mini Forest-style miniature making + feline front paws replacing human hands as the canonical visual grammar
