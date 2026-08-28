@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**
-Baseline inspected before this iteration: `main@f2a1950358b799056631c13c2339a04986a110c5`
+Baseline inspected before this iteration: `main@f3c72c9bf8db8bee3a1a047f79008f5ed7db92a1`
 
 This is the durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -78,22 +78,11 @@ The current TK-005 manifest carries `semantic_override: mini_forest_style_observ
 
 A future cleanup may version the enum and migrate validator/backlog once there is a safe all-at-once schema migration with regression coverage. Until then, production prompts/docs must follow current semantics, not the legacy enum name.
 
-## Canonical docs updated in this iteration
-
-- `CURRENT_STANDARD.md`
-- `START_HERE.md`
-- `docs/22_continuous_episode_learning_engine.md`
-- `docs/23_minimum_credit_operator_architecture.md`
-- `docs/24_hero_cat_brand_identity.md`
-- `docs/25_pov_paws_microworld_grammar.md`
-- `tools/build_flow_pack.py`
-- `episodes/TK-005.yaml`
-
 ## Flow Pack behavior
 
 `tools/build_flow_pack.py` no longer injects a mandatory true first-person cat-eye prompt.
 
-It now injects a `MAKER_STYLE` anchor requiring:
+It injects a `MAKER_STYLE` anchor requiring:
 - realistic Mini Forest-style miniature-making composition
 - high-oblique/top-down/tabletop macro camera as appropriate
 - only one or two feline front paws where human hands normally would enter
@@ -113,10 +102,6 @@ Primary production benchmark class:
 - handcrafted tiny-food making
 - relaxing ASMR / tactile food process
 
-Current public reference rechecked 2026-08-28:
-- Mini Forest's YouTube description explicitly identifies the channel as a miniature cooking channel focused largely on traditional food.
-- Current third-party channel tracking shows roughly mid-500k subscribers and ~51M total views, supporting it as a substantial miniature-cooking reference.
-
 Use only abstract mechanics:
 - hand-centric making composition
 - miniature craftsmanship
@@ -131,12 +116,16 @@ AI-cat character channels are no longer a primary style benchmark. They may be u
 
 ## Current Flow / Veo production assumption
 
-Repository production baseline remains unchanged in this iteration:
+Official Google Flow Help rechecked **2026-08-28**:
+- Google AI Pro: 1,000 Flow credits/month
+- Veo 3.1 Lite 4s/6s/8s + Extend: non-Ultra 10 credits/generation
+- actual Flow UI active model/mode/output count/displayed cost remains generation-time truth
+
+Repository production baseline:
 - Veo 3.1 Lite
 - output count 1
 - progressive one-generation-at-a-time spend
-- current repository assumption: non-Ultra Lite 10 credits/generation
-- actual Flow UI active model/mode/output count/displayed cost is generation-time truth
+- current non-Ultra assumption 10 credits/generation
 
 No paid Flow generation occurred in this iteration.
 
@@ -212,8 +201,21 @@ Avoid:
 - human pinch
 - chopsticks/tongs/knife human grip
 - precise wrist twist
+- chaining a second active paw gesture after the primary action merely for visual flourish
 
 A human-hand action from a Mini Forest reference must be re-designed into a feline-safe equivalent rather than copied literally.
+
+### 2026-08-28 production-risk correction — G4 single-action integrity
+
+TK-005 G4 previously asked for two active paw motions in one 8-second generation: slide the serving tray, then withdraw both paws. That contradicted `preferred_action_count_per_generation: 1` and the repository's calm one-action scene grammar.
+
+Corrected G4:
+- **one active action only:** one paw slides the same tray into the already-visible serving niche and stops
+- **passive payoff only after stop:** warm steam continues
+- no paw-withdrawal gesture
+- KF4 now shows the post-slide resting state rather than requiring another gesture
+
+Rationale: fewer simultaneous/serial paw motions should reduce anatomy drift, unintended character-performance behavior, and avoidable reroll risk while better matching the Mini Forest process-first reference class.
 
 ## Current production state
 
@@ -230,7 +232,7 @@ Runtime: `immersive_h40`
 First-pass ceiling: 4 Lite generations / current 40 credits
 Final target: 32–35s, nominal 34s
 
-### TK-005 visual intent after this iteration
+### TK-005 visual intent
 
 Mini Forest-style tiny yakiimo making:
 - stable high-oblique macro maker camera
@@ -254,6 +256,8 @@ Paid destinations:
 - G3: actual saved G2 frame → KF3
 - G4: actual saved G3 frame → KF4
 
+G4 is now intentionally limited to **one tray-slide action + passive steam**, with no extra paw-withdrawal motion.
+
 ## Production learning available
 
 `analytics/learning_ledger.csv` has one real preflight failure:
@@ -272,6 +276,7 @@ Hard response:
 - hero object <=0.50 paw width
 - maker process is the subject
 - feline-safe action family
+- one active paw action per 8-second generation by default
 
 There is still no trustworthy public 24h/72h Tiny Cat Kitchen performance sample.
 
@@ -293,6 +298,7 @@ subscribers / 100 credits
 5. QC MAKER VIEW / paws-only / scale / anatomy / zero-cut / fixed props
 6. on PASS, native Save frame
 7. continue progressively
+8. when G4 is reached, verify the single slide + passive steam ending remains stable without a second paw gesture
 
 ### Phase B — enum/schema cleanup after production proof
 If real Flow confirms the new maker-view standard is correct and stable:
@@ -317,9 +323,10 @@ Compare compact_h30 vs immersive_h40 using actual final runtime and performance-
 3. actual G1 production/QC
 4. verify paws-only miniature-making identity in motion
 5. actual saved-frame continuity
-6. credits/rerolls/usable motion
-7. first public 24h/72h sample
-8. only then decide whether to perform full enum/backlog schema rename
+6. verify single-action scene reliability, especially G4
+7. credits/rerolls/usable motion
+8. first public 24h/72h sample
+9. only then decide whether to perform full enum/backlog schema rename
 
 ## Safety / invariants
 
@@ -336,6 +343,7 @@ Compare compact_h30 vs immersive_h40 using actual final runtime and performance-
 - no planned KF substituted for actual previous PASS frame
 - no next-scene spend after previous failure
 - no runtime padding
+- no second active paw gesture after the declared primary action unless a future evidence-backed manifest explicitly changes the action-count policy
 - no unrelated repository modifications
 
 ## Definition of Done
@@ -356,6 +364,22 @@ current research
 Success is measured by usable motion/credit, engaged views/credit, subscribers/credit, continuity, tactile realism and fewer structural rerolls — not commit count.
 
 ## Change log
+
+### 2026-08-28 — TK-005 G4 single-action correction
+Baseline: `main@f3c72c9bf8db8bee3a1a047f79008f5ed7db92a1`.
+
+Changed:
+- removed the second active paw-withdrawal gesture from TK-005 G4
+- G4 now contains one tray-slide action followed only by passive steam
+- aligned `fourth_beat_value`, KF4, G4 action/action_guard, and originality ending with the one-action rule
+- documented the production-risk rationale and next validation target in this handoff
+
+Verified:
+- NEXT_EPISODE remains TK-005
+- Mini Forest-style paw-only maker-view direction remains canonical
+- immersive_h40 / four Lite generations / current 40-credit first-pass ceiling unchanged
+- official Google Flow Help rechecked 2026-08-28: non-Ultra Veo 3.1 Lite remains 10 credits/generation; Google AI Pro remains 1,000 Flow credits/month
+- no paid Flow generation / no YouTube publishing
 
 ### 2026-08-28 — Mini Forest paw-only visual correction
 Baseline: `main@f2a1950358b799056631c13c2339a04986a110c5`
