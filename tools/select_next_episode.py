@@ -2,10 +2,14 @@
 """Rank Tiny Cat Kitchen episode ideas with production, seasonal, and novelty priors.
 
 This tool does not invent ideas. It ranks ideas already maintained in
-ideas/episode_backlog.yaml, skips expired trend windows and stale visual grammar,
+ideas/episode_backlog.yaml, skips expired trend windows and candidates that are
+incompatible with the current Mini Forest-style paws-only maker-view standard,
 applies a bounded seasonal lead-time boost only when the matching Japanese
 evidence ledger entry is still fresh, and blocks exact recent story-structure
 repeats using the last five episode fingerprints.
+
+Legacy enum names such as POV_PAWS_MICROWORLD_V1 are compatibility tokens only;
+they are not evidence that literal first-person cat-eye POV is required.
 """
 from __future__ import annotations
 
@@ -22,8 +26,18 @@ BACKLOG = ROOT / "ideas" / "episode_backlog.yaml"
 SEASONAL_EVIDENCE = ROOT / "research" / "seasonal_evidence.yaml"
 NOVELTY_SIGNATURES = ROOT / "ideas" / "novelty_signatures.yaml"
 EPISODES = ROOT / "episodes"
-CURRENT_VISUAL_GRAMMAR = "POV_PAWS_MICROWORLD_V1"
+LEGACY_VISUAL_GRAMMAR_TOKEN = "POV_PAWS_MICROWORLD_V1"
 DEFAULT_RECENT_EPISODE_WINDOW = 5
+SAFE_PAW_ACTIONS = {
+    "nudge",
+    "press",
+    "pat",
+    "roll",
+    "steady",
+    "slide",
+    "tap",
+    "push",
+}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -53,25 +67,54 @@ def trend_valid(value: Any, today: date) -> bool:
         return True
 
 
+def _max_paw_width_ratio(hero_scale: str) -> float | None:
+    """Extract the declared paw-width ratio from the scale clause.
+
+    Current backlog rows use forms such as `<=0.35 paw width` or
+    `0.18-0.32 paw width`. We intentionally read only the clause immediately
+    before `paw width`, so millimeter values earlier in the string are ignored.
+    """
+    match = re.search(r"([^;]*?)\s*paw\s+width", hero_scale, flags=re.IGNORECASE)
+    if not match:
+        return None
+    ratios = [float(value) for value in re.findall(r"0(?:\.\d+)?|1(?:\.0+)?", match.group(1))]
+    return max(ratios) if ratios else None
+
+
 def production_compatible(candidate: dict[str, Any]) -> tuple[bool, str]:
-    """Fail closed on backlog rows that predate the current paw-only POV grammar."""
+    """Fail closed on mechanics that violate the current maker-view standard.
+
+    The legacy visual_grammar token is retained only to avoid breaking existing
+    manifests/tooling. Candidate eligibility also requires explicit tiny-scale
+    evidence and a feline-safe action family, so a stale legacy enum cannot by
+    itself make an unsafe concept production eligible.
+    """
     grammar = str(candidate.get("visual_grammar") or "")
-    if grammar != CURRENT_VISUAL_GRAMMAR:
-        return False, f"visual-grammar:{grammar or 'missing'}"
+    if grammar != LEGACY_VISUAL_GRAMMAR_TOKEN:
+        return False, f"visual-grammar-token:{grammar or 'missing'}"
 
     hero_scale = str(candidate.get("hero_scale") or "").strip()
     if not hero_scale:
         return False, "hero-scale-missing"
+    max_ratio = _max_paw_width_ratio(hero_scale)
+    if max_ratio is None:
+        return False, "paw-width-ratio-missing"
+    if max_ratio > 0.50:
+        return False, f"hero-scale-too-large:{max_ratio:.2f}-paw-width"
 
     actions = candidate.get("paw_action_family") or []
     if not isinstance(actions, list) or not actions:
         return False, "paw-action-family-missing"
+    normalized_actions = [str(action).strip().lower() for action in actions]
+    unsafe_actions = sorted({action for action in normalized_actions if action not in SAFE_PAW_ACTIONS})
+    if unsafe_actions:
+        return False, "unsafe-paw-action:" + ",".join(unsafe_actions)
 
     runtime = str(candidate.get("runtime_prior") or "")
     if runtime not in {"compact_h30", "immersive_h40"}:
         return False, f"runtime-prior:{runtime or 'missing'}"
 
-    return True, "compatible"
+    return True, "maker-view-compatible"
 
 
 def base_score(candidate: dict[str, Any], weights: dict[str, int]) -> float:
@@ -304,7 +347,7 @@ def main() -> None:
     ranked.sort(key=lambda item: (item[0], item[1]), reverse=True)
 
     if not ranked:
-        print("No eligible ideas under the current POV paw-only + recent-novelty production grammar. Refresh the backlog before production.")
+        print("No eligible ideas under the current paws-only miniature maker-view + recent-novelty production standard. Refresh the backlog before production.")
         if rejected:
             print("Rejected candidates: " + ", ".join(f"{idea}({reason})" for idea, reason in rejected))
         return
@@ -314,7 +357,7 @@ def main() -> None:
         print(f"{idx}. {item.get('id')} — {value}/100 (base {base} + seasonal {boost})")
         print(f"   {item.get('working_title_ja', '')}")
         print(f"   premise: {item.get('premise', '')}")
-        print(f"   visual_grammar: {item.get('visual_grammar')}")
+        print(f"   visual_grammar_token: {item.get('visual_grammar')} (legacy compatibility only)")
         print(f"   hero_scale: {item.get('hero_scale')}")
         print(f"   paw_actions: {', '.join(item.get('paw_action_family', []))}")
         print(f"   runtime_prior: {item.get('runtime_prior')}")
