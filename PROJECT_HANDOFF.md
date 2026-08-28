@@ -1,9 +1,9 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected before this iteration: `main@3ceb5f41f2c1ad55fb7b64b32c741cecce75c8e6`
+Baseline inspected before this iteration: `main@269152e782cdfd506c82079616c219c74e1a3eba`
 
-Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
+Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change updates this file in the same branch/PR. True NO-OP research does not churn it.
 
 ## Start-of-run contract
 
@@ -12,26 +12,26 @@ Before every material run:
 2. read this handoff
 3. read `PRODUCT_CHARTER.md`
 4. cross-check `START_HERE.md`, `CURRENT_STANDARD.md`, docs/22/23/27, `production/NEXT_EPISODE.txt`, current manifest, benchmark/backlog/ledger
-5. newest explicit user direction and merged repository state override stale scheduled-prompt wording
+5. newest explicit user direction + latest merged repository state override stale scheduled-prompt wording
 
 Document roles:
 - `PROJECT_HANDOFF.md` = current state / decisions / failures / learning / next priorities
-- `PRODUCT_CHARTER.md` = durable product purpose / identity / economics and improvement criteria
-- `CURRENT_STANDARD.md` = executable production/QC/Flow rules
+- `PRODUCT_CHARTER.md` = durable product purpose / identity / economics / improvement criteria
+- `CURRENT_STANDARD.md` = executable production/QC/Flow/selection rules
 - manifests + ledgers = episode plan + observed evidence
 
 Sync policy:
-- every material change updates this handoff
-- executable production/QC/Flow rule changes also update `CURRENT_STANDARD.md`
-- durable purpose/identity/economics philosophy changes also update `PRODUCT_CHARTER.md`
-- true NO-OP does not churn docs
+- material change → handoff
+- production/QC/Flow/selection rule change → current standard
+- durable purpose/identity/economics philosophy change → product charter
+- true NO-OP → no documentation churn
 
 ## Durable product intent
 
 Tiny Cat Kitchen is a Japanese-target healing Shorts system for realistic miniature cooking/making where **human hands are naturally replaced by feline front paws**.
 
-Non-negotiable identity:
-- cream/pale-ginger front paws only; normally 1–2
+Non-negotiable:
+- cream/pale-ginger front paws only, normally 1–2
 - no face/head/body/full cat
 - no human hands/fingers/thumbs
 - no human-like feline tool grip
@@ -40,10 +40,10 @@ Non-negotiable identity:
 - process-first tactile making
 - calm long-take ASMR
 - default high-oblique maker view; top-down/side-oblique allowed
-- literal first-person cat-eye POV is **not mandatory**
+- literal cat-eye first-person POV is not mandatory
 - no AI-cat human-job/character-performance regression
 
-Primary optimization is not minimum credits/video. Prefer **usable motion/credit, engaged views/credit, and subscribers/100 credits** while protecting quality and explicit user control.
+Primary optimization is not minimum credits/video. Prefer **usable motion/credit, engaged views/credit, subscribers/100 credits** while protecting quality and explicit user control.
 
 ## Current production state
 
@@ -53,68 +53,75 @@ Title: `猫の前足で作る、12mmの焼きいも。`
 Manifest: `episodes/TK-005.yaml`
 Runtime tier: `immersive_h40`
 Current non-Ultra first-pass ceiling: 4 Veo 3.1 Lite generations / 40 credits
-Expected final: ~32–35s when all four beats remain independently useful
+Expected final: ~32–35s if all four beats remain independently useful
 
 Visual intent:
 - stable Mini Forest-style high-oblique maker view
-- only front paws enter where hands normally would
+- front paws only where human hands normally would enter
 - 12mm yakiimo dramatically smaller than paw
-- same tray/warmer/serving niche through KF0→KF4
+- same tray / warmer / serving niche through KF0→KF4
 - zero-cut calm long takes
-- one active paw-safe action per generation + optional passive material payoff
+- one active paw-safe action per generation + optional passive payoff
 - G4 = tray slide, then passive steam only
 
-Paid continuity chain:
+Paid continuity:
 - G1: KF0 → KF1
 - G2: actual saved G1 PASS frame → KF2
 - G3: actual saved G2 PASS frame → KF3
 - G4 only if still justified: actual saved G3 PASS frame → KF4
 
-## Critical operator validation correction — 2026-08-29
+## New material correction — candidate selector safety gate
 
-A material workflow regression was found in the exact normal user path.
+A regression risk was found in `tools/select_next_episode.py`.
 
-`./tools/make_next_short.ps1` called `tools/validate_current_standard.py` before building the production pack. That older validator still required the superseded field:
+Before this iteration, `production_compatible()` treated the legacy token `POV_PAWS_MICROWORLD_V1` plus the presence of any paw-action list/hero-scale text as enough for production compatibility. Because that enum remains only for tooling compatibility, a future stale candidate could keep the legacy token while reintroducing human-like manipulation or weak miniature scale and still pass the selection stage.
 
-`stop_if_pov_scale_anatomy_or_premise_fails: true`
+Corrected behavior:
+- legacy `POV_PAWS_MICROWORLD_V1` is explicitly named a compatibility token, not current creative semantics
+- candidate `hero_scale` must declare a paw-width ratio and its maximum must be <=0.50
+- candidate `paw_action_family` must be entirely inside the current feline-safe allowlist
+- current allowlist: `nudge / press / pat / roll / steady / slide / tap / push`
+- unsupported actions such as `pinch` now fail closed before ranking
+- output now labels the field `visual_grammar_token` and explains that it is legacy compatibility only
+- user-facing no-candidate message now says `paws-only miniature maker-view`, not `POV paw-only`
+- regression tests cover current pass, unsafe action rejection, >0.50 paw-width rejection, missing ratio rejection, and compact runtime pass
 
-PR #56 correctly changed TK-005 to:
+Why this matters:
+- candidate selection is upstream of manifest creation; preventing stale mechanics here is cheaper than discovering anatomy/scale problems after a Flow prompt or paid generation exists
+- this directly protects the user's `다음 영상 준비해줘` workflow from legacy enum regression
 
-`stop_if_maker_view_scale_anatomy_or_premise_fails: true`
+Production impact:
+- TK-005 selection/content/runtime/credit budget unchanged
+- no Flow credits spent
+- no publishing
 
-Therefore the current valid TK-005 could be rejected by the one-command workflow before any Flow work even though the manifest and current docs were semantically correct.
+## Manifest validation state
 
-Correction:
-- added `tools/validate_maker_view_manifest.py` as the canonical current-semantic adapter
-- `make_next_short.ps1` now runs that adapter first
-- the adapter requires current `visual_intent`, maker-view `semantic_override`, `first_person_required: false`, `high_oblique_maker_view`, and the new maker-view structural-failure spend gate
-- it rejects an active legacy POV stop gate
-- after semantic validation it delegates the mature runtime/credit/keyframe/sequential-frame/narration checks to the existing structural validator through compatibility translation only
-- added `tools/test_validate_maker_view_manifest.py` to protect this behavior
-- synchronized `CURRENT_STANDARD.md` in the same change
+The normal `./tools/make_next_short.ps1` path already uses `tools/validate_maker_view_manifest.py`.
 
-Important interpretation:
-- legacy `POV_PAWS_MICROWORLD_V1` / `camera_grammar.mode: first_person_cat_pov` can remain temporarily for compatibility
-- they must not make literal first-person a creative or validation requirement
-- current semantics are maker-view + paws-only + tiny scale + feline-safe actions
+Current semantic gate requires:
+- `visual_intent = mini_forest_style_paws_only_miniature_making`
+- `semantic_override = mini_forest_style_observational_maker_view`
+- `first_person_required = false`
+- preferred angles include `high_oblique_maker_view`
+- `stop_if_maker_view_scale_anatomy_or_premise_fails = true`
+- legacy `stop_if_pov...` gate is not active
 
-This correction does not alter TK-005 content, runtime, scene count, credit ceiling, Flow model, or NEXT_EPISODE.
+Legacy `first_person_cat_pov` / `POV_PAWS_MICROWORLD_V1` values can remain only as compatibility data and must never restore literal first-person as a creative requirement.
 
 ## Flow / spend baseline
 
-Generation-time Flow UI is final truth. Current documented assumption, rechecked against official Flow documentation on 2026-08-29:
+Official Google Flow help rechecked 2026-08-29:
 - Veo 3.1 Lite
-- 9:16
-- output count 1
 - non-Ultra: 10 credits/generation
 - Ultra: 5 credits/generation
-- no-subscription tier: 50 credits/day, not additive to paid-plan allocations
-- Flow image preflight may use the currently offered no-charge image option only when the actual UI shows no charge / 0 credits
+- non-subscriber: 50 free Flow credits/day; does not stack with paid Plus/Pro/Ultra allocation
+- actual active Flow UI model/mode/output count/displayed cost is generation-time final truth
 
 Progressive Spend:
 
 ```text
-free/no-charge planned keyframe chain PASS
+free/no-charge planned KF chain PASS
 → G1 only
 → QC
 → native Save frame
@@ -123,21 +130,21 @@ free/no-charge planned keyframe chain PASS
 → G4 only if runtime/manifest still justifies independent final value
 ```
 
-Never spend Flow credits, generate paid video, or publish to YouTube without explicit user action.
+Never spend Flow credits, generate paid video, or publish without explicit user action.
 
 ## Current learning
 
-One real preflight failure remains recorded in `analytics/learning_ledger.csv`:
+One real preflight failure remains recorded:
 - full cat/body visible
 - hero scale too large
 - human-like tool-use risk
 
 Correct interpretation:
-- observational/third-person maker view itself is not a failure
+- observer/maker-view itself is not a failure
 - body reveal + character-performance framing + weak miniature scale is the failure
 - maker-view + paws-only + tiny workpiece is desirable
 
-There is still no trustworthy public 24h/72h Tiny Cat Kitchen performance sample. Do not treat placeholders or theoretical assumptions as audience evidence.
+No trustworthy public 24h/72h Tiny Cat Kitchen performance sample yet. Do not learn from placeholders/theoretical zeros.
 
 ## Research / candidate state
 
@@ -146,44 +153,39 @@ Primary benchmark class:
 - handcrafted tiny-food process
 - relaxing tactile ASMR
 
-AI-cat channels are secondary evidence only for narrow paw/anatomy/reliability questions. Never copy exact competitor title, plot, branded product/package, distinctive set, dish styling, or ending.
+AI-cat channels are secondary only for narrow paw/anatomy/reliability evidence. Never copy exact title, plot, branded product/package, distinctive set/dish styling, or ending.
 
 Evidence saturation remains active. Same-class promotional/retail signals do not justify commits unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual production learning.
 
-Accepted current demand evidence:
-- 2026-08-19 Maruyanagi release citing Google Trends reports Japanese `さつまいもスイーツ` search interest rising September–December and roughly 9× summer levels in October; treat as directional because raw Trends data was not independently reproduced
-- existing survey, behavioral event attendance, and multiple nationwide activations already make sweet-potato/yakiimo research saturated
-
-Fresh 2026-08-29 research check:
-- additional yakiimo event/texture signals reinforce tactile autumn relevance but do not change TK-005 ranking, timing, or mechanics
-- current Mini Forest adjacent performance evidence remains consistent with the already-recorded cultural-timing miniature-food benchmark and does not justify duplicate benchmark rows
-- therefore benchmark/backlog were intentionally not churned
+Fresh 2026-08-29 checks:
+- official Flow credit/eligibility assumptions remain consistent with repository baseline
+- 2026-08-27 Yakiimo Fest Tokyo/Osaka announcement adds another tactile-texture promotional signal, but it does not change TK-005 ranking or justify copying crunchy menu mechanics; benchmark/backlog intentionally not churned
+- sweet-potato/yakiimo demand evidence is already saturated across search behavior + event/activation signals
 
 Candidate state:
-- TK-005 / IDEA-009 remains the strongest current production choice
-- IDEA-001 月見 remains a strong secondary seasonal candidate
-- IDEA-002 グミの日 and IDEA-006 栗ご飯 remain secondary candidates
-- no score/rank change justified without stronger creator-performance, behavioral demand, or Tiny Cat Kitchen production evidence
+- TK-005 / IDEA-009 remains current production choice
+- IDEA-001 月見 and IDEA-010 新米塩むすび remain strong future seasonal candidates
+- no ranking change justified without stronger creator-performance, behavioral demand, or Tiny Cat Kitchen production evidence
 
-## Legacy manifest caution
+## Legacy artifact caution
 
-Recent manifests TK-001–TK-004 contain pre-correction production concepts/statuses, including older character/story or human-like manipulation assumptions. They are historical/planning artifacts, not authority over the current standard.
+TK-001–TK-004 may contain pre-correction concepts/statuses. They are history, not authority over the current maker-view standard.
 
-The normal production path must fail closed unless the selected NEXT_EPISODE manifest satisfies the current maker-view adapter. Do not revive an old `ready-for-flow`, `planned`, or `priority_trend_window` manifest solely from its historical status without refreshing it to current maker-view semantics first.
+Do not revive an old manifest solely from `ready-for-flow`/`planned` status. Refresh it through current candidate + maker-view validation first.
 
 ## Current roadmap / next priorities
 
-1. Run the current maker-view manifest validation path for TK-005 before local pack preparation.
-2. Create and approve TK-005 KF0 master anchor in real Flow.
-3. Confirm it reads as genuine miniature making with paws replacing hands, not an AI-cat character scene.
-4. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
-5. Generate G1 only after the planned KF chain passes.
-6. QC maker-view, paws-only identity, tiny scale, anatomy, fixed props, zero-cut behavior.
-7. On PASS, save the actual usable final frame and continue progressively.
-8. Record actual credits, rerolls, usable motion, G-stage pass/fail and failure class.
-9. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers and comments.
-10. Use real accumulated evidence to adjust action grammar, runtime tiers, candidate scoring and spend strategy.
-11. Keep the user-facing workflow simpler over time, not more complicated.
+1. Keep `select_next_episode.py` fail-closed on tiny scale + feline-safe mechanics before future manifest creation.
+2. Run current maker-view manifest validation for TK-005.
+3. Create/approve TK-005 KF0 master anchor in real Flow.
+4. Confirm genuine miniature making with paws replacing hands, not an AI-cat character scene.
+5. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
+6. Generate G1 only after planned KF chain passes.
+7. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
+8. PASS → save actual usable final frame → continue progressively.
+9. Record actual credits, rerolls, usable motion, G-stage pass/fail, failure class.
+10. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
+11. Use accumulated real evidence to adjust actions, runtimes, scores, and spend strategy.
 
 ## Safety / invariants
 
@@ -193,7 +195,8 @@ The normal production path must fail closed unless the selected NEXT_EPISODE man
 - no full-cat/face/body default shots
 - no human hands/fingers/thumbs
 - no human-like paw grip
-- no weak miniature scale without documented exception
+- no candidate hero-scale ratio >0.50 paw width without documented exception
+- no unsafe candidate paw-action family through selector
 - no paid G1 before planned KF continuity passes
 - no next paid scene after prior structural failure
 - actual previous PASS frame is the continuity bridge
@@ -201,60 +204,41 @@ The normal production path must fail closed unless the selected NEXT_EPISODE man
 - no runtime padding for its own sake
 - no research churn after saturation
 - no unrelated repository modifications
-- every material repository change synchronizes this handoff
+- every material change synchronizes this handoff
 
 ## Change log
 
-### 2026-08-29 — canonical maker-view validator / one-command workflow fix
-Baseline: `main@3ceb5f41f2c1ad55fb7b64b32c741cecce75c8e6`.
+### 2026-08-29 — candidate selector maker-view safety gates
+Baseline: `main@269152e782cdfd506c82079616c219c74e1a3eba`.
 
 Changed:
-- added `tools/validate_maker_view_manifest.py`
-- added regression tests for maker-view semantics and structural-validator delegation
-- changed `tools/make_next_short.ps1` to use the current maker-view validation path
-- updated `CURRENT_STANDARD.md` with the canonical validation contract
-- synchronized this handoff in the same branch
+- strengthened `tools/select_next_episode.py` production compatibility gate
+- legacy visual grammar is now explicitly treated as compatibility-only
+- enforced explicit <=0.50 paw-width scale declaration
+- enforced feline-safe action allowlist
+- corrected stale POV-centric selector wording
+- added regression tests
+- synchronized `CURRENT_STANDARD.md` and this handoff
 
 Why:
-- the previous validator still required the obsolete `stop_if_pov...` gate, while TK-005 correctly uses `stop_if_maker_view...`; the user's normal command could therefore reject the current NEXT_EPISODE
+- legacy enum presence alone was too weak a safety signal and could allow future stale/human-like candidate mechanics back into the normal next-episode workflow
 
 Production impact:
-- restores compatibility between current accepted maker-view semantics and the one-command prep workflow
-- no change to TK-005 selection, H40 runtime, four-generation/40-credit first-pass ceiling, scene actions, Flow settings, audio, or NEXT_EPISODE
-- no Flow credits spent; no publishing
+- no change to TK-005, NEXT_EPISODE, H40, 40-credit first-pass ceiling, current manifest actions, keyframes, audio, or Flow settings
+- no credits spent; no publishing
 
-Research verification:
-- current yakiimo and Mini Forest-adjacent evidence does not change ranking/mechanics and was not added due saturation
-- official Flow assumptions were rechecked; generation-time UI remains final truth
+### 2026-08-29 — canonical maker-view manifest validator
+- added `validate_maker_view_manifest.py`
+- fixed one-command workflow so current TK-005 is not rejected by obsolete `stop_if_pov...` validation
+- added regression tests and synchronized current standard
 
-### 2026-08-29 — TK-005 maker-view spend-gate semantic correction
-Baseline: `main@de2545d4cfa1c6ea1f25e74ba76fedb35cedc4d6`.
-
-Changed:
-- renamed TK-005 manifest progressive-spend key from legacy `stop_if_pov_scale_anatomy_or_premise_fails` to `stop_if_maker_view_scale_anatomy_or_premise_fails`
-- synchronized this handoff in the same branch
-
-Why:
-- the old field name could reintroduce the superseded assumption that literal first-person POV is mandatory even though current accepted production grammar prefers Mini Forest-style observational maker view
-
-Production impact:
-- no change to TK-005 episode choice, H40 runtime, 4-generation/40-credit first-pass ceiling, action sequence, keyframes, audio, Flow settings, or NEXT_EPISODE
-- no Flow credits spent; no publishing
+### 2026-08-29 — TK-005 maker-view spend-gate correction
+- renamed active progressive spend gate from stale POV wording to maker-view semantics
 
 ### 2026-08-29 — sweet-potato search-demand evidence
-- added a new search-behavior evidence class for `さつまいもスイーツ` seasonality
-- TK-005 remained top-ranked; no production-rule change
+- added new search-behavior evidence class for `さつまいもスイーツ`; TK-005 remained top-ranked
 
-### 2026-08-28 — product charter governance wiring
-- made `PRODUCT_CHARTER.md` mandatory in the improvement loop
-- synchronized START_HERE, docs/22, CURRENT_STANDARD and handoff governance
-
-### 2026-08-28 — durable product charter
-- added `PRODUCT_CHARTER.md` as the stable product-purpose and decision-standard document
-
-### 2026-08-28 — Flow / operator / maker-view corrections
-- clarified Flow free-tier eligibility without changing H40 spend discipline
-- removed stale operator wording that treated non-first-person camera as failure
-- removed mandatory first-person/cat-job semantics from actionable backlog/learning
-- reduced TK-005 G4 to one active tray-slide action + passive steam
-- established Mini Forest-style miniature making + feline front paws replacing human hands as the canonical visual grammar
+### 2026-08-28 — product governance
+- added `PRODUCT_CHARTER.md`
+- wired charter into improvement loop
+- established Mini Forest-style miniature making + feline front paws replacing human hands as canonical visual identity
