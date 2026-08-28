@@ -1,142 +1,41 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**
-Baseline inspected before this iteration: `main@9bf8fac51dc27be1c9519e562d38b78a6872d2c6`
+Baseline inspected before this iteration: `main@24ae7e6bdfe5ab9892a8895de9952dc657df706a`
 
-Durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
+Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
-## Execution policy
+## Start-of-run contract
 
-- Before every run inspect latest main SHA, recent commits/PRs, then this handoff.
-- Latest merged repository state overrides stale chat or scheduled-prompt wording.
-- Modify only `lgkangno1-svg/youtube-diorama`.
-- Never spend Flow credits, generate paid video, or publish to YouTube without explicit user action.
-- Normal user interface remains: `다음 영상 준비해줘` → prepare repo state → user runs `./tools/make_next_short.ps1`.
+Before every material run:
+1. inspect latest `main` SHA
+2. inspect recent commits/PRs
+3. read this handoff
+4. cross-check `PRODUCT_CHARTER.md`, `START_HERE.md`, `CURRENT_STANDARD.md`, docs/22/23/27, `production/NEXT_EPISODE.txt`, benchmark/backlog/ledger, and recent manifests
+5. newest explicit user direction and merged repository state override stale prompts
 
-## Canonical visual identity
+`PRODUCT_CHARTER.md` is now the durable statement of **why/what we are building and how future improvements are judged**. This handoff remains the source for **where the project is now, what changed, failures/learnings, and next priorities**.
 
-User-directed correction from 2026-08-28:
+## Durable product intent
 
-> **Mini Forest-style realistic miniature cooking/making, except the human hands are replaced by the cat's front paws. The cat's full body does not need to appear.**
+Tiny Cat Kitchen is a Japanese-target healing Shorts production system for realistic miniature cooking/making where **the human hands are naturally replaced by feline front paws**.
 
-Tiny Cat Kitchen is not an AI-cat character-performance channel.
+Creative shorthand: Mini Forest-like realistic miniature making mechanics, without copying exact creative expression.
 
-Required:
-- realistic handcrafted miniature food/object making
-- one or two cream/pale-ginger feline front paws only
+Non-negotiable identity:
+- cream/pale-ginger front paws only; normally 1–2
 - no face/head/body/full cat
 - no human hands/fingers/thumbs
+- no human-like feline tool grip
 - absurdly tiny hero object, normally 5–20mm and <=0.50 paw width
-- process-first calm tactile ASMR
-- stable workbench/diorama continuity
-- one primary paw-safe tactile action per 8-second generation, plus at most one passive material payoff
+- handcrafted miniature workbench/diorama realism
+- process-first tactile making
+- calm long-take ASMR
+- high-oblique maker view default; top-down/side-oblique allowed
+- literal first-person cat-eye POV is not mandatory
+- no AI-cat human-job/character-performance regression
 
-Default camera priority:
-1. high-oblique maker view
-2. top-down macro
-3. tabletop/side-oblique macro
-4. first-person-like angle only when it materially improves the making shot
-
-Literal true first-person cat-eye POV is **not mandatory**.
-
-Legacy labels such as `POV_PAWS_MICROWORLD_V1` and `camera_grammar.mode: first_person_cat_pov` remain temporarily for tooling compatibility. Their semantic meaning is `mini_forest_style_paws_only_miniature_making`; do not use the legacy name to restore mandatory POV.
-
-## Research / benchmark policy
-
-Primary production benchmark class:
-- Mini Forest-style miniature cooking
-- handcrafted tiny-food making
-- relaxing ASMR / tactile process
-
-Abstract only:
-- hand-centric maker composition
-- tiny-scale contrast
-- material transformation
-- calm pacing
-- seasonal timing
-- tactile payoff
-
-Do not copy exact titles, plots, branded products/packages, sets, dish styling, or endings.
-
-AI-cat character channels are secondary only for narrow paw appearance/reliability evidence, not for character storytelling or job-role structure.
-
-Evidence saturation remains active: do not add same-class retail/promotional signals unless they change candidate ranking, timing, evidence class, production mechanics, Flow assumptions, or actual Tiny Cat Kitchen learning.
-
-## Flow / Veo production baseline
-
-Official Google Flow Help rechecked 2026-08-28:
-- Veo 3.1 Lite supports 4s/6s/8s and Extend
-- non-Ultra cost: 10 credits/generation
-- Ultra cost: 5 credits/generation
-- Google AI Pro: 1,000 Flow credits/month
-- **non-subscriber account: 50 Flow credits/day**, usable for Veo 3.1 Lite/Fast/Quality
-- non-subscriber daily credits do **not** stack on Plus/Pro/Ultra; upgrading replaces any remaining free credits with the paid-plan allocation
-- actual active Flow UI model/mode/output count/displayed cost at generation time is final truth
-
-Repository baseline:
-- Veo 3.1 Lite
-- output count 1
-- progressive one-generation-at-a-time spend
-- no paid spend before free planned-keyframe continuity passes
-- do not loosen reroll/spend discipline merely because a non-subscriber free tier exists
-
-## Planned keyframe continuity
-
-```text
-verify image model + displayed cost
-→ KF0 maker-view master anchor
-→ QC paws / scale / camera / props / lighting
-→ derive KF1 from approved KF0
-→ derive KF2 from approved KF1
-→ continue through required KFs
-→ all planned KFs PASS
-→ G1 only
-```
-
-KF1+ must not become unrelated fresh text-to-image lottery tickets.
-
-Planned KF = destination. Actual previous PASS video frame = next-scene continuity bridge.
-
-## Progressive Spend
-
-```text
-planned KF chain PASS
-→ G1 only
-→ QC
-→ native Save frame
-→ G2 only after G1 PASS
-→ G3 only after G2 PASS
-→ G4 only if immersive_h40 + G3 PASS + independent world-resolution value
-```
-
-## Runtime policy
-
-H30/H40 are first-pass credit tiers, not promised final seconds.
-
-- `compact_h30`: 3 × 8s raw = 24s, current ceiling 30 credits, normal final ~24–27s
-- `immersive_h40`: 4 × 8s raw = 32s, current ceiling 40 credits, normal final ~32–35s
-
-No invented still/loop padding.
-
-## Paw-action grammar
-
-Preferred:
-- nudge
-- press
-- pat
-- roll
-- steady
-- slide
-- tap
-- push
-
-Avoid:
-- human pinch
-- chopsticks/tongs/knife human grip
-- precise wrist twist
-- multiple serial active paw gestures in one generation without explicit evidence-backed justification
-
-A Mini Forest human-hand action must be translated into a feline-safe equivalent, not copied literally.
+Primary optimization target is not simply minimum credits/video. Prefer **usable motion/credit, engaged views/credit, and subscribers/100 credits**, while protecting creative quality and user control.
 
 ## Current production state
 
@@ -144,172 +43,156 @@ A Mini Forest human-hand action must be translated into a feline-safe equivalent
 
 Title: `猫の前足で作る、12mmの焼きいも。`
 Manifest: `episodes/TK-005.yaml`
-Runtime: `immersive_h40`
-First-pass ceiling: 4 Lite generations / current 40 credits
-Final target: 32–35s
+Runtime tier: `immersive_h40`
+Current non-Ultra first-pass ceiling: 4 Veo 3.1 Lite generations / 40 credits
+Expected final: ~32–35s when all four scenes are justified and usable
 
-TK-005 visual intent:
-- stable high-oblique Mini Forest-style maker view
-- only front paws enter where human hands normally would
-- no face/head/body/full cat
+Visual intent:
+- stable Mini Forest-style high-oblique maker view
+- front paws enter only where hands normally would
 - 12mm yakiimo dramatically smaller than paw
 - same tray/warmer/serving niche through KF0→KF4
 - zero-cut calm long takes
-- G4 = one tray-slide action, then passive steam only
+- one active paw-safe action per generation + optional passive material payoff
+- G4 = tray slide, then passive steam only
 
-Paid chain:
+Paid continuity chain:
 - G1: KF0 → KF1
-- G2: actual saved G1 frame → KF2
-- G3: actual saved G2 frame → KF3
-- G4: actual saved G3 frame → KF4
+- G2: actual saved G1 PASS frame → KF2
+- G3: actual saved G2 PASS frame → KF3
+- G4 only when still justified: actual saved G3 PASS frame → KF4
 
-## Production learning available
+## Flow / spend baseline
 
-`analytics/learning_ledger.csv` has one real preflight failure:
+Generation-time Flow UI is final truth. Current documented assumption:
+- Veo 3.1 Lite
+- 9:16
+- 8 seconds
+- output count 1
+- non-Ultra: 10 credits/generation
+- Ultra: 5 credits/generation
+- non-subscriber tier: 50 credits/day, not additive to paid-plan allocations
+
+Progressive Spend:
+
+```text
+free/no-charge planned keyframe chain PASS
+→ G1 only
+→ QC
+→ native Save frame
+→ G2 only after G1 PASS
+→ G3 only after G2 PASS
+→ G4 only if runtime/manifest still justifies independent final value
+```
+
+Never spend Flow credits, generate paid video, or publish to YouTube without explicit user action.
+
+## Current learning
+
+One real preflight failure is recorded in `analytics/learning_ledger.csv`:
 - full cat/body visible
-- scale too large
+- hero scale too large
 - human-like tool-use risk
 
 Correct interpretation:
-- third-person/observer view itself is not a failure
-- character-performance framing + body reveal + weak miniature scale is the failure
-- Mini Forest-style observer/maker view with paws + workbench is desirable
+- observational/third-person maker view itself is not a failure
+- body reveal + character-performance framing + weak miniature scale is the failure
+- maker-view + paws-only + tiny workpiece is desirable
 
-There is still no trustworthy public 24h/72h Tiny Cat Kitchen performance sample.
+There is not yet a trustworthy public 24h/72h Tiny Cat Kitchen performance sample. Do not pretend theoretical assumptions are audience evidence.
 
-Long-term KPIs:
-- usable motion / credit
-- engaged views / credit
-- subscribers / 100 credits
+## Research policy
 
-## Backlog correction — 2026-08-28
+Primary benchmark class:
+- realistic miniature cooking/making
+- handcrafted tiny-food process
+- relaxing tactile ASMR
 
-Material issue found after the canonical Mini Forest correction: `ideas/episode_backlog.yaml` still contained multiple literal `True first-person cat POV` premises and `cat_job_world` mechanics. That could reintroduce the old AI-cat character direction when future episodes are selected even though START_HERE/CURRENT_STANDARD/learning ledger were already corrected.
+AI-cat channels are secondary evidence only for narrow paw/anatomy/reliability questions.
 
-Corrected:
-- all current candidate premises now describe high-oblique/top-down/tabletop Mini Forest-style maker views instead of mandatory cat-eye POV
-- explicit no-face/no-body/no-character-performance semantics added where relevant
-- `cat_job_world` mechanics replaced with diorama-workspace/environmental worldbuilding mechanics
-- bakery/kissaten/oden settings remain allowed only as handcrafted miniature environments, not as a cat acting out a human job
-- IDEA-008 ending no longer asks for an extra paw-withdrawal gesture after the tray slide
-- legacy `POV_PAWS_MICROWORLD_V1` field remains only for tooling compatibility
-- candidate scores/ranking and NEXT_EPISODE were intentionally not changed because this is a semantic correction, not new demand evidence
+Abstract mechanics only. Never copy exact competitor title, plot, branded product/package, distinctive set, or ending.
 
-## Operator wording correction — 2026-08-28
+Evidence saturation remains active: do not commit repeated same-class promotional/retail signals unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual Tiny Cat Kitchen learning.
 
-Material operator-facing inconsistency found in `tools/make_next_short.ps1`: the Progressive Flow Spend instructions still told the user to stop when `POV` was wrong. Under the accepted Mini Forest maker-view standard, a non-first-person observational camera is valid and often preferred, so that wording could falsely reject a correct output.
+## Normal user interface
 
-Corrected:
-- G1 operator QC now says to stop for structural failure of maker-view composition, paws-only identity, tiny scale, or anatomy
-- explicitly states that a non-first-person camera is not itself a failure
-- no production manifest, NEXT_EPISODE, candidate ranking, runtime, credit budget, or Flow spend behavior changed
+The intended routine remains extremely simple:
 
-## Flow free-tier eligibility clarification — 2026-08-28
+```text
+User: 다음 영상 준비해줘
+```
 
-Official Google Flow pricing/help now clearly documents a no-subscription tier with 50 Flow credits per day. This is a platform-cost/feature change worth persisting because it affects minimum-credit planning, but it does **not** change TK-005's generation count or Progressive Spend rules.
+ChatGPT/system should inspect current state and evidence, choose the next original episode, prepare/update manifest and prompt pack, update `production/NEXT_EPISODE.txt`, synchronize this handoff when material state changes, and leave the repo ready for:
 
-Current interpretation:
-- non-subscriber: 50 Flow credits/day; usable for Veo 3.1 Lite/Fast/Quality
-- refresh begins from the first generation; unused free credits do not roll over
-- Plus/Pro/Ultra subscribers do not also receive the free 50/day
-- upgrading forfeits remaining free daily credits and replaces them with the paid plan allocation
-- Lite remains 10 credits/generation for non-Ultra, 5 for Ultra
-- therefore TK-005 H40 remains a 40-credit non-Ultra first-pass ceiling
-- do not treat free-tier availability as permission to batch outputs or relax G1→G2→G3→G4 PASS gates
+```powershell
+./tools/make_next_short.ps1
+```
+
+The user should not need to manually research topics, engineer prompts, remember Flow settings, or administer repository state. The user retains explicit control over paid generation, QC acceptance, and publishing.
 
 ## Current roadmap / next priorities
 
-1. Create and approve TK-005 KF0 maker-view master anchor in real Flow.
-2. Confirm it looks like real miniature cooking with paws replacing hands, not an AI-cat character scene.
-3. Derive KF1→KF4 with stable camera/paws/scale/props.
-4. Generate G1 only after all planned KFs PASS.
-5. QC maker-view / paws-only / scale / anatomy / zero-cut / fixed props.
-6. On PASS, native Save frame and continue progressively.
-7. Record actual credits/rerolls/usable motion and failure type.
-8. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
-9. Consider full enum/schema rename only after real Flow production proves the maker-view standard; do not migrate piecemeal.
+1. Create and approve TK-005 KF0 master anchor in real Flow.
+2. Confirm it reads as genuine miniature making with paws replacing hands, not an AI-cat character scene.
+3. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
+4. Generate G1 only after the planned KF chain passes.
+5. QC maker-view, paws-only identity, tiny scale, anatomy, fixed props, zero-cut behavior.
+6. On PASS, save the actual usable final frame and continue progressively.
+7. Record actual credits, rerolls, usable motion, G-stage pass/fail and failure class.
+8. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers and comments.
+9. Use real accumulated evidence to adjust action grammar, runtime tiers, candidate scoring and spend strategy.
+10. Keep the user-facing workflow simpler over time, not more complicated.
 
 ## Safety / invariants
 
-- no automatic Flow credit spend
 - no automatic paid generation
-- no automatic YouTube publish
+- no automatic YouTube publishing
 - no exact competitor copying
 - no full-cat/face/body default shots
-- no AI-cat character-performance regression
 - no human hands/fingers/thumbs
-- no human-like feline tool grip
-- no hero scale >0.50 paw width without documented exception
-- no paid G1 before planned KF chain PASS
-- no planned KF substituted for actual previous PASS frame
-- no next-scene spend after previous failure
-- no runtime padding
+- no human-like paw grip
+- no weak miniature scale without documented exception
+- no paid G1 before planned KF continuity passes
+- no next paid scene after prior structural failure
+- actual previous PASS frame is the continuity bridge
+- no runtime padding for its own sake
+- no research churn after saturation
 - no unrelated repository modifications
+- every material repository change synchronizes this handoff
 
 ## Change log
 
-### 2026-08-28 — Flow free-tier eligibility clarification
-Baseline: `main@9bf8fac51dc27be1c9519e562d38b78a6872d2c6`.
+### 2026-08-28 — durable product charter
+Baseline: `main@24ae7e6bdfe5ab9892a8895de9952dc657df706a`.
 
 Changed:
-- updated `docs/27_research_evidence_saturation_gate.md` with current official Flow plan/credit eligibility, including the 50 credits/day no-subscription tier
-- updated `docs/23_minimum_credit_operator_architecture.md` so minimum-credit planning does not incorrectly assume those free daily credits stack with paid Plus/Pro/Ultra plans
+- added `PRODUCT_CHARTER.md` as the stable product-purpose and decision-standard document requested by the user
+- codified the durable goal, visual identity, audience strategy, production economics, credit philosophy, continuity philosophy, anti-goals, success definition, development philosophy, and a 10-question merge decision test
+- explicitly separated durable intent (`PRODUCT_CHARTER.md`) from current state (`PROJECT_HANDOFF.md`) and executable operating rules (`CURRENT_STANDARD.md`)
 - synchronized this handoff in the same branch
 
 Why:
-- official Flow documentation now explicitly exposes the free daily tier and its non-stacking/forfeiture behavior; this is `platform_cost_or_feature` evidence that materially affects credit-planning interpretation
+- repeated incremental corrections showed that future AI/developers need a single durable document explaining the user's actual desired product, not only transient episode state or implementation rules
+- this reduces regressions from stale scheduled prompts, legacy POV enum names, isolated benchmarks, or cost-only optimization
 
 Production impact:
-- no change to TK-005, NEXT_EPISODE, H40 runtime, 4-generation first-pass ceiling, candidate ranking, or visual grammar
-- non-Ultra Lite remains 10 credits/generation; TK-005 remains 40 credits first pass
-- free-tier availability does not weaken Progressive Spend or QC gates
+- no change to TK-005 selection, manifest, NEXT_EPISODE, H40 runtime, current 40-credit first-pass ceiling, or Progressive Spend
+- future improvements should be rejected when they save credits or add automation but damage paws-only miniature-making identity, tactile healing quality, or user control
 
-Research verification:
-- fresh August 28 sweet-potato/autumn retail signals remain same-class evidence for already-saturated IDEA-009 and were intentionally not added to benchmark/backlog
-- current adjacent miniature-cooking evidence still supports hands-only/macro/ASMR production mechanics already represented by the Mini Forest standard; no ranking or production-mechanic change justified
+### 2026-08-28 — Flow free-tier eligibility clarification
+- persisted official no-subscription 50 credits/day eligibility and non-stacking behavior
+- TK-005 remained H40 / current 40-credit non-Ultra first-pass ceiling
 
-### 2026-08-28 — operator maker-view QC wording correction
-Baseline: `main@73da6e77a5da8553b9f48b32327acd79f18eaca6`.
+### 2026-08-28 — operator maker-view QC correction
+- removed stale operator wording that treated non-first-person camera as failure
 
-Changed:
-- corrected `tools/make_next_short.ps1` G1 QC wording from legacy POV-centric failure language to maker-view / paws-only / tiny-scale / anatomy structural QC
-- explicitly clarified that non-first-person camera is not itself a failure
-- synchronized this handoff in the same branch
+### 2026-08-28 — backlog/learning semantic correction
+- removed mandatory true-first-person and cat-job-world semantics from actionable planning
+- preserved maker-view, paws-only, tiny-scale intent
 
-Why:
-- the normal one-command operator interface could otherwise tell the user to reject a valid Mini Forest-style observational maker-view output
-
-Research verification:
-- official Flow help still shows non-Ultra Veo 3.1 Lite at 10 credits per generation for 4s/6s/8s and Extend
-- official Flow model help still supports First + Last frames for Veo 3.1 Lite at 4s/6s/8s
-- fresh August 28 Japanese sweet-potato/moon-viewing retail signals are same-class evidence and do not change the already-saturated TK-005 ranking or timing, so benchmark/backlog were not churned
-
-### 2026-08-28 — backlog maker-view semantic correction
-Baseline: `main@3f2aab3aa365cb67422a3bdbee09104a49230e4c`.
-
-Changed:
-- migrated all active backlog premises away from mandatory `True first-person cat POV`
-- replaced `cat_job_world` mechanics with miniature-environment/workbench worldbuilding
-- made settings such as kissaten/bakery/oden stall environmental only, not cat-roleplay premises
-- removed IDEA-008's extra paw-withdrawal ending gesture
-- kept candidate scores, ranking, TK-005 selection, runtime and credit budget unchanged
-- synchronized this handoff in the same branch
-
-Why:
-- the backlog is part of the operating system and could otherwise regenerate the superseded AI-cat/mandatory-POV direction during future episode selection
-
-Research verification:
-- official Flow cost assumption still holds: non-Ultra Veo 3.1 Lite 4/6/8s + Extend = 10 credits/generation
-- fresh late-August Japanese sweet-potato/seasonal evidence remains same-class and does not materially change the current ranking, so benchmark log was not churned
-
-### 2026-08-28 — learning-ledger maker-view correction
-- corrected stale actionable learning that said to force true first-person camera
-- preserved historical observation/hypothesis while updating future action to Mini Forest-style maker-view semantics
-
-### 2026-08-28 — TK-005 G4 single-action correction
-- removed a second active paw-withdrawal gesture
-- G4 now contains one tray slide followed only by passive steam
+### 2026-08-28 — TK-005 G4 correction
+- reduced G4 to one active tray-slide action followed by passive steam
 
 ### 2026-08-28 — canonical Mini Forest paw-only correction
-- established Mini Forest-style miniature making + human hands replaced by feline front paws as channel grammar
+- established realistic miniature making + feline front paws replacing human hands as the channel grammar
 - demoted literal first-person POV from mandatory to optional
