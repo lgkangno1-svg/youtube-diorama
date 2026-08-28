@@ -7,8 +7,25 @@
 1. 최신 `main` SHA와 최근 PR/commit 확인
 2. `AGENTS.md` 확인
 3. `PROJECT_HANDOFF.md` 확인
-4. `CURRENT_STANDARD.md`, docs/22, docs/23, NEXT_EPISODE, current manifest, research/backlog/ledger 교차 확인
-5. 최신 merged state가 오래된 대화/자동화 문구보다 우선
+4. `PRODUCT_CHARTER.md` 확인 — 왜/무엇을 만드는지와 개선 판단 기준
+5. `CURRENT_STANDARD.md`, docs/22, docs/23, NEXT_EPISODE, current manifest, research/backlog/ledger 교차 확인
+6. 최신 explicit user direction + merged state가 오래된 대화/자동화 문구보다 우선
+
+## 문서 역할 / precedence
+
+- `PROJECT_HANDOFF.md` = 현재 상태, 최근 결정/실패/학습, 다음 우선순위
+- `PRODUCT_CHARTER.md` = 장기 제품 목적, 창작 정체성, 경제성/개선 판단 기준
+- `CURRENT_STANDARD.md` = 지금 실제로 실행하는 제작/QC/Flow 규칙
+- episode manifest / ledger = 해당 영상 계획과 관측 증거
+
+충돌 시:
+1. 더 최신의 명시적 사용자 지시
+2. 최신 merged repository state + `PROJECT_HANDOFF.md`
+3. `PRODUCT_CHARTER.md`의 durable intent
+4. `CURRENT_STANDARD.md` 및 specialized docs의 현재 구현 규칙
+5. 오래된 manifest/prompt/research/legacy enum
+
+`PRODUCT_CHARTER.md`는 모든 material 개선에서 읽어야 하지만, transient production 상태를 기록하는 용도로 사용하지 않는다. 장기 목적/판단 기준이 실제로 바뀔 때만 수정한다.
 
 ## 사용자가 평소 말할 것
 
@@ -21,6 +38,7 @@
 ## Source of truth
 
 - `PROJECT_HANDOFF.md`
+- `PRODUCT_CHARTER.md`
 - `CURRENT_STANDARD.md`
 - `docs/22_continuous_episode_learning_engine.md`
 - `docs/23_minimum_credit_operator_architecture.md`
@@ -88,6 +106,8 @@ AI-cat 캐릭터 채널은 1차 제작 방향이 아니다. 필요한 경우 paw
 - manifest 생성/수정
 - `production/NEXT_EPISODE.txt` 갱신
 - material 변경 시 `PROJECT_HANDOFF.md` 같은 branch/PR에서 갱신
+- durable goal/decision philosophy까지 바뀐 경우에만 `PRODUCT_CHARTER.md` 갱신
+- executable production/QC rule이 바뀐 경우 `CURRENT_STANDARD.md`도 같은 change에서 동기화
 
 ## 사용자가 로컬에서 하는 일
 
