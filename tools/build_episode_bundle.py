@@ -100,11 +100,14 @@ def main() -> int:
 
     # Current-standard validation must live inside the bundle builder itself. This
     # closes bypasses through direct `make_short.ps1` or direct Python invocation;
-    # callers do not get to opt out of POV/scale/runtime/credit/frame/action gates.
+    # callers do not get to opt out of maker-view/scale/runtime/credit/frame/action
+    # gates. Use the canonical maker-view adapter rather than the legacy structural
+    # validator directly, because the adapter enforces current semantics and then
+    # delegates the mature structural/runtime checks safely.
     try:
-        run([python, str(tools / "validate_current_standard.py"), episode_id])
+        run([python, str(tools / "validate_maker_view_manifest.py"), episode_id])
     except subprocess.CalledProcessError:
-        print("\nBUILD STOPPED: current-production-standard validation failed. No production pack was created.", file=sys.stderr)
+        print("\nBUILD STOPPED: current maker-view production-standard validation failed. No production pack was created.", file=sys.stderr)
         return 1
 
     try:
