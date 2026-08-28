@@ -69,6 +69,19 @@ displayed cost = current UI truth
 
 기존 영상 edit/Omni Flash 상태면 새 generation 화면으로 돌아간다.
 
+## Current Flow credit eligibility note — 2026-08-28
+
+Google Flow 공식 도움말 기준:
+- 비구독 계정은 50 Flow credits/day를 무료로 받으며 Veo 3.1 Lite/Fast/Quality generation에 사용할 수 있다.
+- 무료 daily credits는 유료 Plus/Pro/Ultra 계정에 추가로 stack되지 않는다.
+- 유료 플랜으로 업그레이드하면 남은 무료 credits는 소멸하고 해당 플랜의 월간 credits로 대체된다.
+- Veo 3.1 Lite는 non-Ultra 10 credits/generation, Ultra 5 credits/generation이다.
+
+운영 원칙:
+- TK-005 같은 `immersive_h40`은 non-Ultra 기준 first pass 40 credits가 그대로다.
+- 비구독 무료 tier를 쓰는 경우에도 "공짜니까 여러 장 뽑기"를 하지 않는다. 같은 Progressive Spend / previous-scene PASS gate를 유지한다.
+- 계정의 실제 subscription state와 Flow UI displayed cost가 언제나 최종 truth다.
+
 ## Progressive Spend
 
 ```text

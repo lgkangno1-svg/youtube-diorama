@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**
-Baseline inspected before this iteration: `main@73da6e77a5da8553b9f48b32327acd79f18eaca6`
+Baseline inspected before this iteration: `main@9bf8fac51dc27be1c9519e562d38b78a6872d2c6`
 
 Durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -67,6 +67,10 @@ Evidence saturation remains active: do not add same-class retail/promotional sig
 Official Google Flow Help rechecked 2026-08-28:
 - Veo 3.1 Lite supports 4s/6s/8s and Extend
 - non-Ultra cost: 10 credits/generation
+- Ultra cost: 5 credits/generation
+- Google AI Pro: 1,000 Flow credits/month
+- **non-subscriber account: 50 Flow credits/day**, usable for Veo 3.1 Lite/Fast/Quality
+- non-subscriber daily credits do **not** stack on Plus/Pro/Ultra; upgrading replaces any remaining free credits with the paid-plan allocation
 - actual active Flow UI model/mode/output count/displayed cost at generation time is final truth
 
 Repository baseline:
@@ -74,6 +78,7 @@ Repository baseline:
 - output count 1
 - progressive one-generation-at-a-time spend
 - no paid spend before free planned-keyframe continuity passes
+- do not loosen reroll/spend discipline merely because a non-subscriber free tier exists
 
 ## Planned keyframe continuity
 
@@ -199,6 +204,19 @@ Corrected:
 - explicitly states that a non-first-person camera is not itself a failure
 - no production manifest, NEXT_EPISODE, candidate ranking, runtime, credit budget, or Flow spend behavior changed
 
+## Flow free-tier eligibility clarification — 2026-08-28
+
+Official Google Flow pricing/help now clearly documents a no-subscription tier with 50 Flow credits per day. This is a platform-cost/feature change worth persisting because it affects minimum-credit planning, but it does **not** change TK-005's generation count or Progressive Spend rules.
+
+Current interpretation:
+- non-subscriber: 50 Flow credits/day; usable for Veo 3.1 Lite/Fast/Quality
+- refresh begins from the first generation; unused free credits do not roll over
+- Plus/Pro/Ultra subscribers do not also receive the free 50/day
+- upgrading forfeits remaining free daily credits and replaces them with the paid plan allocation
+- Lite remains 10 credits/generation for non-Ultra, 5 for Ultra
+- therefore TK-005 H40 remains a 40-credit non-Ultra first-pass ceiling
+- do not treat free-tier availability as permission to batch outputs or relax G1→G2→G3→G4 PASS gates
+
 ## Current roadmap / next priorities
 
 1. Create and approve TK-005 KF0 maker-view master anchor in real Flow.
@@ -229,6 +247,26 @@ Corrected:
 - no unrelated repository modifications
 
 ## Change log
+
+### 2026-08-28 — Flow free-tier eligibility clarification
+Baseline: `main@9bf8fac51dc27be1c9519e562d38b78a6872d2c6`.
+
+Changed:
+- updated `docs/27_research_evidence_saturation_gate.md` with current official Flow plan/credit eligibility, including the 50 credits/day no-subscription tier
+- updated `docs/23_minimum_credit_operator_architecture.md` so minimum-credit planning does not incorrectly assume those free daily credits stack with paid Plus/Pro/Ultra plans
+- synchronized this handoff in the same branch
+
+Why:
+- official Flow documentation now explicitly exposes the free daily tier and its non-stacking/forfeiture behavior; this is `platform_cost_or_feature` evidence that materially affects credit-planning interpretation
+
+Production impact:
+- no change to TK-005, NEXT_EPISODE, H40 runtime, 4-generation first-pass ceiling, candidate ranking, or visual grammar
+- non-Ultra Lite remains 10 credits/generation; TK-005 remains 40 credits first pass
+- free-tier availability does not weaken Progressive Spend or QC gates
+
+Research verification:
+- fresh August 28 sweet-potato/autumn retail signals remain same-class evidence for already-saturated IDEA-009 and were intentionally not added to benchmark/backlog
+- current adjacent miniature-cooking evidence still supports hands-only/macro/ASMR production mechanics already represented by the Mini Forest standard; no ranking or production-mechanic change justified
 
 ### 2026-08-28 — operator maker-view QC wording correction
 Baseline: `main@73da6e77a5da8553b9f48b32327acd79f18eaca6`.

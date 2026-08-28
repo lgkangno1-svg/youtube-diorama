@@ -117,11 +117,22 @@ saturated 상태에서는 같은 성격의 PR/출시 뉴스가 한 건 더 생�
 
 ## Flow assumption recheck
 
-2026-08-26 Google Flow 공식 도움말 재확인 기준:
-- Google AI Pro: 1,000 credits / billing cycle
-- Veo 3.1 Lite 4s/6s/8s: non-Ultra 10 credits per generation
-- Veo 3.1 Lite Extend: non-Ultra 10 credits per generation
-- Veo 3.1 Lite First + Last frames: 4s/6s/8s 지원
-- 1080p upscale: Plus/Pro/Ultra 0 credits
+2026-08-28 Google Flow 공식 도움말 재확인 기준:
+- Google AI Plus: 200 Flow credits / month
+- Google AI Pro: 1,000 Flow credits / billing cycle
+- Google AI Ultra $100: 10,000 Flow credits / month
+- Google AI Ultra $200: 25,000 Flow credits / month
+- **비구독 계정: 50 Flow credits / day**, 첫 generation이 daily refresh를 트리거하며 미사용분은 이월되지 않음
+- 비구독 무료 credits는 Veo 3.1 Lite / Fast / Quality generation에만 사용 가능
+- 무료 50/day는 유료 구독에 추가로 stack되지 않음; Plus/Pro/Ultra로 업그레이드하면 남은 무료 credits는 즉시 소멸하고 월간 할당량으로 대체됨
+- Veo 3.1 Lite 4s/6s/8s: non-Ultra 10 credits per generation, Ultra 5
+- Veo 3.1 Lite Extend: non-Ultra 10 credits per generation, Ultra 5
+- 1080p upscale: Plus/Pro/Ultra 0 credits; 비구독 계정은 제공되지 않음
+
+운영 해석:
+- 현재 TK-005 H40의 non-Ultra first-pass ceiling은 여전히 4 × Lite = 40 credits다.
+- 비구독 무료 tier를 쓰는 별도 계정/운영 방식은 50 daily credits 안에서 H40 first pass를 이론상 감당할 수 있지만, **구독자에게 50/day가 추가 지급된다고 가정하지 않는다.**
+- 실제 active account의 구독 상태, 모델, generation type, output count, displayed cost가 항상 최종 source of truth다.
+- 무료 tier 존재 자체만으로 reroll 기준을 느슨하게 만들지 않는다. Progressive Spend와 previous-scene PASS gate는 그대로 유지한다.
 
 공식 문서나 실제 Flow UI가 바뀌면 이 문서보다 최신 공식값/UI를 우선하고 production assumptions를 재검토한다.
