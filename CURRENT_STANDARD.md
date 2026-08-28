@@ -1,6 +1,6 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-28 Mini Forest-style Paw-Only Miniature Making + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility**
+최신 적용 기준: **2026-08-29 Mini Forest-style Paw-Only Miniature Making + Maker-View Fail-Closed Validation + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility**
 
 ## 0. 문서 거버넌스
 
@@ -23,6 +23,22 @@ latest explicit user direction
 - true NO-OP → 문서 churn 금지
 
 비용 절감만으로는 개선이 아니다. `PRODUCT_CHARTER.md`의 판단 기준에 따라 paws-only miniature-making identity, tactile/healing quality, audience outcome per credit, user control을 함께 보호한다.
+
+### Canonical manifest validation path
+
+정상 사용자 경로 `./tools/make_next_short.ps1`은 이제 `tools/validate_maker_view_manifest.py`를 먼저 실행한다.
+
+이 adapter가 현재 의미를 fail-closed로 확인한다.
+- `brand_identity.visual_intent = mini_forest_style_paws_only_miniature_making`
+- `camera_grammar.semantic_override = mini_forest_style_observational_maker_view`
+- `camera_grammar.first_person_required = false`
+- `preferred_angles`에 `high_oblique_maker_view` 포함
+- `stop_if_maker_view_scale_anatomy_or_premise_fails = true`
+- legacy `stop_if_pov_scale_anatomy_or_premise_fails`를 현재 manifest의 active gate로 사용하지 않음
+
+그 다음 기존 `validate_current_standard.py`의 성숙한 구조 검증을 재사용한다: Flow model/output count, H30/H40 scene/credit ceiling, keyframe completeness, actual saved-frame chaining, progressive PASS gates, cut/action limits, runtime feasibility, narration 등.
+
+중요: legacy `camera_grammar.mode: first_person_cat_pov`와 `POV_PAWS_MICROWORLD_V1`은 호환 필드일 뿐이다. **검증기가 이 이름을 근거로 literal first-person을 다시 강제해서는 안 된다.**
 
 ## 1. 핵심 경험
 
@@ -113,8 +129,8 @@ output count = 1
 displayed cost = current UI truth
 ```
 
-2026-08-28 확인 기준:
-- Google AI Pro는 Flow를 포함
+2026-08-29 재확인 기준:
+- Flow의 no-charge image option은 실제 UI에서 0 credits/no charge인지 매번 확인
 - repository의 현행 production assumption은 non-Ultra Veo 3.1 Lite 10 credits/generation
 - 실제 Flow UI 모델/모드/output count/표시 비용이 생성 시점 최종 source of truth
 
@@ -209,10 +225,11 @@ AI-cat 채널은 고양이 캐릭터 스토리 구조의 1차 기준이 아니�
 - zero-cut long take
 
 최우선 실제 단계:
-1. TK-005 KF0→KF4 maker-view continuity PASS
-2. G1만 생성
-3. maker-view / paws-only / scale / anatomy / fixed props / zero-cut QC
-4. PASS → Save frame → G2
+1. `validate_maker_view_manifest.py` 기준 TK-005 current semantics PASS
+2. TK-005 KF0→KF4 maker-view continuity PASS
+3. G1만 생성
+4. maker-view / paws-only / scale / anatomy / fixed props / zero-cut QC
+5. PASS → Save frame → G2
 
 ## 11. Learning
 
@@ -247,7 +264,7 @@ ChatGPT가 `PROJECT_HANDOFF.md` + `PRODUCT_CHARTER.md` + 현재 production/resea
 ./tools/make_next_short.ps1
 ```
 
-자동화는 Flow 크레딧을 쓰거나 유료 영상을 생성하거나 YouTube에 게시하지 않는다.
+이 명령은 current maker-view manifest validator를 먼저 통과한 뒤 production pack을 만든다. 자동화는 Flow 크레딧을 쓰거나 유료 영상을 생성하거나 YouTube에 게시하지 않는다.
 
 ## 최종 목표
 
