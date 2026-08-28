@@ -1,4 +1,4 @@
-updated_at: 2026-08-27
+updated_at: 2026-08-28
 scoring:
   benchmark_evidence: 10
   japan_relevance: 10
@@ -15,7 +15,9 @@ seasonal_ranking:
   default_tail_days: 7
 rules:
   - Scores are 0..20; weights above sum to 100.
-  - Every production-eligible candidate must declare visual_grammar=POV_PAWS_MICROWORLD_V1. Stale third-person/full-cat candidates are not eligible for ranking.
+  - Every production-eligible candidate currently retains visual_grammar=POV_PAWS_MICROWORLD_V1 only for tooling compatibility; semantically it means Mini Forest-style paws-only miniature making, not mandatory true first-person cat-eye POV.
+  - Candidate premises should default to high-oblique maker view, top-down macro, or tabletop/side-oblique macro; literal first-person framing is optional only when it improves the making shot.
+  - Full-cat character-performance, cat-job roleplay, face/head/body reveal, and human-like feline tool use are not production-eligible mechanics.
   - Hero food/object should normally read as 5..20mm and <=0.50 of one visible paw width unless a documented episode-specific reason says otherwise.
   - Prefer paw-safe action families such as nudge, press, pat, roll, steady, slide and tap; penalize precise pinch, twist, chopsticks, tongs or knife grip.
   - Seasonal timing is a bounded additive boost, not a replacement for Flow reliability, visual payoff, or audience evidence.
@@ -34,7 +36,7 @@ rules:
 candidates:
   - id: IDEA-001
     working_title_ja: "猫の前足で作る、8mmの月見だんご。"
-    premise: "True first-person cat POV. Only two front paws frame an 8mm moon dumpling on a tiny lacquer tray; one paw gently rolls it once, the other steadies the tray, and the finished round dumpling is slid beneath a paper-moon diorama window."
+    premise: "High-oblique miniature-making view. Only two feline front paws enter from the frame edges where human hands normally would; an 8mm moon dumpling sits on a tiny lacquer tray, one paw gently rolls it once while the other steadies the tray, and the finished dumpling is slid beneath a paper-moon diorama window. No cat face, head, body, or character-performance framing."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "8mm; <=0.35 paw width"
     paw_action_family: [roll, steady, slide]
@@ -63,7 +65,7 @@ candidates:
     production_note: "2026 中秋の名月 is September 25. Current Japanese 月見 commercialization is already active from late August. Use only the abstract moon/roundness/harvest-season mechanic; do not copy branded menus. Paw-only dumpling rolling is safer than yolk handling and customer arrival."
   - id: IDEA-009
     working_title_ja: "猫の前足で作る、12mmの焼きいも。"
-    premise: "True first-person cat POV. A 12mm purple sweet potato sits between two front paws on the same tiny roasting tray; one paw nudges the tray toward heat, the skin slowly cracks from residual roasting, golden flesh appears, and the same tray is slid into a miniature serving niche."
+    premise: "Stable high-oblique Mini Forest-style maker view. A 12mm purple sweet potato sits on the same tiny roasting tray between partial feline front paws; one paw nudges the tray toward heat, the skin slowly cracks from residual roasting, golden flesh appears, and the same tray is slid into a miniature serving niche. No cat face, head, body, or roleplay."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "10-15mm; 0.18-0.32 paw width"
     paw_action_family: [nudge, steady, slide]
@@ -92,7 +94,7 @@ candidates:
     production_note: "Current strongest production candidate and already realized as TK-005. Japanese late-August behavioral/product signals support early sweet-potato interest. Preserve one whole sweet potato, same roasting tray, slow crack, steam and golden-center reveal; no human-like pinch and no branded product design."
   - id: IDEA-002
     working_title_ja: "3mmのグミ、猫の前足でどこまで伸びる？"
-    premise: "True first-person cat POV. A translucent 3mm gummy lies beside one familiar grain-sized scale cue; one paw softly presses and drags its edge a few millimeters against a fixed tiny plate until it elongates, then releases before snapping."
+    premise: "Top-down or high-oblique macro maker view. A translucent 3mm gummy lies beside one familiar grain-sized scale cue; one feline front paw softly presses and drags its edge a few millimeters against a fixed tiny plate until it elongates, then releases before snapping. Only the working paw enters frame."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "3mm; <=0.20 paw width"
     paw_action_family: [press, slide]
@@ -121,12 +123,12 @@ candidates:
     production_note: "Timely for グミの日, but deformable-object drift remains a risk. Avoid ruler text dependence and precise two-paw pinching; use a fixed plate edge plus one press/slide action with locked endpoints."
   - id: IDEA-003
     working_title_ja: "雨の日だけ開く、猫の8mmおでん屋。"
-    premise: "True first-person cat POV. Two front paws work over a rainy miniature stall; one 8mm daikon piece is nudged into a tiny broth cup, a second paw steadies the cup, and the finished steaming serving is slid beneath the stall awning while rain continues."
+    premise: "High-oblique miniature workbench view inside a rainy 8mm-scale oden-stall diorama. Only feline front paws enter like hands in a miniature-cooking video; one paw nudges an 8mm daikon piece into a tiny broth cup, the other steadies the cup, and the steaming serving is slid beneath the awning while rain continues. The stall is environmental worldbuilding, not a cat-job character scene."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "8-12mm; <=0.40 paw width"
     paw_action_family: [nudge, steady, slide]
     runtime_prior: immersive_h40
-    benchmark_mechanic: [cat_job_world, daily_worldbuilding, weather_ambience, steam_payoff]
+    benchmark_mechanic: [diorama_workspace_worldbuilding, weather_ambience, steam_payoff, tiny_serving_resolution]
     benchmark_evidence: 17
     japan_relevance: 15
     healing_fit: 20
@@ -141,7 +143,7 @@ candidates:
     status: candidate
   - id: IDEA-004
     working_title_ja: "一滴の卵で、8mmだし巻きは作れる？"
-    premise: "True first-person cat POV. One tiny egg drop sets in an 8mm pan; instead of gripping a spatula, one paw presses a broad flat paddle from above to slide and fold the egg once, then the pan is nudged forward for the tiny reveal."
+    premise: "High-oblique macro miniature-making view. One tiny egg drop sets in an 8mm pan; instead of gripping a spatula, one feline paw presses a broad flat paddle from above to slide and fold the egg once, then the pan is nudged forward for the tiny reveal. Only paws and workbench are visible."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "8mm; <=0.30 paw width"
     paw_action_family: [press, nudge]
@@ -161,12 +163,12 @@ candidates:
     status: candidate
   - id: IDEA-005
     working_title_ja: "猫の前足で作る、12mmメロンソーダ。"
-    premise: "True first-person cat POV at a closed miniature kissaten. A 12mm glass sits between the paws; one paw nudges a tiny prefilled dropper cup so green soda flows in, a miniature ice bead clicks, and the completed glass is slid toward the quiet window."
+    premise: "Tabletop/high-oblique miniature kissaten-making view. A 12mm glass sits on a tiny counter while only feline front paws enter from the edges; one paw nudges a tiny prefilled pour cup so green soda flows in, a miniature ice bead clicks, and the completed glass is slid toward the quiet window. The kissaten is a handcrafted setting, not a cat character job."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "10-15mm; <=0.40 paw width"
     paw_action_family: [nudge, steady, slide]
     runtime_prior: compact_h30
-    benchmark_mechanic: [cat_job_world, colorful_transformation, private_after_hours_moment]
+    benchmark_mechanic: [diorama_workspace_worldbuilding, colorful_transformation, quiet_after_hours_atmosphere]
     benchmark_evidence: 17
     japan_relevance: 13
     healing_fit: 20
@@ -181,12 +183,12 @@ candidates:
     status: candidate
   - id: IDEA-006
     working_title_ja: "猫の前足で作る、10mm栗ごはん。"
-    premise: "True first-person cat POV. A 10mm clay pot sits far smaller than either paw; one paw steadies the lid while residual steam lifts it slightly, then a single tiny chestnut-rice serving is slid into a miniature bowl without any utensil grip."
+    premise: "High-oblique miniature-making view. A 10mm clay pot sits far smaller than either visible paw; one paw steadies the lid while residual steam lifts it slightly, then a single tiny chestnut-rice serving is slid into a miniature bowl without any utensil grip. No cat body or character-performance framing."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "10-15mm; <=0.40 paw width"
     paw_action_family: [steady, slide]
     runtime_prior: compact_h30
-    benchmark_mechanic: [familiar_japanese_food, steam_payoff, seasonal_worldbuilding]
+    benchmark_mechanic: [familiar_japanese_food, steam_payoff, seasonal_diorama_worldbuilding]
     benchmark_evidence: 17
     japan_relevance: 18
     healing_fit: 20
@@ -210,7 +212,7 @@ candidates:
     production_note: "2026-08-26 multiple Japanese businesses announced September-1 chestnut launches, including an exact seasonal 栗ご飯 menu. Treat this as stronger timing/recognition evidence, not proof of demand magnitude. Keep the Flow-safe tiny clay-pot steam reveal and never copy a retailer's dish styling, garnish, package or branded presentation."
   - id: IDEA-007
     working_title_ja: "最後の3mmゼリーだけ、月の色。"
-    premise: "True first-person cat POV. Four 3mm translucent jellies sit on a thumbnail-sized display tile; one paw taps each tile edge in sequence and the final jelly catches warm moon-yellow light, becoming the tiny display piece."
+    premise: "Top-down macro miniature-making view. Four 3mm translucent jellies sit on a thumbnail-sized display tile; one feline paw taps each tile edge in sequence and the final jelly catches warm moon-yellow light, becoming the tiny display piece. Keep the paw partial and the material transformation as the subject."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "3-5mm each; <=0.18 paw width"
     paw_action_family: [tap, slide]
@@ -230,12 +232,12 @@ candidates:
     status: candidate
   - id: IDEA-008
     working_title_ja: "閉店後、猫の前足が焼く12mmパン。"
-    premise: "True first-person cat POV after the tiny bakery closes. One 12mm dough ball is pressed once by a paw, the proofed bun later shows a soft crust crack from residual heat, and the same miniature tray is slid into tomorrow's serving niche while both paws withdraw."
+    premise: "High-oblique miniature bakery-workbench view after closing. One 12mm dough ball is pressed once by a feline paw, the proofed bun later shows a soft crust crack from residual heat, and the same miniature tray is slid into tomorrow's serving niche; the paw stops after the slide while the baked surface remains the payoff. No cat baker character or body reveal."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "10-15mm; <=0.35 paw width"
     paw_action_family: [press, slide]
     runtime_prior: immersive_h40
-    benchmark_mechanic: [cat_job_world, private_life_glimpse, sensory_baking_payoff, quiet_world_resolution]
+    benchmark_mechanic: [diorama_workspace_worldbuilding, quiet_after_hours_atmosphere, sensory_baking_payoff, quiet_world_resolution]
     benchmark_evidence: 17
     japan_relevance: 12
     healing_fit: 20
@@ -250,7 +252,7 @@ candidates:
     status: candidate
   - id: IDEA-010
     working_title_ja: "猫の前足で作る、8mmの新米塩むすび。"
-    premise: "True first-person cat POV. A tiny triangular rice mold holding glossy just-cooked new rice sits between two front paws; one paw presses the broad flat mold lid once, the mold is slid away to reveal one 8mm salt onigiri with visible steam and individual rice grains, then the tiny wooden board is nudged into a quiet dawn breakfast shelf."
+    premise: "High-oblique maker view over a tiny breakfast workbench. A triangular rice mold holding glossy just-cooked new rice sits between partial feline front paws; one paw presses the broad flat mold lid once, the mold is slid away to reveal one 8mm salt onigiri with visible steam and individual rice grains, then the tiny wooden board is nudged into a quiet dawn serving shelf. No face, body, or literal cat-eye POV is required."
     visual_grammar: POV_PAWS_MICROWORLD_V1
     hero_scale: "8mm; <=0.30 paw width"
     paw_action_family: [press, slide, nudge]
