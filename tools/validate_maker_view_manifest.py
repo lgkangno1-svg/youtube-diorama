@@ -21,6 +21,7 @@ CURRENT_VISUAL_INTENT = "mini_forest_style_paws_only_miniature_making"
 CURRENT_CAMERA_SEMANTIC = "mini_forest_style_observational_maker_view"
 CURRENT_STOP_GATE = "stop_if_maker_view_scale_anatomy_or_premise_fails"
 LEGACY_STOP_GATE = "stop_if_pov_scale_anatomy_or_premise_fails"
+SAFE_PAW_ACTIONS = {"nudge", "press", "pat", "roll", "steady", "slide", "tap", "push"}
 
 
 def validate(data: dict[str, Any]) -> list[str]:
@@ -29,6 +30,7 @@ def validate(data: dict[str, Any]) -> list[str]:
     camera = data.get("camera_grammar") or {}
     flow = data.get("flow_strategy") or {}
     progressive_gate = flow.get("progressive_spend_gate") or {}
+    scenes = data.get("scenes") or []
 
     if brand.get("visual_intent") != CURRENT_VISUAL_INTENT:
         errors.append(
@@ -58,6 +60,27 @@ def validate(data: dict[str, Any]) -> list[str]:
         errors.append(
             f"legacy progressive-spend gate {LEGACY_STOP_GATE} must not be active on a current maker-view manifest"
         )
+
+    # Candidate-level action safety is not enough: a manifest can be edited after
+    # selection. Fail closed again at the final paid-generation boundary so every
+    # scene explicitly declares exactly one feline-safe active action family.
+    if not isinstance(scenes, list) or not scenes:
+        errors.append("manifest must contain production scenes with explicit paw_action_family")
+    else:
+        for i, scene in enumerate(scenes, 1):
+            scene_id = str((scene or {}).get("id") or f"G{i}")
+            action_family = (scene or {}).get("paw_action_family")
+            if not isinstance(action_family, list) or len(action_family) != 1:
+                errors.append(
+                    f"{scene_id}.paw_action_family must contain exactly one active action"
+                )
+                continue
+            action = str(action_family[0] or "").strip().lower()
+            if action not in SAFE_PAW_ACTIONS:
+                errors.append(
+                    f"{scene_id}.paw_action_family action '{action}' is not feline-safe; "
+                    f"allowed: {', '.join(sorted(SAFE_PAW_ACTIONS))}"
+                )
 
     if errors:
         return errors

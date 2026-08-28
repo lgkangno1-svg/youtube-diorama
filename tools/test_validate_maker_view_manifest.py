@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import copy
 import unittest
 
 from test_validate_current_standard import base_manifest
@@ -21,6 +20,8 @@ def current_manifest() -> dict:
     gate = data["flow_strategy"]["progressive_spend_gate"]
     gate.pop("stop_if_pov_scale_anatomy_or_premise_fails")
     gate["stop_if_maker_view_scale_anatomy_or_premise_fails"] = True
+    for scene in data["scenes"]:
+        scene["paw_action_family"] = ["slide"]
     return data
 
 
@@ -53,6 +54,24 @@ class MakerViewManifestValidationTests(unittest.TestCase):
         data["camera_grammar"]["first_person_required"] = True
         errors = validate(data)
         self.assertTrue(any("first_person_required must be false" in e for e in errors))
+
+    def test_missing_scene_action_family_fails_closed(self) -> None:
+        data = current_manifest()
+        data["scenes"][0].pop("paw_action_family")
+        errors = validate(data)
+        self.assertTrue(any("G1.paw_action_family must contain exactly one" in e for e in errors))
+
+    def test_multiple_active_actions_fail_closed(self) -> None:
+        data = current_manifest()
+        data["scenes"][0]["paw_action_family"] = ["press", "slide"]
+        errors = validate(data)
+        self.assertTrue(any("G1.paw_action_family must contain exactly one" in e for e in errors))
+
+    def test_human_dexterity_action_fails_closed(self) -> None:
+        data = current_manifest()
+        data["scenes"][0]["paw_action_family"] = ["pinch"]
+        errors = validate(data)
+        self.assertTrue(any("not feline-safe" in e for e in errors))
 
     def test_structural_checks_are_still_delegated(self) -> None:
         data = current_manifest()

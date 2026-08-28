@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected before this iteration: `main@ffba0bde59ac67d282ce459265b77b03288cd3b5`
+Baseline inspected before this iteration: `main@80500b2dc295ad9dec6f2723bebdbcd7b5e4e0f5`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research must not churn it.
 
@@ -62,6 +62,7 @@ Visual intent:
 - same tray / warmer / serving niche through KF0→KF4
 - zero-cut calm long takes
 - one active paw-safe action per generation + optional passive payoff
+- explicit scene action families: G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide`
 - G4 = tray slide, then passive steam only
 
 Paid continuity:
@@ -70,59 +71,56 @@ Paid continuity:
 - G3: actual saved G2 PASS frame → KF3
 - G4 only if still justified: actual saved G3 PASS frame → KF4
 
-## Material improvement in this iteration — zero-credit 1080p finishing
+## Material improvement in this iteration — scene-level paw-action fail-closed gate
 
-Official Google Flow Help rechecked 2026-08-29 documents:
-- Veo 3.1 Lite: non-Ultra 10 credits/generation, Ultra 5 credits/generation
-- non-subscriber: 50 free Flow credits/day
-- **1080p upscale: 0 credits for Google AI Plus / Pro / Ultra subscribers**
-- 1080p upscale is unavailable to non-subscribers
-- actual Flow UI displayed cost remains final truth at execution time
+A production safety gap was found after candidate-level action gating was added:
+- `tools/select_next_episode.py` already rejects unsafe candidate mechanics such as pinch/twist/grip.
+- But an episode manifest can be edited after candidate selection.
+- Before this change, `validate_maker_view_manifest.py` did not independently require a machine-readable safe action family for every paid G scene.
+- Therefore a later manifest edit could reintroduce a human-dexterity action or multiple active paw actions and still reach the paid-generation boundary.
 
-This is materially useful because it improves delivered visual quality without increasing paid generation count.
+Corrected:
+- `validate_maker_view_manifest.py` now requires every scene to declare `paw_action_family` with **exactly one** active action.
+- Allowed set: `nudge / press / pat / roll / steady / slide / tap / push`.
+- Missing action family, more than one active action, or unsupported action such as `pinch` now fails closed before Flow preparation.
+- Passive material payoffs such as steam/crack/gloss are not counted as active paw actions.
+- `episodes/TK-005.yaml` now declares G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide` explicitly.
+- regression tests cover missing, multi-action and unsafe-action failures.
+- `CURRENT_STANDARD.md` synchronized in the same branch.
 
-New operator rule:
-- use 1080p upscale only on QC-PASS clips
-- preferably wait until the continuity chain is complete, or until that clip is no longer needed as a continuity source
-- before clicking, verify the active account is eligible and Flow currently displays 0 credits
-- do not upscale FAIL/reroll candidates
-- do not use an upscaled/re-encoded export as the next scene First frame
-- next-scene continuity remains the previous PASS clip's **native Save frame**
-- 1080p upscale never justifies extra generation, padding, or weaker QC
-
-Updated in the same change:
-- `tools/make_next_short.ps1` now surfaces the PASS-only 1080p finishing rule to the normal operator path
-- `CURRENT_STANDARD.md` now makes the rule executable production policy
-- `docs/23_minimum_credit_operator_architecture.md` now includes the finishing step and continuity guard
-- this handoff synchronized in the same branch
+Why this matters:
+- candidate safety alone is insufficient because manifests are durable/editable artifacts.
+- the final paid-generation boundary now enforces the core `one calm tactile primary action + optional passive payoff` rule structurally rather than relying only on prose.
+- this reduces avoidable anatomy/tool-use failures and reroll credits.
 
 Production impact:
-- no change to TK-005 content, runtime, H40, scene count, keyframes, Progressive Spend, or 40-credit non-Ultra first-pass ceiling
-- no Flow credits spent
-- no publishing
+- no change to TK-005 story, selection, H40, keyframes, Flow model, scene count or 40-credit non-Ultra ceiling.
+- no Flow credits spent.
+- no publishing.
 
 ## Canonical validation / selection state
 
 Candidate selection:
 - `tools/select_next_episode.py` is fail-closed
 - hero-scale ratio max must be <=0.50 paw width
-- paw actions must stay in `nudge / press / pat / roll / steady / slide / tap / push`
+- candidate paw actions must stay in `nudge / press / pat / roll / steady / slide / tap / push`
 - unsupported human-dexterity actions are rejected before ranking
 - legacy `POV_PAWS_MICROWORLD_V1` is compatibility-only
 
 Manifest / bundle validation:
 - canonical production semantic gate is `tools/validate_maker_view_manifest.py`
 - all production bundle entry points route through it
+- every paid scene must declare exactly one safe `paw_action_family`
 - `validate_current_standard.py` is internal structural/runtime validation behind the adapter, not a direct current-semantic entry point
 - legacy POV values may remain only as compatibility data and cannot restore mandatory literal first-person framing
 
 ## Flow / spend baseline
 
-Current baseline:
-- Veo 3.1 Lite
-- output count 1
-- non-Ultra 10 credits/generation
-- Ultra 5 credits/generation
+Official Google Flow Help rechecked 2026-08-29:
+- Veo 3.1 Lite: non-Ultra 10 credits/generation, Ultra 5 credits/generation
+- non-subscriber: 50 free Flow credits/day
+- Plus/Pro/Ultra: 1080p upscale currently 0 credits
+- non-subscriber: 1080p upscale unavailable
 - actual UI model/mode/output count/displayed cost = generation-time final truth
 
 Progressive Spend:
@@ -168,9 +166,9 @@ Evidence saturation remains active. Same-class promotional/retail signals do not
 
 2026-08-29 cross-check:
 - sweet-potato/yakiimo evidence remains saturated and still supports TK-005
-- no stronger current creator-performance or Japanese seasonal signal changed candidate ordering
+- fresh 月見 product/event signals confirm IDEA-001 timing but do not outrank or invalidate the current prepared TK-005 production state
 - benchmark/backlog were intentionally not churned
-- official Flow 1080p upscale eligibility/cost is a new platform-cost/quality mechanic and therefore did justify this material change
+- official Flow pricing remains: Lite 10 non-Ultra / 5 Ultra; 1080p upscale 0 for paid Plus/Pro/Ultra
 
 Candidate state:
 - TK-005 / IDEA-009 remains current production choice
@@ -179,16 +177,17 @@ Candidate state:
 ## Current roadmap / next priorities
 
 1. Keep all production entry points routed through `validate_maker_view_manifest.py`.
-2. Run current maker-view manifest/bundle path for TK-005 when the user executes `./tools/make_next_short.ps1`.
-3. Create/approve TK-005 KF0 master anchor in real Flow.
-4. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
-5. Generate G1 only after planned KF chain passes.
-6. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
-7. PASS → save actual native usable final frame → continue progressively.
-8. After chain completion, if eligible and UI shows 0 credits, upscale QC-PASS clips to 1080p before final editing/export.
-9. Record actual credits, rerolls, usable motion, G-stage pass/fail, failure class.
-10. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
-11. Use accumulated real evidence to adjust actions, runtimes, scores, and spend strategy.
+2. Keep one-safe-action-per-scene manifest validation fail-closed.
+3. Run current maker-view manifest/bundle path for TK-005 when the user executes `./tools/make_next_short.ps1`.
+4. Create/approve TK-005 KF0 master anchor in real Flow.
+5. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
+6. Generate G1 only after planned KF chain passes.
+7. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
+8. PASS → save actual native usable final frame → continue progressively.
+9. After chain completion, if eligible and UI shows 0 credits, upscale QC-PASS clips to 1080p before final editing/export.
+10. Record actual credits, rerolls, usable motion, G-stage pass/fail, failure class.
+11. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
+12. Use accumulated real evidence to adjust actions, runtimes, scores, and spend strategy.
 
 ## Safety / invariants
 
@@ -200,6 +199,7 @@ Candidate state:
 - no human-like paw grip
 - no candidate hero-scale ratio >0.50 paw width without documented exception
 - no unsafe candidate paw-action family through selector
+- no paid scene without exactly one safe `paw_action_family`
 - no paid G1 before planned KF continuity passes
 - no next paid scene after prior structural failure
 - actual previous PASS native saved frame is the continuity bridge
@@ -213,23 +213,26 @@ Candidate state:
 
 ## Change log
 
-### 2026-08-29 — zero-credit 1080p PASS finishing
-Baseline: `main@ffba0bde59ac67d282ce459265b77b03288cd3b5`.
+### 2026-08-29 — scene-level paw-action fail-closed validation
+Baseline: `main@80500b2dc295ad9dec6f2723bebdbcd7b5e4e0f5`.
 
 Changed:
-- documented official Plus/Pro/Ultra 1080p upscale at current 0-credit cost
-- added PASS-only, post-continuity upscale rule to `CURRENT_STANDARD.md`
-- added same finishing rule to `docs/23_minimum_credit_operator_architecture.md`
-- surfaced the rule in `tools/make_next_short.ps1`
-- synchronized this handoff
+- required exactly one machine-readable safe `paw_action_family` per paid scene in `validate_maker_view_manifest.py`
+- added regression coverage for missing, multiple and unsafe action families
+- annotated TK-005 G1/G2/G3/G4 with `nudge / press / slide / slide`
+- synchronized `CURRENT_STANDARD.md` and this handoff
 
 Why:
-- this increases delivered resolution without increasing paid generation count, while protecting native saved-frame continuity and Progressive Spend
+- prevents post-selection manifest edits from reintroducing human-dexterity or multi-action prompts immediately before paid Flow generation
 
 Production impact:
 - TK-005 remains H40 / four Lite generations / 40-credit non-Ultra first-pass ceiling
-- no content/ranking/keyframe/action changes
+- no content/ranking/keyframe/runtime changes
 - no credits spent; no publishing
+
+### 2026-08-29 — zero-credit 1080p PASS finishing
+- documented official Plus/Pro/Ultra 1080p upscale at current 0-credit cost
+- added PASS-only, post-continuity upscale rule
 
 ### 2026-08-29 — canonical bundle maker-view validation path
 - routed bundle creation through `validate_maker_view_manifest.py`

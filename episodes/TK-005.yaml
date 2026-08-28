@@ -77,6 +77,7 @@ scenes:
     generation_seconds: 8
     start_frame: KF0_OPEN
     end_frame: KF1_WARM
+    paw_action_family: [nudge]
     action: "one feline front paw slowly nudges the thumbnail-sized roasting tray a few millimeters toward the already-present tiny tabletop warmer, then stops; the sweet potato itself barely moves"
     action_guard: "Mini Forest-style hand-centric miniature-making composition; camera observes the workbench from a stable high-oblique macro angle; front paws only; no cat face/head/body; no human hands or fingers; no tongs; no gripping; keep the 12mm sweet potato dramatically smaller than the paw; keep warmer and serving niche fixed; one calm action"
   - id: G2
@@ -85,6 +86,7 @@ scenes:
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G1
     end_frame: KF2_CRACK
+    paw_action_family: [press]
     action: "one paw gently presses the edge of the tiny tray to steady it while heat darkens the skin; a small crack slowly appears and a thin wisp of steam escapes"
     action_guard: "preserve the same stable miniature-making camera, same paw anatomy and tiny scale; no tool grip; paw does not pick up food; same warmer and serving niche remain fixed; one material transformation"
   - id: G3
@@ -93,6 +95,7 @@ scenes:
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G2
     end_frame: KF3_OPEN
+    paw_action_family: [slide]
     action: "one paw slowly slides the same tiny roasting tray a few millimeters away from the heat, then stops; during the quiet hold the existing crack widens naturally from residual warmth and the golden center becomes visible"
     action_guard: "one slide plus one passive material micro-beat; no cat character performance; paw never pinches the sweet potato; no fingers or thumbs; preserve same tray, maker-view camera, tiny scale, fixed warmer and serving niche"
   - id: G4
@@ -101,6 +104,7 @@ scenes:
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G3
     end_frame: KF4_SERVE
+    paw_action_family: [slide]
     action: "one feline front paw slowly slides the same ceramic roasting tray holding the finished yakiimo into the already-visible miniature serving niche, then stops; warm steam continues as a passive payoff"
     action_guard: "exactly one active paw action: the tray slide; after the paw stops, only steam may continue; same tray, warmer and serving niche; introduce no new plate, bowl, cookware, shelf or stall structure; keep the Mini Forest-style miniature-making observer camera; this is a quiet world-resolution beat, not runtime padding; no paw withdrawal gesture, eating, customer, camera cut, face or full cat"
 post_production:
