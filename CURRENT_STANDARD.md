@@ -1,6 +1,6 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-29 Mini Forest-style Paw-Only Miniature Making + Fail-Closed Candidate/Manifest Validation + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility + PASS-only 1080p Upscale**
+최신 적용 기준: **2026-08-29 Mini Forest-style Paw-Only Miniature Making + Fail-Closed Candidate/Manifest/Scene-Action Validation + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility + PASS-only 1080p Upscale**
 
 ## 0. 문서 거버넌스
 
@@ -77,6 +77,9 @@ latest explicit user direction
 - `preferred_angles`에 `high_oblique_maker_view`
 - `stop_if_maker_view_scale_anatomy_or_premise_fails = true`
 - legacy `stop_if_pov...` gate는 active current gate가 아님
+- **각 paid scene은 `paw_action_family`를 정확히 1개 선언해야 하며 `nudge / press / pat / roll / steady / slide / tap / push` 중 하나여야 함**
+
+후보 단계에서 안전하더라도 manifest는 이후 수정될 수 있으므로 scene-action gate를 paid-generation 직전 다시 적용한다. `paw_action_family: [press, slide]`처럼 두 active action을 한 8초 generation에 선언하거나 `pinch/grip/twist` 같은 human-dexterity action을 넣으면 fail-closed 한다. Steam/crack/gloss 같은 passive payoff는 action family에 넣지 않는다.
 
 그 뒤 구조 validator가 Flow model/output count, H30/H40 scene/credit ceiling, keyframe completeness, actual saved-frame chaining, progressive PASS gates, cut/action limits, runtime feasibility, narration을 검증한다.
 
@@ -87,7 +90,7 @@ latest explicit user direction
 ```text
 make_next_short.ps1 / make_short.ps1 / direct build_episode_bundle.py
 → validate_maker_view_manifest.py
-→ current maker-view semantic gate
+→ current maker-view + one-safe-action-per-scene semantic gate
 → legacy structural validator internally via adapter
 → originality gate
 → generated production pack
@@ -188,6 +191,8 @@ runtime padding 금지.
 기본:
 > **1 calm tactile primary action + optional 1 passive material payoff**
 
+각 scene manifest에는 active action을 machine-checkable하게 `paw_action_family: [<one action>]`으로 기록한다. 정확히 하나만 허용한다.
+
 선호 active action:
 `nudge / press / pat / roll / steady / slide / tap / push`
 
@@ -258,6 +263,7 @@ Evidence saturation: ranking/timing/mechanics/freshness/Flow assumption/actual p
 - G2/G3/G4 First = previous PASS clip native saved frame
 - no direct pinch/grab
 - zero-cut long take
+- explicit scene action families: G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide`
 
 최우선:
 1. current maker-view manifest validation PASS
