@@ -1,16 +1,14 @@
 # Tiny Cat Kitchen — START HERE
 
-목표: 사용자가 매번 주제·대본·Flow 프롬프트를 고민하지 않고 **한 문장 → 준비 완료 → planned keyframe 연속성 검수 → 필요한 Veo generation만 순차 생성 → 24h/72h 학습**을 반복한다.
+목표: 사용자가 매번 주제·대본·Flow 프롬프트를 고민하지 않고 **한 문장 → 준비 완료 → planned keyframe 검수 → 필요한 Veo generation만 순차 생성 → 24h/72h 학습**을 반복한다.
 
-## 작업 시작 전 가장 먼저
-
-다른 AI/개발자가 중간에 수정했을 수 있으므로 이전 대화 기억을 최신 상태라고 가정하지 않는다.
+## 작업 시작 전
 
 1. 최신 `main` SHA와 최근 PR/commit 확인
-2. `AGENTS.md` 확인 — 저장소 개발 실행 정책
-3. **`PROJECT_HANDOFF.md`를 읽어 개발 의도·완료 상태·NEXT 작업 복구**
-4. 아래 source of truth 교차 확인
-5. 충돌/회귀 위험 확인 후에만 수정 시작
+2. `AGENTS.md` 확인
+3. `PROJECT_HANDOFF.md` 확인
+4. `CURRENT_STANDARD.md`, docs/22, docs/23, NEXT_EPISODE, current manifest, research/backlog/ledger 교차 확인
+5. 최신 merged state가 오래된 대화/자동화 문구보다 우선
 
 ## 사용자가 평소 말할 것
 
@@ -18,72 +16,78 @@
 다음 영상 준비해줘
 ```
 
-소재를 직접 정하고 싶을 때만:
-
-```text
-이번엔 미니 라멘으로 만들어줘
-```
-
-그 외 조사·선정·대본·Flow 설계·기록은 시스템이 담당한다.
+소재를 직접 정할 때만 별도 지시한다.
 
 ## Source of truth
 
-- `AGENTS.md` — 저장소 개발 실행 정책
-- `PROJECT_HANDOFF.md` — **개발 의도 / 목표 / 현재 완료 상태 / 앞으로의 플랜 / 인수인계 change log**
-- `CURRENT_STANDARD.md` — 최신 production 기준
-- `docs/22_continuous_episode_learning_engine.md` — 연구/학습 루프
-- `docs/23_minimum_credit_operator_architecture.md` — 최소 조작/크레딧 구조
-- `docs/24_hero_cat_brand_identity.md` — 고양이/주방 identity
-- `docs/25_pov_paws_microworld_grammar.md` — **Shorts 1인칭 앞발-only / 초소형 scale 문법**
-- `docs/26_flow_ui_mode_preflight.md` — **Flow 새 생성 vs 기존 영상 수정 상태 / 모델·길이·비용 preflight**
-- `docs/27_research_evidence_saturation_gate.md` — research no-churn / evidence saturation
-- `docs/28_episode_novelty_authenticity_gate.md` — 최근 episode fingerprint 반복 방지
-- `docs/29_planned_keyframe_continuity_chain.md` — **planned KF0→KFn 연속성 체인**
-- `research/benchmark_log.csv` — 성공 메커니즘 기억
-- `ideas/episode_backlog.yaml` — 후보와 점수
-- `analytics/learning_ledger.csv` — 실제 제작비/성과/학습
-- `production/NEXT_EPISODE.txt` — 지금 만들 episode
+- `PROJECT_HANDOFF.md`
+- `CURRENT_STANDARD.md`
+- `docs/22_continuous_episode_learning_engine.md`
+- `docs/23_minimum_credit_operator_architecture.md`
+- `docs/24_hero_cat_brand_identity.md`
+- `docs/25_pov_paws_microworld_grammar.md`
+- `docs/26_flow_ui_mode_preflight.md`
+- `docs/27_research_evidence_saturation_gate.md`
+- `docs/28_episode_novelty_authenticity_gate.md`
+- `docs/29_planned_keyframe_continuity_chain.md`
+- `research/benchmark_log.csv`
+- `ideas/episode_backlog.yaml`
+- `analytics/learning_ledger.csv`
+- `production/NEXT_EPISODE.txt`
 
-## Tiny Cat Kitchen의 영상은 이렇게 보여야 함
+## Tiny Cat Kitchen의 최신 정체성
 
-> **시청자가 고양이가 된 것처럼 작업대를 내려다본다. 화면 아래에는 앞발만 보이고, 발보다 훨씬 작은 5~20mm 음식/물건을 조심스럽게 만든다.**
+> **Mini Forest처럼 아주 작은 음식/물건을 실제로 만드는 힐링 미니어처 영상. 사람 손이 나올 자리를 고양이 앞발만 대신한다.**
 
 반드시:
-- true first-person cat POV
-- cream + pale ginger 앞발 1~2개만 등장
-- 얼굴/머리/몸통/full cat 금지
-- hero object가 한 앞발 폭의 절반 이하로 보임
-- macro miniature diorama
-- 고양이 발은 nudge / press / roll / slide / tap 위주
-- human fingers/thumbs/grip 금지
+- cream + pale-ginger feline front paws 1~2개만 등장
+- face/head/body/full cat 금지
+- human hands/fingers/thumbs 금지
+- hero object 보통 5~20mm, 한 paw 폭의 15~50%
+- real miniature materials / handcrafted diorama look
+- process-first making shot
+- calm long take / close ASMR
 
-예쁘더라도 다음이면 FAIL:
-- 고양이가 카운터 뒤에 서서 요리함
-- 정면에서 고양이를 바라보는 third-person shot
-- 음식/팬이 paw와 비슷하거나 더 큼
-- full kitchen establishing shot 때문에 tiny scale가 안 읽힘
+중요:
+- **true first-person cat POV는 더 이상 필수 조건이 아니다.**
+- 기본은 Mini Forest류의 high-oblique maker view.
+- top-down macro / side-oblique macro도 동작과 질감이 더 잘 읽히면 허용.
+- 기존 enum `POV_PAWS_MICROWORLD_V1`은 도구 호환을 위해 당분간 유지하지만 실제 의미는 paws-only miniature making이다.
 
-## ChatGPT가 `다음 영상 준비해줘`를 받으면
+FAIL:
+- cat face/full body/character acting
+- 고양이가 카운터 뒤에서 사람처럼 요리
+- 사람 손/손가락/엄지
+- human-like tool grip
+- miniature scale가 약함
+- making process보다 고양이 캐릭터가 주인공
 
-- 최신 일본/글로벌 AI-cat / miniature / ASMR / relaxing Shorts 확인
-- 앞으로 2~6주 일본 시즌/기념일/제철 신호 확인
-- 경쟁작을 복제하지 않고 성공 원리만 추출
-- production/24h/72h 기록 확인
-- POV paw-only와 tiny-scale에 맞는 후보만 우선
-- 최근 fingerprint 중복 제거
-- 다음 episode 선택
-- H30 vs H40 runtime gate 선택
-- 일본어 title/hook
-- narration 필요 여부
-- episode manifest 생성/수정
+## 벤치마크 우선순위
+
+1차: Mini Forest류 miniature cooking / handcrafted tiny-food / relaxing ASMR
+
+추출할 것:
+- hand-centric making composition
+- real miniature craftsmanship
+- tactile process
+- tiny scale contrast
+- calm pacing
+- seasonal food timing
+- steam/crack/gloss/crumb/sizzle payoff
+
+AI-cat 캐릭터 채널은 1차 제작 방향이 아니다. 필요한 경우 paw appearance/reliability 같은 보조 참고만 한다.
+
+## `다음 영상 준비해줘` 처리
+
+- 최신 일본/글로벌 miniature / ASMR / relaxing-food / adjacent Shorts 확인
+- 일본 시즌/기념일/제철 신호 확인
+- 실제 production/analytics 확인
+- novelty-safe candidate 선택
+- Mini Forest-style paw-only making으로 premise 재해석
+- H30 vs H40 결정
+- manifest 생성/수정
 - `production/NEXT_EPISODE.txt` 갱신
-- **material repo 변경이 있으면 `PROJECT_HANDOFF.md`도 같은 branch/PR에서 갱신**
-
-후보만 확인:
-
-```powershell
-python tools/select_next_episode.py --top 3
-```
+- material 변경 시 `PROJECT_HANDOFF.md` 같은 branch/PR에서 갱신
 
 ## 사용자가 로컬에서 하는 일
 
@@ -91,237 +95,135 @@ python tools/select_next_episode.py --top 3
 ./tools/make_next_short.ps1
 ```
 
-자동 생성:
-- `generated/TK-XXX_bundle.md`
-- `generated/TK-XXX_flow_pack.md`
-- `generated/TK-XXX_edit_plan.md`
-- `generated/TK-XXX_publish_pack.md`
+자동 생성 pack은 Flow 크레딧을 쓰지 않는다.
 
-이 단계는 Flow/LLM/API 크레딧을 쓰지 않는다.
-
-## Gate A — planned keyframe chain 먼저
-
-**Paid Veo 전에 현재 episode가 요구하는 planned keyframe을 모두 만들고 연속성을 검수한다.**
-
-현재 공식 Flow 문서에서 no-charge 이미지 경로가 안내되더라도, 실제 UI에서 **active image model + displayed cost**를 먼저 확인한다. 0-credit/no-charge로 표시될 때만 무료 preflight로 사용한다.
+## Gate A — planned keyframe chain
 
 ```text
-KF0 = master visual anchor
-↓ approved KF0를 edit/refine/reference로 사용
-KF1
-↓ approved KF1에서 파생
-KF2
-↓
-필요한 마지막 KF까지 순차 파생
-↓
-planned KF chain 전체 PASS
-↓
-G1만 생성
+image model + displayed cost 확인
+→ KF0 maker-view master anchor 생성
+→ paws / scale / camera / props / lighting QC
+→ KF1을 KF0에서 edit/reference 파생
+→ KF2를 KF1에서 파생
+→ 필요한 마지막 KF까지 반복
+→ 전체 PASS
+→ G1만 생성
 ```
 
-**KF1+를 각각 독립적인 fresh text-to-image로 다시 뽑지 않는다.** 그러면 paw fur, 카메라, hero-object scale, fixed props, 조명과 workbench geometry가 바뀔 수 있다.
-
-각 KF 체크:
-- true first-person인가?
-- 앞발만 보이는가?
-- 얼굴/몸통이 안 보이는가?
-- hero object가 paw보다 압도적으로 작은가?
-- human fingers/thumbs가 없는가?
-- paw fur/anatomy가 이전 승인 KF와 같은가?
-- camera/lens/workbench/fixed props 위치가 유지되는가?
-- 바뀌어야 할 food/material state만 의도대로 바뀌었는가?
-
-구조적 drift가 있으면 `KEYFRAME DRIFT FAIL`이고 **paid G1으로 넘어가지 않는다.**
-
-중요:
-- planned KF = 각 scene이 도달할 **destination**
-- 이전 PASS 영상에서 Flow `Save frame`으로 저장한 actual frame = 다음 scene의 **continuity bridge**
-
-둘을 혼동하지 않는다.
+KF1+를 independent fresh text-to-image로 만들지 않는다.
 
 ## Flow 기본 설정
 
-생성 직전 실제 UI에서 확인:
+생성 직전 실제 UI 확인:
 
 ```text
-새 영상 generation 상태
+NEW VIDEO GENERATION
 Veo 3.1 Lite
 9:16
-8 seconds 또는 현재 mode가 8s-only임을 확인
+8 seconds
 output count = 1
-표시 비용 = 현재 공식표/실제 UI와 일치
+displayed cost = current UI truth
 ```
 
-**기존 영상을 열어둔 수정 화면은 G1/G2/G3/G4 생성 화면이 아니다.** `수정 사항 설명` 계열 입력창이나 `Omni Flash` video-edit 상태가 보이면 standard 새 동영상 generation 화면으로 돌아간다.
+기존 영상 edit/Omni Flash 화면이면 새 generation 화면으로 돌아간다.
 
-4s/6s/8s selector가 안 보인다고 바로 오류로 판단하지 않는다. mode에 따라 8s-only일 수 있으므로 **duration selector 자체보다 active model + generation mode + output count + displayed cost 확인을 우선한다.** 자세한 절차는 `docs/26_flow_ui_mode_preflight.md`.
-
-## Runtime / credit 선택
-
-**H30/H40의 숫자는 final seconds가 아니라 current first-pass credit ceiling이다.**
+## Runtime / Progressive Spend
 
 ### compact_h30
-
-```text
-planned KF chain PASS
-→ G1 8s = 10
-PASS → G2 = +10
-PASS → G3 = +10
-first-pass ceiling = 30 credits
-raw motion = 24s
-기본 final ≈ 24~27s
-```
-
-3개 독립 beat로 완결될 때 사용.
+- 3×8s raw = 24s
+- current first-pass ceiling 30 credits
+- final 보통 24~27s
 
 ### immersive_h40
+- 4×8s raw = 32s
+- current first-pass ceiling 40 credits
+- final 보통 32~35s
+- G4는 독립적인 serving/world-resolution value가 있을 때만
 
 ```text
 planned KF chain PASS
-→ G1 → G2 → G3 모두 PASS
-독립적인 4번째 world-resolution beat가 있을 때만 G4 = +10
-first-pass ceiling = 40 credits
-raw motion = 32s
-기본 final ≈ 32~35s
+→ G1
+PASS → Flow native Save frame
+→ G2
+PASS → Save frame
+→ G3
+→ 필요한 경우만 G4
 ```
 
-4번째 scene은 길이 패딩이 아니라 작은 세계의 여운/serving/resolution이어야 한다.
-
-자연스러운 slowdown은 manifest가 허용한 범위 안에서만 쓴다. 정적/keyframe hold는 `editorial_seconds`에 실제 이유와 함께 명시된 경우에만 사용한다. `max_total_static_hold_seconds`는 자동으로 채우는 시간이 아니다.
-
-`tools/validate_current_standard.py`는 generated motion + 허용 slowdown + 명시된 hold로 도달 불가능한 runtime target을 사전에 차단한다.
-
-48~60초는 실제 retention 데이터가 지지하고 추가 독립 motion beat가 설계될 때만 실험한다.
-
-## Actual-frame Sequential Chain
-
-```text
-planned KF0→KFn 전체 PASS
-↓
-G1
-↓ QC PASS
-Flow native Save frame — actual last usable frame
-↓
-G2 First frame
-↓ QC PASS
-Flow native Save frame
-↓
-G3 First frame
-↓ QC PASS
-Flow native Save frame
-↓
-G4 First frame (immersive_h40 only)
-```
-
-다음 scene의 First frame은 **이전 PASS clip의 실제 saved frame**을 사용한다. 더 예쁜 planned target KF로 대체하지 않는다.
+다음 scene First frame은 previous PASS clip의 실제 saved frame이다.
 
 ## 한 8초 scene
 
-> **1 calm tactile primary action + optional 1 passive micro-payoff**
+> **1 calm tactile primary action + optional 1 passive material payoff**
 
 좋은 동작:
-- paw nudges a tiny cup
-- paw presses a tiny dough ball
-- paw rolls one tiny ingredient
-- paw slides a miniature plate
-- paw taps one garnish
+- nudge
+- press
+- pat
+- roll
+- steady
+- slide
+- tap
+- push
 
 나쁜 동작:
-- paw grips chopsticks/tongs like a hand
-- 여러 도구를 동시에 사용
-- 준비→조리→완성→먹기 전부 한 번에
-
-기본 long-take episode에서 manifest가 `max_visual_cuts_per_8s_generation: 0`을 선언하면 generated paid prompt에도 literal zero-cut 지시가 남아야 한다.
+- chopsticks/tongs/knife human grip
+- thumb-index pinch
+- 여러 복잡한 동작 동시 수행
 
 ## 오디오
 
 기본:
-
 ```text
 No narration
 No generated music
 Quiet room tone + close tiny ASMR
 ```
 
-영상 motion이 좋고 소리만 이상하면 영상 재생성 금지. 후편집 SFX로 교체한다.
+영상이 좋고 소리만 이상하면 후편집 교체.
 
-## 생성 결과를 다시 보여줄 때
+## 결과 QC
 
-```text
-G1 만들었어. 봐줘
-```
-
-영상/스크린샷만 첨부.
-
-ChatGPT 판단:
-- `PASS`
-- `EDITABLE`
-- `REROLL`
-- `STOP`
-
-구조적 실패 shorthand:
-- `POV FAIL`
+- `MAKER VIEW PASS`
 - `SCALE FAIL`
+- `CHARACTER FAIL`
 - `ANATOMY FAIL`
 - `CAMERA FAIL`
 - `KEYFRAME DRIFT FAIL`
 - `FRAME CHAIN FAIL`
+- `PROP CONTINUITY FAIL`
 - `PADDING FAIL`
 
-## 업로드 후 학습
+## 학습
 
-24h/72h에 가능한 범위에서 기록:
-- Stayed to watch
-- APV
-- engaged views
-- subscribers
-- comments
-- actual Flow credits
-- rerolls
-- G1/G2/G3/G4 first-pass success
-- POV/scale/anatomy failure
-- continuity failure
-- failed action type
+실제 값만 기록:
+- credits/rerolls
+- G1~G4 first-pass success
+- maker-view/camera failure
+- scale/anatomy/continuity failure
 - usable motion seconds
-- final duration
+- final runtime
+- 24h/72h Stayed to watch / APV / engaged views / subscribers / comments
 
-장기 목표:
-
+장기 KPI:
 ```text
 usable motion / credit
 engaged views / credit
 subscribers / 100 credits
 ```
 
-`compact_h30`과 `immersive_h40`을 비교할 때는 이름에 적힌 숫자가 아니라 **실제 final runtime + beat 수 + credits**로 retention/efficiency를 학습한다.
-
-## Handoff persistence gate
-
-repo를 실제로 수정하는 모든 material 작업은 `PROJECT_HANDOFF.md`를 같은 branch/PR에서 갱신해야 완료로 본다.
-
-로컬 검증:
-
-```powershell
-python tools/validate_handoff_update.py --base origin/main
-```
-
-의미 있는 개선이 없어 repo를 NO-OP으로 유지한 회차는 handoff도 억지로 수정하지 않는다.
-
-# 가장 간단한 실제 사용법
+## 가장 간단한 실제 사용법
 
 ```text
 1. ChatGPT: "다음 영상 준비해줘"
 2. PowerShell: ./tools/make_next_short.ps1
-3. Flow: image model/cost 확인 → KF0 생성/QC
-4. KF1→필요한 마지막 KF까지 이전 승인 KF에서 순차 파생/QC
-5. planned KF chain 전체 PASS 후 새 동영상 generation 상태 확인
-6. G1만 생성
-7. ChatGPT: "G1 만들었어. 봐줘"
-8. PASS면 Flow native Save frame → 그 실제 frame으로 G2
-9. G2 PASS → Save frame → G3 → 필요하면 정당한 G4
-10. 업로드 후 Studio 수치/스크린샷 공유
+3. Flow: KF0→KFn maker-view continuity PASS
+4. G1만 생성
+5. ChatGPT에게 G1 결과 공유
+6. PASS면 native Save frame → G2 → G3 → 필요한 경우 G4
+7. 업로드 후 성과 기록
 ```
 
 핵심:
 
-> **고양이를 보여주는 영상이 아니라, 고양이의 앞발이 된 시점에서 믿기 어려울 만큼 작은 것을 만드는 경험을 판다.**
+> **Mini Forest의 손-중심 미니어처 제작 감성을 유지하고, 그 손만 고양이 앞발로 바꾼다. 고양이 전체 모습이나 캐릭터 연기는 필요 없다.**
