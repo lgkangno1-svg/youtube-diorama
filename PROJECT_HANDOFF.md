@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-28 KST**
-Baseline inspected before this iteration: `main@3f2aab3aa365cb67422a3bdbee09104a49230e4c`
+Baseline inspected before this iteration: `main@73da6e77a5da8553b9f48b32327acd79f18eaca6`
 
 Durable handoff source of truth for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research should not churn it.
 
@@ -181,7 +181,7 @@ Long-term KPIs:
 
 Material issue found after the canonical Mini Forest correction: `ideas/episode_backlog.yaml` still contained multiple literal `True first-person cat POV` premises and `cat_job_world` mechanics. That could reintroduce the old AI-cat character direction when future episodes are selected even though START_HERE/CURRENT_STANDARD/learning ledger were already corrected.
 
-Corrected in this iteration:
+Corrected:
 - all current candidate premises now describe high-oblique/top-down/tabletop Mini Forest-style maker views instead of mandatory cat-eye POV
 - explicit no-face/no-body/no-character-performance semantics added where relevant
 - `cat_job_world` mechanics replaced with diorama-workspace/environmental worldbuilding mechanics
@@ -189,6 +189,15 @@ Corrected in this iteration:
 - IDEA-008 ending no longer asks for an extra paw-withdrawal gesture after the tray slide
 - legacy `POV_PAWS_MICROWORLD_V1` field remains only for tooling compatibility
 - candidate scores/ranking and NEXT_EPISODE were intentionally not changed because this is a semantic correction, not new demand evidence
+
+## Operator wording correction — 2026-08-28
+
+Material operator-facing inconsistency found in `tools/make_next_short.ps1`: the Progressive Flow Spend instructions still told the user to stop when `POV` was wrong. Under the accepted Mini Forest maker-view standard, a non-first-person observational camera is valid and often preferred, so that wording could falsely reject a correct output.
+
+Corrected:
+- G1 operator QC now says to stop for structural failure of maker-view composition, paws-only identity, tiny scale, or anatomy
+- explicitly states that a non-first-person camera is not itself a failure
+- no production manifest, NEXT_EPISODE, candidate ranking, runtime, credit budget, or Flow spend behavior changed
 
 ## Current roadmap / next priorities
 
@@ -220,6 +229,22 @@ Corrected in this iteration:
 - no unrelated repository modifications
 
 ## Change log
+
+### 2026-08-28 — operator maker-view QC wording correction
+Baseline: `main@73da6e77a5da8553b9f48b32327acd79f18eaca6`.
+
+Changed:
+- corrected `tools/make_next_short.ps1` G1 QC wording from legacy POV-centric failure language to maker-view / paws-only / tiny-scale / anatomy structural QC
+- explicitly clarified that non-first-person camera is not itself a failure
+- synchronized this handoff in the same branch
+
+Why:
+- the normal one-command operator interface could otherwise tell the user to reject a valid Mini Forest-style observational maker-view output
+
+Research verification:
+- official Flow help still shows non-Ultra Veo 3.1 Lite at 10 credits per generation for 4s/6s/8s and Extend
+- official Flow model help still supports First + Last frames for Veo 3.1 Lite at 4s/6s/8s
+- fresh August 28 Japanese sweet-potato/moon-viewing retail signals are same-class evidence and do not change the already-saturated TK-005 ranking or timing, so benchmark/backlog were not churned
 
 ### 2026-08-28 — backlog maker-view semantic correction
 Baseline: `main@3f2aab3aa365cb67422a3bdbee09104a49230e4c`.
