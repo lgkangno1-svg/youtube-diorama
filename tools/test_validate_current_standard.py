@@ -91,7 +91,7 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         del data["flow_strategy"]["max_visual_cuts_per_8s_generation"]
         errors = validate(data)
         self.assertIn(
-            "flow_strategy.max_visual_cuts_per_8s_generation must be explicitly declared (0 or 1)",
+            "flow_strategy.max_visual_cuts_per_8s_generation must be an integer 0 or 1",
             errors,
         )
 
@@ -109,11 +109,32 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         data["flow_strategy"]["max_visual_cuts_per_8s_generation"] = 1
         self.assertEqual(validate(data), [])
 
+    def test_cut_limit_float_does_not_coerce_to_integer(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["max_visual_cuts_per_8s_generation"] = 0.0
+        errors = validate(data)
+        self.assertIn(
+            "flow_strategy.max_visual_cuts_per_8s_generation must be an integer 0 or 1",
+            errors,
+        )
+
     def test_preferred_action_count_must_remain_one(self) -> None:
         data = base_manifest()
         data["flow_strategy"]["preferred_action_count_per_generation"] = 2
         errors = validate(data)
-        self.assertIn("flow_strategy.preferred_action_count_per_generation must be 1", errors)
+        self.assertIn("flow_strategy.preferred_action_count_per_generation must be the integer 1", errors)
+
+    def test_preferred_action_count_fraction_does_not_truncate_to_one(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["preferred_action_count_per_generation"] = 1.5
+        errors = validate(data)
+        self.assertIn("flow_strategy.preferred_action_count_per_generation must be the integer 1", errors)
+
+    def test_output_count_bool_does_not_coerce_to_one(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["output_count"] = True
+        errors = validate(data)
+        self.assertIn("flow_strategy.output_count must be the integer 1", errors)
 
     def test_declared_generation_count_must_match_scenes(self) -> None:
         data = base_manifest()
@@ -121,11 +142,29 @@ class ManifestSpendConsistencyTests(unittest.TestCase):
         errors = validate(data)
         self.assertTrue(any("must equal the number of manifest scenes" in error for error in errors))
 
+    def test_generation_count_fraction_does_not_truncate(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["max_lite_generations_first_pass"] = 3.5
+        errors = validate(data)
+        self.assertIn("flow_strategy.max_lite_generations_first_pass must be an integer", errors)
+
     def test_credit_budget_must_match_generation_ceiling(self) -> None:
         data = base_manifest()
         data["flow_strategy"]["non_ultra_credit_budget_first_pass"] = 40
         errors = validate(data)
         self.assertTrue(any("must match the current Lite first-pass ceiling" in error for error in errors))
+
+    def test_credit_budget_float_does_not_coerce(self) -> None:
+        data = base_manifest()
+        data["flow_strategy"]["non_ultra_credit_budget_first_pass"] = 30.0
+        errors = validate(data)
+        self.assertIn("flow_strategy.non_ultra_credit_budget_first_pass must be an integer", errors)
+
+    def test_generation_seconds_float_does_not_coerce(self) -> None:
+        data = base_manifest()
+        data["scenes"][0]["generation_seconds"] = 8.0
+        errors = validate(data)
+        self.assertIn("G1 generation_seconds must be the integer 8", errors)
 
     def test_compact_h30_cannot_silently_gain_g4(self) -> None:
         data = base_manifest()
