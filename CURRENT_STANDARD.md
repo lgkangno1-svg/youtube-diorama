@@ -1,252 +1,195 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-29 Mini Forest-style Paw-Only Miniature Making + Fail-Closed Candidate/Manifest/Scene-Action Validation + Planned Keyframe Continuity + Progressive Spend + Runtime Feasibility + PASS-only 1080p Upscale**
+최신 적용 기준: **2026-08-29 Quality-first + Fast Operator Loop + Mini Forest Paw-Only Making + Progressive Paid Spend**
 
-## 0. 문서 거버넌스
+## 0. 문서 거버넌스 / 우선순위
 
-이 문서는 현재 실행 규칙이다. 장기 목적/개선 판단은 `PRODUCT_CHARTER.md`, 현재 상태/최근 결정/실패/다음 우선순위는 `PROJECT_HANDOFF.md`가 담당한다.
+장기 목적은 `PRODUCT_CHARTER.md`, 현재 상태는 `PROJECT_HANDOFF.md`, 이 문서는 실제 실행 규칙이다.
 
-모든 material 개선 전:
+최신 사용자 지시에 따라 개선 우선순위는:
+1. 영상/내용 퀄리티
+2. 시청성과/채널 정체성
+3. 제작 편의성·속도
+4. paid-video reroll/credit 효율
+5. 무료 이미지 비용 가드
 
-```text
-latest explicit user direction
-→ latest merged main + PROJECT_HANDOFF.md
-→ PRODUCT_CHARTER.md
-→ CURRENT_STANDARD.md + specialized docs
-→ current manifest / benchmark / backlog / ledger
-```
+사용자는 Google 사용 환경에서 Nano Banana 이미지를 무료로 사용할 수 있다고 명시했다. **Nano Banana 비용 가드 자체를 더 고도화하는 작업은 중단/후순위화한다.** 기존 fail-closed 안내는 안전망으로 유지하되, 실제 비용 문제가 다시 보고되지 않는 한 여기에 개발 시간을 쓰지 않는다.
 
-동기화:
-- material repository change → `PROJECT_HANDOFF.md`
-- production/QC/Flow/selection executable rule change → `CURRENT_STANDARD.md`
-- durable purpose/identity/economics philosophy change → `PRODUCT_CHARTER.md`
-- true NO-OP → 문서 churn 금지
+Paid Veo generation/publishing은 여전히 사용자 명시 행동 없이는 금지한다.
 
-비용 절감만으로는 개선이 아니다. paws-only miniature-making identity, tactile/healing quality, audience outcome per credit, user control을 함께 보호한다.
+## 1. 핵심 영상 경험
 
-## 1. 핵심 경험
-
-> **Mini Forest처럼 아주 작은 음식/물건을 실제로 만드는 미니어처 힐링 영상이며, 사람 손이 들어올 자리를 고양이 앞발이 대신한다.**
+> **Mini Forest처럼 실제로 아주 작은 음식/물건을 만드는 미니어처 힐링 영상에서 사람 손 자리만 자연스러운 고양이 앞발이 대신한다.**
 
 필수:
-- cream/pale-ginger feline front paws 1~2개만 등장
+- cream/pale-ginger front paws 1~2
 - face/head/body/full cat 금지
-- human hands/fingers/thumbs 금지
-- human-like feline tool grip 금지
-- hero object 보통 5~20mm, 한 paw 폭의 15~50% 이하
+- human hands/fingers/thumbs 및 human-like paw grip 금지
+- hero object 보통 5~20mm, <=0.50 paw width
 - realistic handcrafted miniature workbench
-- process-first making shot
-- mostly locked observational camera
-- 1 generation = 1 primary tactile action + optional 1 passive micro-payoff
-- no rapid montage / no cat character-performance shot
+- process-first tactile making
+- calm long take / macro intimacy / close ASMR
 
-카메라 우선순위:
-1. high-oblique maker view
-2. top-down macro
-3. side/tabletop oblique macro
-4. first-person-like angle은 결과가 더 자연스러울 때만
+카메라 우선순위: high-oblique maker view → top-down macro → side/tabletop macro → 필요할 때만 first-person-like. Literal first-person은 필수가 아니다.
 
-**literal true first-person cat POV는 필수가 아니다.** `POV_PAWS_MICROWORLD_V1` / `first_person_cat_pov` 같은 이름은 현재 tooling compatibility token일 뿐이며 창작 의미를 결정하지 않는다.
+## 2. Content Quality Gate — paid video 전에 먼저 해결
 
-## 2. Candidate selection fail-closed gate
+각 episode는 paid generation 전에 다음 5가지를 한 문장씩 명확히 해야 한다.
 
-`tools/select_next_episode.py`는 legacy enum 값만 보고 production-eligible로 판단하지 않는다.
+1. **HOOK** — 첫 1~2초에 무엇이 `tiny + cat paws + making`을 즉시 이해시키는가?
+2. **TRANSFORMATION** — 각 scene에서 재료/물체 상태가 실제로 무엇에서 무엇으로 변하는가?
+3. **SCALE PROOF** — paw와 hero object의 대비가 어느 shot에서 가장 강하게 보이는가?
+4. **PAYOFF** — 마지막까지 볼 이유가 되는 완성/steam/crack/gloss/serving 결과는 무엇인가?
+5. **NOVELTY/JAPAN FIT** — 왜 지금 일본 타깃에게 맞고, 기존/경쟁 episode와 무엇이 다른가?
 
-현재 후보가 통과하려면 최소한:
-- compatibility token `POV_PAWS_MICROWORLD_V1` 존재
-- `hero_scale`에 paw-width ratio가 명시되어 있고 최대값 `<= 0.50`
-- paw action family가 feline-safe allowlist 안에 있음
-- runtime prior가 `compact_h30` 또는 `immersive_h40`
-- trend/evidence/novelty gate도 기존 규칙대로 통과
+이 중 하나라도 약하면 장면을 추가하지 말고 premise/shot/action을 먼저 개선한다.
 
-현재 feline-safe allowlist:
-`nudge / press / pat / roll / steady / slide / tap / push`
+Scene은 단순 움직임이 아니라 **보이는 상태 변화**를 만들어야 한다. G4는 길이 채우기가 아니라 독립 payoff/world-resolution 가치가 있을 때만 허용한다.
 
-`pinch`, `twist`, `grip`, tongs/chopsticks/knife류 human-dexterity action을 후보 metadata에 넣으면 selector가 fail-closed로 거부해야 한다.
+## 3. Candidate / manifest fail-closed identity gate
 
-중요: legacy enum은 **호환 토큰**이고 maker-view 적합성의 증거가 아니다. 후보 선택 출력도 이를 `visual_grammar_token`으로 표시한다.
+Candidate selector와 canonical manifest validator는 계속 다음을 막는다.
+- hero scale >0.50 paw width
+- human-dexterity actions
+- full-cat/character-performance drift
+- paid scene에 active action 0개 또는 2개 이상
 
-## 3. Canonical manifest validation path
+Safe action family: `nudge / press / pat / roll / steady / slide / tap / push`.
 
-정상 사용자 경로 `./tools/make_next_short.ps1`은 `tools/validate_maker_view_manifest.py`를 먼저 실행한다.
+Legacy `POV_PAWS_MICROWORLD_V1`은 compatibility token일 뿐 창작 방향이 아니다.
 
-필수 semantics:
-- `brand_identity.visual_intent = mini_forest_style_paws_only_miniature_making`
-- `camera_grammar.semantic_override = mini_forest_style_observational_maker_view`
-- `camera_grammar.first_person_required = false`
-- `preferred_angles`에 `high_oblique_maker_view`
-- `stop_if_maker_view_scale_anatomy_or_premise_fails = true`
-- legacy `stop_if_pov...` gate는 active current gate가 아님
-- **각 paid scene은 `paw_action_family`를 정확히 1개 선언해야 하며 `nudge / press / pat / roll / steady / slide / tap / push` 중 하나여야 함**
+Canonical production validation entry: `tools/validate_maker_view_manifest.py`.
 
-후보 단계에서 안전하더라도 manifest는 이후 수정될 수 있으므로 scene-action gate를 paid-generation 직전 다시 적용한다. `paw_action_family: [press, slide]`처럼 두 active action을 한 8초 generation에 선언하거나 `pinch/grip/twist` 같은 human-dexterity action을 넣으면 fail-closed 한다. Steam/crack/gloss 같은 passive payoff는 action family에 넣지 않는다.
+## 4. Fast Preparation Loop
 
-그 뒤 구조 validator가 Flow model/output count, H30/H40 scene/credit ceiling, keyframe completeness, actual saved-frame chaining, progressive PASS gates, cut/action limits, runtime feasibility, narration을 검증한다.
+목표는 사용자가 여러 문서를 읽거나 프롬프트를 조립하지 않게 하는 것이다.
 
-**모든 production bundle entry point도 같은 canonical maker-view validator를 사용해야 한다.** `tools/build_episode_bundle.py`가 `validate_current_standard.py`를 직접 호출하면 안 된다. legacy structural validator는 maker-view adapter 내부 구현으로만 사용하며, adapter가 current semantics를 검증한 뒤 compatibility fields를 안전하게 번역해서 구조 검증을 위임한다.
-
-따라서 현재 production preflight는 다음과 같다.
-
+사용자:
 ```text
-make_next_short.ps1 / make_short.ps1 / direct build_episode_bundle.py
-→ validate_maker_view_manifest.py
-→ current maker-view + one-safe-action-per-scene semantic gate
-→ legacy structural validator internally via adapter
-→ originality gate
-→ generated production pack
+다음 영상 준비해줘
 ```
 
-직접 bundle builder를 실행해도 current maker-view manifest가 legacy `stop_if_pov...` 요구 때문에 뒤늦게 거부되어서는 안 된다.
+ChatGPT/repo가 준비해야 할 결과:
+- 다음 소재와 선택 이유
+- runtime tier
+- HOOK / TRANSFORMATION / SCALE PROOF / PAYOFF
+- KF0→KFn exact-order prompts
+- G1→G3/필요시 G4 exact-order Flow prompts
+- invariant negative constraints/settings를 매번 다시 고민하지 않도록 pack에 포함
+- 각 단계의 `지금 할 것` 1개와 PASS/FAIL 기준
+- manifest + `production/NEXT_EPISODE.txt` + material handoff sync
 
-## 4. Planned keyframe continuity
-
-Paid Veo 전:
-
-```text
-Flow image model + displayed cost 확인
-→ no-charge일 때만 free preflight
-→ KF0 maker-view master anchor
-→ paws / scale / camera / fixed props / lighting QC
-→ KF1은 승인 KF0에서 파생
-→ KF2는 KF1에서 파생
-→ 필요한 마지막 KF까지 순차 파생
-→ planned KF chain 전체 PASS
-→ G1만 생성
+사용자 로컬:
+```powershell
+./tools/make_next_short.ps1
 ```
 
-KF1+를 independent fresh text-to-image lottery로 만들지 않는다.
+Operator UX 원칙:
+- 한 번에 다음 행동 하나를 가장 명확하게 보여준다.
+- 프롬프트는 copy/paste-ready여야 한다.
+- 같은 설정/negative prompt를 사용자가 여러 곳에서 재조립하게 하지 않는다.
+- 무료 planning/keyframe 단계에서 불필요한 confirmation을 늘리지 않는다.
+- paid Veo generation 직전에는 명확한 user action을 유지한다.
 
-planned KF = destination. actual previous PASS frame = next-scene continuity bridge.
+앞으로 tooling 개선 KPI:
+- time-to-first-valid-G1
+- manual interventions / episode
+- prompt corrections before G1
+- rerolls / finished episode
 
-## 5. Flow / Veo baseline
+## 5. Keyframe / visual continuity
 
-생성 직전 실제 UI 확인:
+Nano Banana keyframe/reference 작업은 품질·연속성 preflight로 적극 활용한다. 사용자가 무료로 사용할 수 있으므로 **비용 자체보다 좋은 KF0 anchor와 연속된 destination frames를 빠르게 만드는 데 집중**한다.
 
 ```text
-NEW VIDEO GENERATION
+KF0 strong maker-view anchor
+→ paws / scale / camera / props / lighting QC
+→ KF1을 승인 KF0에서 파생
+→ KF2를 KF1에서 파생
+→ 필요한 KFn까지
+→ visual continuity PASS
+→ G1 only
+```
+
+KF1+를 unrelated fresh lottery frame으로 만들지 않는다.
+
+기존 image-cost safety check는 남겨두지만, 사용자의 무료 접근이 유지되는 한 반복적인 비용 확인/문서 작업이 제작 흐름을 지배하면 안 된다.
+
+## 6. Flow / Veo paid baseline
+
+Paid generation 직전 실제 Flow UI의 active model/mode/output count/displayed cost를 확인한다.
+
+기본:
+```text
 Veo 3.1 Lite
 9:16
 8 seconds
 output count = 1
-displayed cost = current UI truth
 ```
 
-2026-08-29 공식 Flow 문서 재확인 기준:
-- non-Ultra Veo 3.1 Lite: 10 credits/generation
-- Ultra: 5 credits/generation
-- non-subscriber: 50 free Flow credits/day, paid plan과 stack되지 않음
-- Plus / Pro / Ultra: 1080p upscale currently 0 credits
-- non-subscriber: 1080p upscale unavailable
-- actual UI model/mode/output count/displayed cost가 생성 시점 최종 truth
-
-무료 tier가 있어도 batch/reroll discipline을 느슨하게 하지 않는다.
-
-### PASS-only 1080p upscale rule
-
-공식 Flow 도움말에서 Plus/Pro/Ultra의 1080p upscale이 현재 0 credits로 문서화되어 있으므로, **유료 generation을 늘리지 않고 최종 전달 화질을 개선하는 후단 단계**로 사용할 수 있다.
-
-운영 원칙:
-- continuity chain이 끝난 뒤, 또는 적어도 해당 clip이 더 이상 다음 scene의 continuity source로 필요하지 않은 시점에만 적용
-- QC-PASS clip만 upscale; FAIL/reroll 후보에는 쓰지 않음
-- 실행 직전 Flow UI가 실제로 `1080p upscale = 0 credits`를 표시하는지 확인
-- upscaled/re-encoded export를 다음 scene First frame으로 사용하지 않음
-- next-scene bridge는 계속 previous PASS clip의 **native Save frame** 사용
-- upscale 자체가 새 paid generation이나 reroll을 정당화하지 않음
-
-## 6. Progressive Spend
-
+Progressive Spend:
 ```text
-FREE planned KF chain PASS
+visual/keyframe chain PASS
 → G1 only
 → QC
 → actual last usable frame native Save frame
 → G2 only after G1 PASS
 → G3 only after G2 PASS
-→ G4 only if immersive_h40 + G3 PASS + independent world-resolution value
-→ chain complete
-→ eligible subscription + UI shows 0 credits: QC-PASS clips may be upscaled to 1080p
+→ G4 only if manifest/runtime still justifies independent payoff
 ```
 
-구조적 FAIL 후 다음 paid scene 금지.
+구조적 FAIL 후 다음 paid scene 금지. Actual previous PASS native saved frame이 continuity bridge다.
 
-## 7. Runtime
+H30/H40는 first-pass paid-video tier이지 final runtime 약속이 아니다.
+- compact_h30: 3×8s raw, current non-Ultra ceiling 30 credits
+- immersive_h40: 4×8s raw, current non-Ultra ceiling 40 credits
 
-H30/H40는 final seconds가 아니라 first-pass credit tier다.
+## 7. 8초 scene grammar
 
-### compact_h30
-- 3 × 8s = raw 24s
-- current non-Ultra first-pass ceiling 30 credits
-- final 보통 24~27s
-
-### immersive_h40
-- 4 × 8s = raw 32s
-- current non-Ultra first-pass ceiling 40 credits
-- final 보통 32~35s
-- G4는 serving/world-resolution/afterglow 독립 가치가 있을 때만
-
-runtime padding 금지.
-
-## 8. 8초 scene / paw-action grammar
-
-기본:
 > **1 calm tactile primary action + optional 1 passive material payoff**
 
-각 scene manifest에는 active action을 machine-checkable하게 `paw_action_family: [<one action>]`으로 기록한다. 정확히 하나만 허용한다.
+`paw_action_family`는 paid scene당 정확히 하나.
 
-선호 active action:
-`nudge / press / pat / roll / steady / slide / tap / push`
-
-피함:
-- thumb-index pinch
-- precise twist
-- tongs/chopsticks/knife human grip
-- 여러 복잡한 active gesture 동시 수행
+좋은 예:
+```text
+0–1.5s  premise/scale immediately readable; paw settles
+1.5–6s  one clear tactile transformation
+6–8s    paw becomes still; steam/crack/gloss/crumb/sizzle payoff continues
+```
 
 기본 `max_visual_cuts_per_8s_generation: 0`.
 
-예:
-```text
-0~1.5s  paw approaches/settles
-1.5~6s  one press / roll / slide / nudge / push
-6~8s    paw stops; steam/crack/gloss/crumb continues
-```
+피함: pinch / precise twist / human tool grip / 여러 active gesture / rapid montage.
 
-## 9. Audio
+## 8. QC 우선순위
 
-기본:
-```text
-No narration
-No generated music
-Quiet room tone + close miniature ASMR
-```
+Paid output QC는 단순 기술 PASS보다 **영상 가치**를 먼저 본다.
 
-motion이 좋고 audio만 나쁘면 reroll보다 후편집 교체.
+1. 첫 프레임/초반에 premise와 scale이 즉시 읽히는가?
+2. 실제 miniature making처럼 보이는가, AI-cat 연기처럼 보이지 않는가?
+3. paw anatomy/동작이 자연스러운가?
+4. tactile transformation이 만족스럽고 명확한가?
+5. 이전 clip과 scale/props/camera/lighting continuity가 유지되는가?
+6. 8초가 지루하지 않으면서도 급하지 않은가?
+7. payoff가 다음 scene 또는 완결을 기대하게 만드는가?
 
-## 10. Research / benchmark
+구조 FAIL: face/body/full cat, human hands, human-like grip, weak scale, maker-view collapse, major continuity drift.
 
-1차 benchmark:
-- realistic miniature cooking/making
-- handcrafted tiny-food process
-- relaxing tactile ASMR
+## 9. Audio / finishing
 
-AI-cat 채널은 paw appearance/reliability 같은 보조 근거만 사용한다.
+기본: no narration, no generated music, quiet room tone + close ASMR.
 
-복제 금지:
-- exact title
-- exact plot
-- branded product/package
-- distinctive set/dish styling
-- exact ending
+Motion이 좋고 audio만 나쁘면 reroll 대신 후편집 교체.
 
-추출 허용:
-- hand-centric maker composition
-- tiny scale contrast
-- tactile process
-- calm pacing
-- seasonal timing
-- material payoff
+Eligible Flow UI에서 1080p upscale이 0 credits로 표시되면 continuity chain 완료 후 QC-PASS clip에만 적용할 수 있다. Upscaled/re-encoded export는 next-scene continuity bridge로 사용하지 않는다.
 
-Evidence saturation: ranking/timing/mechanics/freshness/Flow assumption/actual production learning을 바꾸지 않는 same-class promo/retail signal은 commit하지 않는다.
+## 10. Research / episode choice
+
+Primary benchmark: realistic miniature cooking/making, handcrafted tiny-food process, relaxing tactile ASMR. AI-cat channels은 paw/anatomy/reliability 보조 신호만.
+
+추출: hook mechanics, hand-centric composition, scale contrast, tactile transformation, pacing, seasonal timing, payoff. Exact title/plot/branded package/distinctive set/ending 복제 금지.
+
+Evidence saturation 유지. 새 근거가 ranking/timing/content mechanic/production mechanic/actual learning을 바꾸지 않으면 기록을 늘리지 않는다.
 
 ## 11. 현재 제작 상태
 
@@ -254,61 +197,39 @@ Evidence saturation: ranking/timing/mechanics/freshness/Flow assumption/actual p
 
 `猫の前足で作る、12mmの焼きいも。`
 
-- runtime: `immersive_h40`
-- 4 Lite scenes / current non-Ultra first-pass ceiling 40 credits
-- final target 32~35s
-- Mini Forest-style tiny yakiimo making
+- `immersive_h40`
+- up to 4 Lite scenes / current non-Ultra first-pass ceiling 40 video credits
 - KF0→KF4 planned continuity
-- same roasting tray / warmer / serving niche
-- G2/G3/G4 First = previous PASS clip native saved frame
+- same tray / warmer / serving niche
+- scene actions: G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide`
 - no direct pinch/grab
 - zero-cut long take
-- explicit scene action families: G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide`
 
-최우선:
-1. current maker-view manifest validation PASS
-2. KF0→KF4 continuity PASS
-3. G1만 생성
-4. maker-view / paws-only / scale / anatomy / fixed props / zero-cut QC
-5. PASS → Save frame → G2
-6. chain 완료 후 eligible subscription에서 UI가 0 credits를 표시할 때 QC-PASS clip만 1080p upscale
+다음 실제 제작의 초점은 비용 가드가 아니라:
+1. TK-005 HOOK/SCALE PROOF가 KF0에서 즉시 읽히게 만들기
+2. KF0→KF4의 miniature realism/props/lighting continuity 높이기
+3. 각 G scene의 tactile transformation과 payoff를 더 명확하게 하기
+4. G1을 한 번에 PASS시킬 prompt/first-last-frame 품질 높이기
+5. 실제 제작 시간/수정 횟수/reroll을 기록해 다음 episode를 더 빨리 만들기
 
 ## 12. Learning
 
-실제 값만 기록:
-- Flow credits / rerolls
-- G1~G4 first-pass success
-- maker-view/camera failure
-- scale/anatomy/continuity failure
-- failed action type
-- usable motion seconds
-- final runtime
-- audio replacement
+기존 기록:
+- video credits / rerolls / G-stage first-pass
+- maker-view/character/scale/anatomy/continuity failures
+- failed action type / usable motion seconds / final runtime / audio replacement
 - 24h/72h Stayed to watch / APV / engaged views / subscribers / comments
 
-장기 KPI:
+추가 운영 학습:
+- preparation minutes
+- manual interventions
+- prompt corrections before G1
+- time-to-first-valid-G1
+
+장기 목표:
 ```text
-usable motion / credit
-engaged views / credit
-subscribers / 100 credits
+higher content quality
++ higher engaged views / paid credit
++ higher subscribers / paid credit
++ lower preparation time and manual work
 ```
-
-## 13. 가장 단순한 사용자 인터페이스
-
-사용자:
-```text
-다음 영상 준비해줘
-```
-
-ChatGPT가 handoff + charter + current standard + production/research/history 확인 → novelty-safe episode 선택 → manifest/NEXT_EPISODE/handoff 준비.
-
-사용자 로컬:
-```powershell
-./tools/make_next_short.ps1
-```
-
-자동화는 Flow 크레딧을 쓰거나 유료 영상을 생성하거나 YouTube에 게시하지 않는다.
-
-## 최종 목표
-
-> **Mini Forest의 사람 손만 자연스러운 고양이 앞발로 바꾼 듯한 초소형 힐링 제작 영상을, 실제 성과와 실패 데이터를 이용해 점점 더 높은 품질/credit 효율로 만든다.**
