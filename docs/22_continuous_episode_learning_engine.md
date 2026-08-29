@@ -1,14 +1,12 @@
 # Continuous Episode Learning Engine
 
-목표: **Mini Forest류 miniature-making benchmark → 일본 시즌 선행 신호 → paw-only 아이디어 → 저실패 Flow 제작 → 24h/72h 성과 → 다음 episode**가 한 저장소에서 누적되게 한다.
+목표: **Mini Forest류 miniature-making benchmark → 일본 시즌/수요 신호 → paw-only 아이디어 → quality-first fast production → 24h/72h 성과 + 제작시간 → 다음 episode**가 한 저장소에서 누적되게 한다.
 
 Source of truth:
 - `PROJECT_HANDOFF.md` — current state / decisions / failures / next priorities
-- `PRODUCT_CHARTER.md` — durable product intent / creative identity / improvement decision standard
-- `CURRENT_STANDARD.md` — current executable production rules
-- `docs/23_minimum_credit_operator_architecture.md`
-- `docs/24_hero_cat_brand_identity.md`
-- `docs/25_pov_paws_microworld_grammar.md`
+- `PRODUCT_CHARTER.md` — durable product intent / priority order / improvement standard
+- `CURRENT_STANDARD.md` — executable production rules
+- `docs/23_minimum_credit_operator_architecture.md` — legacy filename, current quality-first fast operator architecture
 - `docs/27_research_evidence_saturation_gate.md`
 - `ideas/episode_backlog.yaml`
 - `analytics/learning_ledger.csv`
@@ -17,50 +15,49 @@ Source of truth:
 
 1. latest main SHA + recent commits/PRs
 2. `PROJECT_HANDOFF.md`
-3. `PRODUCT_CHARTER.md` — durable intent와 10-question improvement test 확인
-4. START_HERE / CURRENT_STANDARD / NEXT_EPISODE / current manifest / analytics
-5. latest explicit user direction + merged state가 stale chat/automation보다 우선
-6. material change면 same branch/PR에서 PROJECT_HANDOFF 업데이트
-7. executable production rule이 바뀌면 CURRENT_STANDARD도 동기화
-8. durable product purpose/identity/economics philosophy가 바뀌는 경우에만 PRODUCT_CHARTER 업데이트
+3. `PRODUCT_CHARTER.md`
+4. START_HERE / CURRENT_STANDARD / docs/23/27 / NEXT_EPISODE / current manifest / research/backlog/ledger
+5. newest explicit user direction + merged state override stale chat/automation/legacy enum
+6. material change → same branch/PR `PROJECT_HANDOFF.md`
+7. executable production rule change → `CURRENT_STANDARD.md`
+8. durable product priority/purpose change only → `PRODUCT_CHARTER.md`
 
-NO-OP 연구는 handoff/charter/current standard를 억지로 수정하지 않는다.
+True NO-OP은 문서 churn 금지.
 
-## 1. Research loop
+## 1. Improvement priority
+
+현재 우선순위:
+1. video/content quality
+2. viewer outcome / recognizable channel identity
+3. production convenience and speed
+4. paid-video reroll/credit efficiency
+5. free-image cost policing
+
+사용자의 Nano Banana image access는 현재 무료다. 실제 비용 문제가 다시 생기지 않는 한 free-image cost gate 자체는 연구/개발 우선순위가 아니다.
+
+## 2. Research loop
 
 1. 일본/글로벌 miniature cooking, handcrafted tiny-food, ASMR, relaxing-food, adjacent Shorts 조사
-2. **Mini Forest류 hand-centric making composition을 1차 제작 benchmark로 사용**
-3. AI-cat character channels는 주된 스타일 기준이 아니라 paw appearance/reliability 등 보조 참고만 사용
-4. 일본 2~6주 seasonal/cultural/food signals 확인
-5. Flow 공식 가격/기능 확인
-6. 실제 Tiny Cat Kitchen production/performance 확인
-7. 의사결정이 바뀔 때만 repo 갱신
+2. Mini Forest류 hand-centric making composition을 1차 제작 benchmark로 사용
+3. AI-cat character channels은 paw appearance/reliability 같은 보조 참고만 사용
+4. 일본 2–6주 seasonal/cultural/food signals 확인
+5. 실제 Tiny Cat Kitchen production/performance 확인
+6. Flow 가정 변경이 필요할 때만 공식 Google 기능/가격 재확인
+7. decision이 바뀔 때만 repo evidence 갱신
 
-복제 금지:
-- exact title
-- exact plot
-- branded food/package
-- exact ending
-- exact set/dish presentation
+복제 금지: exact title / exact plot / branded package / distinctive set / signature ending.
 
-추출 허용:
-- hand-centric making composition
-- tiny scale contrast
-- real miniature craftsmanship
-- tactile process
-- pacing
-- material payoff
-- seasonal timing
+추출 허용: hook mechanic / hand-centric maker composition / tiny scale / tactile transformation / calm pacing / seasonal timing / material payoff.
 
-## 2. Evidence saturation
+## 3. Evidence saturation
 
-같은 후보에 behavioral demand / independent nationwide activation / current survey / dated cultural activation 중 충분한 근거가 이미 있으면 same-class PR/retail signal을 더 쌓지 않는다.
+이미 충분한 same-class evidence가 있으면 promotional/retail/news row를 더 쌓지 않는다.
 
-새 commit은 ranking, NEXT_EPISODE, timing, evidence class, production mechanic, freshness, Flow assumptions, 실제 production/performance 중 하나를 바꿀 때만 정당화한다.
+새 evidence commit은 ranking, NEXT_EPISODE, timing, evidence class, content mechanic, production mechanic, Flow assumption, freshness, 또는 real production learning 중 하나를 바꿀 때만 정당화한다.
 
-## 3. Backlog scoring
+## 4. Backlog scoring
 
-9축:
+기존 9축을 유지한다.
 - benchmark evidence 10
 - Japan relevance 10
 - healing fit 15
@@ -69,149 +66,164 @@ NO-OP 연구는 handoff/charter/current standard를 억지로 수정하지 않�
 - originality 10
 - worldbuilding 5
 - audience demand 5
-- expected credit efficiency 10
+- expected paid-credit efficiency 10
 
-현재 production prior:
-- 사람 손으로 미니어처를 만드는 듯한 process가 명확할수록 가점
-- 그 손 역할을 feline-safe paws로 바꿀 수 있을수록 가점
-- high-oblique/top-down/tabletop macro에서 동작이 잘 읽힐수록 가점
-- 5~20mm hero object와 paw scale contrast가 강할수록 가점
-- press/slide/nudge/roll/tap으로 만들 수 있을수록 가점
+Production prior:
+- first 1–2s scale-hook가 강할수록 가점
+- hand-centric miniature process가 명확할수록 가점
+- feline-safe paw action으로 변환하기 쉬울수록 가점
+- 5–20mm hero + paw scale contrast가 강할수록 가점
+- visible material transformation과 payoff가 강할수록 가점
+- high-oblique/top-down/tabletop macro에서 잘 읽힐수록 가점
 
 감점:
-- full-cat character acting 필요
-- human-like tool grip 필요
-- precise pinch/twist 필요
+- full-cat acting
+- human-like tool grip / pinch / precise twist
+- weak scale
 - crowd/multiple characters
-- miniature scale가 약함
+- payoff 없는 motion-only scene
 
-기존 backlog의 `POV_PAWS_MICROWORLD_V1` label은 legacy compatibility로 해석한다. 새 manifest에서는 CURRENT_STANDARD의 Mini Forest-style paw-only semantics로 재해석한다.
+Legacy `POV_PAWS_MICROWORLD_V1`은 compatibility token이다.
 
-## 4. Episode creation loop
+## 5. Episode creation loop
 
 사용자:
 ```text
 다음 영상 준비해줘
 ```
 
-ChatGPT:
-1. benchmark + seasonal signals
-2. production + analytics
-3. backlog 재평가
-4. recent fingerprint 중복 제거
-5. Mini Forest-style paw-only making에 맞게 premise 재구성
-6. H30/H40 선택
+ChatGPT/repo:
+1. latest state + actual production/analytics 확인
+2. fresh evidence는 필요한 만큼만 조사
+3. backlog 재평가 + novelty check
+4. episode 선택
+5. H30/H40 선택
+6. HOOK / TRANSFORMATION / SCALE PROOF / PAYOFF / JAPAN FIT 설계
 7. manifest 생성/수정
-8. NEXT_EPISODE 갱신
-9. material change면 handoff 동기화
+8. exact-order copy/paste `production/<EPISODE>_OPERATOR_CARD.md` 생성/수정
+9. NEXT_EPISODE 갱신
+10. material handoff sync
 
-## 5. Runtime learning
-
-H30/H40 숫자는 first-pass credit ceiling.
-
-```text
-compact_h30
-3×8s = raw 24s
-final 보통 24~27s
-
-immersive_h40
-4×8s = raw 32s
-final 보통 32~35s
+Normal user path:
+```powershell
+./tools/make_next_short.ps1
 ```
 
-G4는 독립적인 serving/world-resolution/afterglow 가치가 있을 때만.
+Primary execution surface = Operator Card. Bundle/flow-pack = fallback/reference.
 
-학습 비교:
-- Stayed to watch
-- APV
-- engaged views / credit
-- subscribers / 100 credits
+## 6. Content-quality learning
 
-## 6. Progressive Spend
+각 episode에서 paid generation 전 다음 hypothesis를 명시한다.
+- opening hook hypothesis
+- strongest scale-proof frame
+- scene-by-scene visible transformation
+- final payoff hypothesis
+- Japan timing/relevance hypothesis
 
-생성 직전 공식 docs + 실제 UI 확인.
+영상이 실제로 나온 뒤 이 hypothesis가 output에서 살아남았는지 기록한다. 기술적으로 PASS여도 hook/transform/payoff가 약하면 다음 episode prior에 반영한다.
+
+## 7. Runtime / Progressive Spend
+
+H30/H40는 first-pass paid tier.
 
 ```text
-FREE planned KF chain
+compact_h30 = 3×8s raw
+immersive_h40 = up to 4×8s raw
+```
+
+G4는 독립적인 serving/world-resolution/afterglow 가치가 있을 때만. G3가 이미 완결되면 stop.
+
+```text
+strong visual/KF chain
 → G1 only
-→ maker-view / paw-only / scale / anatomy QC
-→ native Save frame
+→ quality + structural QC
+→ PASS: native Save frame
 → G2 only after PASS
 → G3 only after PASS
-→ G4 only when manifest/runtime gate justifies it
+→ G4 only when real G3 still benefits
 ```
 
-다음 scene First frame = previous PASS clip actual saved frame.
+다음 scene First frame = previous PASS clip actual native saved frame.
 
-## 7. Learning ledger
+## 8. Learning ledger
 
-가능하면 기록:
-- actual Flow credits
+가능하면 실제값 기록:
+- paid Flow credits
 - rerolls
 - G1~G4 first-pass success
-- `maker_view_failure` — 작업대/공정 중심 Mini Forest-style maker composition이 무너진 구조적 실패
-- `character_failure` — face/head/body/full-cat 또는 human-job character-performance 회귀
-- scale failure
-- anatomy failure
-- continuity issue
+- `maker_view_failure`
+- `character_failure`
+- scale/anatomy/continuity failure
 - failed action type
-- usable motion seconds
-- final runtime
+- usable motion seconds / final runtime
 - audio replacement
-- Stayed to watch
-- APV
-- engaged views
-- subscribers
-- comments
+- Stayed to watch / APV / engaged views / subscribers / comments
 
-`pov_failure`는 과거 ledger 호환을 위해 남겨둔 deprecated field다. 새 관측에서 **non-first-person maker view라는 이유만으로 true로 기록하지 않는다.** `maker_view_failure` / `character_failure`가 존재하면 현재 scorer는 이 둘을 우선하며 legacy `pov_failure`는 무시한다. 오래된 외부 ledger처럼 새 필드 자체가 없을 때만 compatibility fallback으로 사용한다.
+Operator-efficiency도 가능한 범위로 기록:
+- preparation minutes
+- manual interventions
+- prompt corrections before G1
+- time-to-first-valid-G1
 
-placeholder zero를 실제 관측값으로 학습하지 않는다.
+`pov_failure`는 deprecated compatibility field다. Non-first-person maker view 자체를 실패로 기록하지 않는다.
 
-## 8. Existing production lesson reinterpretation
+Placeholder zero를 실제 관측값으로 학습하지 않는다.
 
-2026-08-25 test에서 third-person full-cat + body visible + object scale too large가 실패했다.
+## 9. Existing production lesson
 
-이 실패의 최신 해석:
-- 문제는 `third-person` 자체가 아니다.
-- 문제는 **cat character-performance framing + body reveal + weak miniature scale**이다.
-- 허용 third-person/observer camera는 Mini Forest처럼 작업대와 앞발 동작만 보는 maker view다.
+실제 preflight failure:
+- full cat/body visible
+- hero too large
+- human-like tool-use risk
 
-Hard gate:
+최신 해석:
+- observer maker-view 자체는 문제 아님
+- character framing / weak scale / human-like manipulation이 실패
+
+Hard identity gate:
 - front paws only
 - no face/head/body/full cat
-- hero object <=0.50 paw width
-- miniature-making process is subject
+- hero <=0.50 paw width
+- miniature making process is subject
 - no human-like grip
 
-## 9. Long-term optimization
+## 10. Optimization targets
 
-장기 지표:
+장기적으로 함께 본다.
+
+Audience / paid-efficiency:
 ```text
-usable motion / credit
-engaged views / credit
-subscribers / 100 credits
+engaged views / paid credit
+subscribers / 100 paid credits
+usable motion / paid credit
 ```
 
-성공한 음식 자체를 복제하지 않고 성공한 scale hook / tactile action / maker-view composition / pacing / ASMR / payoff만 다음 prior에 반영한다.
+Production speed:
+```text
+time-to-first-valid-G1
+manual interventions / episode
+prompt corrections before G1
+rerolls / finished episode
+```
 
-`PRODUCT_CHARTER.md`의 decision test가 최상위 개선 필터다. 단순히 credits/video를 낮추는 변경은 paws-only miniature-making identity, healing/tactile quality, viewer outcome per credit, 또는 user control을 해치면 개선으로 간주하지 않는다.
+중요: `credits/video` 또는 `minutes/video`를 단독 최적화하지 않는다. 영상 퀄리티와 audience outcome이 떨어지면 개선이 아니다.
 
-최종 목표:
+성공한 음식/경쟁 episode 자체를 복제하지 않고 성공한 hook / scale / tactile action / maker-view / pacing / ASMR / payoff mechanics만 다음 prior에 반영한다.
 
-> **Mini Forest의 손-중심 미니어처 제작 감성을 유지하면서 사람 손만 고양이 앞발로 바꾼 듯한 Shorts를 가장 적은 실패 generation으로 만든다.**
+## 11. Final goal
 
-## 10. Documentation persistence
+> **Mini Forest의 손-중심 미니어처 제작 감성을 사람 손 대신 자연스러운 고양이 앞발로 구현하면서, 더 좋은 hook·transformation·payoff를 가진 Shorts를 사용자가 점점 더 적은 수동 작업과 재생성으로 빠르게 만들 수 있게 한다.**
 
-Material change 때 문서 역할에 따라 동기화한다.
+## 12. Documentation persistence
 
-- 항상: `PROJECT_HANDOFF.md` — 현재 상태/결정/학습/다음 단계
-- production/QC/Flow 실행 규칙 변경: `CURRENT_STANDARD.md`
-- durable purpose/creative identity/economics or improvement philosophy 변경: `PRODUCT_CHARTER.md`
+Material change:
+- always `PROJECT_HANDOFF.md`
+- production/QC/operator rule change → `CURRENT_STANDARD.md`
+- durable purpose/priority change → `PRODUCT_CHARTER.md`
 
 로컬 git 가능 시:
 ```powershell
 python tools/validate_handoff_update.py --base origin/main
 ```
 
-로컬 git이 불가능하면 최신 main에서 분기한 branch/PR diff로 same-change handoff 포함 여부를 검증한다.
+로컬 git이 불가능하면 latest main 기반 branch/PR diff에서 same-change handoff 포함 여부를 확인한다.
