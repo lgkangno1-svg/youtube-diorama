@@ -1,9 +1,9 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected for this iteration: `main@9d9d1bbe1e71a3ef330f3151deb77ee48c184507`
+Baseline inspected for this iteration: `main@5761758e7ff9809ecf6d98840e59ff7be7338fcc`
 
-Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research must not churn it.
+Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. A true NO-OP must not churn it.
 
 ## Start-of-run contract
 
@@ -70,30 +70,26 @@ Paid continuity:
 - G3: actual saved G2 PASS frame → KF3
 - G4 only if still justified: actual saved G3 PASS frame → KF4
 
-## Material improvement in this iteration — no-charge image preflight fail-closed operator gate
+## Material improvement in this iteration — no-charge keyframe gate now survives into generated bundle
 
-Official Google Flow model documentation was rechecked on 2026-08-29. It currently states:
-- `Nano Banana 2 Lite` is the default image model available **at no charge** for image generation/editing.
-- Veo 3.1 Lite supports First + Last Frames for 4s/6s/8s videos.
-- Veo 3.1 Lite remains 10 credits/generation for non-Ultra subscribers and 5 for Ultra.
-- Plus/Pro/Ultra 1080p upscale remains 0 credits.
-- actual Flow UI model/mode/output count/displayed cost remains final truth.
-
-Problem found:
-- `tools/make_next_short.ps1` told the operator to approve “free reference/keyframe images” but did not identify the documented no-charge image model or require a no-charge UI confirmation.
-- A user could accidentally switch to a paid image model and spend credits during what the production architecture treats as free keyframe preflight.
+Problem found after inspecting the latest merged one-command path:
+- `tools/make_next_short.ps1` correctly requires `Nano Banana 2 Lite` plus a visible no-charge UI state before planned KF work.
+- `tools/build_flow_pack.py` also contains the detailed fail-closed image preflight.
+- however, the generated top-level `${episode_id}_bundle.md` produced by `tools/build_episode_bundle.py` still told the operator to approve “free keyframes/contact sheet” without carrying the model + displayed-cost requirement.
+- a user who reopened only the bundle later could therefore miss the newer fail-closed preflight and treat an image-model change as automatically free.
 
 Corrected:
-- the one-command operator path now explicitly requires `Nano Banana 2 Lite` **and** a UI no-charge indication before KF0→KFn image generation/editing.
-- if the active model or displayed cost is different/unclear, the operator instruction is to stop rather than spend credits on keyframes.
-- no paid video generation or publishing is performed by the repository.
+- generated bundle Approval A now says planned keyframes are approved only after Flow is set to `Nano Banana 2 Lite` **and** the UI confirms no charge.
+- if the active image model or displayed keyframe cost is different or unclear, the bundle itself tells the operator to STOP and not treat Gate A as free.
+- regression coverage in `tools/test_build_episode_bundle_runtime.py` now fails if this protection disappears or the old generic “Approve ... free keyframes/contact sheet” wording returns.
 
 Why this matters:
-- preserves the intended “free keyframe/reference preflight → paid Veo only after continuity PASS” economics.
-- prevents hidden preflight credit leakage while keeping the actual Flow UI as final truth if Google changes model pricing or eligibility.
+- the simple user workflow produces artifacts that may be reopened independently of the PowerShell console.
+- cost/safety gates must be self-contained in those artifacts, not only transient terminal output.
+- this closes a realistic preflight credit-leak path without changing episode content or adding generations.
 
 Production impact:
-- no change to TK-005 story, ranking, runtime, keyframes, scene count, paw actions, Flow video model, or 40-credit first-pass ceiling.
+- no change to TK-005 story, ranking, runtime, keyframes, scene count, paw actions, video model, or 40-credit first-pass ceiling.
 - no Flow credits spent.
 - no publishing.
 
@@ -119,6 +115,12 @@ Learning semantics:
 - non-first-person maker view is not a failure by itself
 
 ## Flow / spend baseline
+
+Official Google Flow pages rechecked on 2026-08-29:
+- Veo 3.1 Lite 4s/6s/8s: 10 credits/generation for non-Ultra, 5 for Ultra
+- free non-subscriber accounts receive 50 Flow credits/day; these do not stack on paid Plus/Pro/Ultra allocations
+- Nano Banana 2 Lite is documented in Flow Help as the default image model available at no charge
+- actual active model, feature eligibility and UI displayed cost remain final truth
 
 Current operator sequence:
 
@@ -171,9 +173,9 @@ Evidence saturation remains active. Same-class promotional/retail signals do not
 
 2026-08-29 cross-check:
 - sweet-potato/yakiimo evidence remains saturated and still supports TK-005
+- current Japanese sweet-potato event/menu signals are same-class and do not change ranking or production mechanics
 - 月見 remains a strong next seasonal class but does not invalidate prepared TK-005
-- latest MOS/yakiimo promotional signals were same-class and intentionally not committed to benchmark/backlog
-- official Flow model/features check produced the material no-charge image-model operator improvement above
+- no benchmark/backlog churn was justified in this iteration
 
 Candidate state:
 - TK-005 / IDEA-009 remains current production choice
@@ -182,8 +184,8 @@ Candidate state:
 ## Current roadmap / next priorities
 
 1. Keep all production entry points routed through `validate_maker_view_manifest.py`.
-2. Keep one-safe-action-per-scene manifest validation fail-closed.
-3. Keep KF preflight no-charge fail-closed: Nano Banana 2 Lite + UI confirms no charge before any keyframe generation/editing.
+2. Keep one-safe-action-per-scene validation fail-closed.
+3. Keep KF preflight no-charge fail-closed in **every operator artifact**: Nano Banana 2 Lite + UI confirms no charge before image generation/editing.
 4. Run current maker-view manifest/bundle path for TK-005 when the user executes `./tools/make_next_short.ps1`.
 5. Create/approve TK-005 KF0 master anchor in real Flow, then derive KF1→KF4 sequentially.
 6. Generate G1 only after planned KF chain passes.
@@ -204,6 +206,7 @@ Candidate state:
 - no candidate hero-scale ratio >0.50 paw width without documented exception
 - no paid scene without exactly one safe `paw_action_family`
 - no keyframe spend when no-charge image model/cost is not confirmed
+- generated bundle/Flow guidance must not call planned KFs generically free without the no-charge gate
 - no paid G1 before planned KF continuity passes
 - no next paid scene after prior structural failure
 - actual previous PASS native saved frame is the continuity bridge
@@ -216,20 +219,24 @@ Candidate state:
 
 ## Change log
 
-### 2026-08-29 — no-charge image preflight operator gate
-Baseline: `main@9d9d1bbe1e71a3ef330f3151deb77ee48c184507`.
+### 2026-08-29 — generated-bundle no-charge KF gate
+Baseline: `main@5761758e7ff9809ecf6d98840e59ff7be7338fcc`.
 
 Changed:
-- updated `tools/make_next_short.ps1` to require `Nano Banana 2 Lite` + a UI no-charge confirmation before KF0→KFn image work
+- `tools/build_episode_bundle.py`: carry Nano Banana 2 Lite + UI no-charge fail-closed requirement into generated bundle Approval A
+- `tools/test_build_episode_bundle_runtime.py`: regression guard against generic-free keyframe wording
 - synchronized this handoff
 
 Why:
-- official Flow docs identify Nano Banana 2 Lite as the default image model available at no charge; the previous generic “free keyframe” wording could hide accidental paid image-model use
+- the terminal had the safe rule, but a later-opened generated bundle could omit it and become a credit-leak bypass
 
 Production impact:
 - TK-005 remains H40 / four Lite video generations / 40-credit non-Ultra first-pass ceiling
 - no episode/ranking/keyframe/runtime changes
 - no credits spent; no publishing
+
+### 2026-08-29 — no-charge image preflight operator gate
+- `make_next_short.ps1` requires Nano Banana 2 Lite + UI no-charge confirmation before KF work
 
 ### 2026-08-29 — learning maker-view failure semantics
 - added `maker_view_failure` and `character_failure`; deprecated `pov_failure` to compatibility-only fallback
