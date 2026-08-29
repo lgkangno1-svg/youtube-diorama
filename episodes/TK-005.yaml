@@ -5,25 +5,25 @@ audience: [teens, twenties]
 format: healing_miniature_making_paws_only
 food: yakiimo
 constraint: 12mm_sweet_potato
-length_target_seconds: 34
+length_target_seconds: [24, 35]
 hook: "この小ささで、焼きいも作れる？"
 title: "猫の前足で作る、12mmの焼きいも。"
 content_quality:
   hook_visual: "KF0 must instantly read as two real feline front paws surrounding one absurdly tiny 12mm purple sweet potato on a thumbnail-sized roasting tray; the tiny scale must be understandable before any motion starts"
   scale_proof: "the sweet potato should occupy roughly 18-32% of one visible paw width and remain visibly smaller than the paw throughout; strongest proof is KF0/G1 with the potato centered between partial paws"
   japan_fit: "early-autumn yakiimo recognition is already rising in Japan; use generic roasted-sweet-potato warmth/crack/steam cues only, with no branded product styling"
-  payoff: "the single crack opens to a warm golden center and the same tiny tray settles into the already-visible serving niche while steam continues"
+  payoff: "G3 must already deliver the complete bright golden-center + steam payoff; G4 may add only an independently satisfying same-world serving resolution"
   scene_transformations:
     G1: "stationary tiny raw-looking purple sweet potato on tray → tray nudged toward heat, skin just beginning to warm/darken"
     G2: "warming intact skin → one small natural crack plus a thin steam wisp"
-    G3: "small crack → visibly widened crack revealing bright golden center after the tray slides away from heat"
-    G4: "finished yakiimo beside warmer → same tray quietly slid into the existing serving niche, then stillness + steam"
+    G3: "small crack → visibly widened crack revealing bright golden center after the tray slides away from heat; this is the complete core ending"
+    G4: "optional only after real G3 review: finished yakiimo beside warmer → same tray quietly slid into the existing serving niche, then stillness + steam"
   first_pass_quality_priority:
     - "impossible scale readable in first 1-2 seconds"
     - "real miniature food/workbench realism stronger than AI-cat character presence"
     - "each scene shows one clear state transformation, not motion for motion's sake"
     - "same paw fur, tray, warmer, serving niche, lens, light and hero scale across KF0-KF4 and G1-G4"
-    - "G4 stays only if the tray-to-serving-niche resolution feels independently satisfying after real G3 footage"
+    - "G1-G3 must already form a satisfying complete Short; G4 stays only if the tray-to-serving-niche resolution feels independently satisfying after real G3 footage"
 brand_identity:
   hero_cat: HERO_CAT_V1
   kitchen_world: KITCHEN_WORLD_V1
@@ -48,9 +48,10 @@ camera_grammar:
   third_person_full_cat_is_fail: true
 runtime_strategy:
   mode: immersive_h40
-  target_final_runtime_seconds: [32, 35]
-  minimum_distinct_motion_beats: 4
-  fourth_beat_value: "quiet world-resolution: one paw slides the same tiny roasting tray with the finished yakiimo into its diorama serving position, then stops while steam remains"
+  target_final_runtime_seconds: [24, 35]
+  minimum_distinct_motion_beats: 3
+  fourth_beat_optional_after_g3: true
+  fourth_beat_value: "optional quiet world-resolution: only if real G3 still benefits, one paw slides the same tiny roasting tray with the finished yakiimo into its diorama serving position, then stops while steam remains"
   do_not_pad_to_runtime: true
 flow_strategy:
   mode: progressive_h40_sequential_chain
@@ -84,8 +85,8 @@ keyframes:
   KF0_OPEN: "realistic miniature cooking scene inspired only by the hand-centric making grammar of Mini Forest; high-oblique macro view over a tiny handcrafted wooden workbench; only two cream-and-pale-ginger feline front paws enter naturally from the lower side edges where human hands normally would; no cat face, head or body; between the paws sits one absurdly tiny 12mm purple sweet potato on a thumbnail-sized ceramic roasting tray; a tiny tabletop warmer is already fixed ahead of the tray; a tiny wooden serving niche is already visible at the far upper-right; shallow depth of field, real miniature materials, calm handcrafted realism"
   KF1_WARM: "same high-oblique maker-view camera, same paw identity, same workbench, same fixed warmer and same serving niche; the same 12mm sweet potato is gently warming on the same tiny ceramic roasting tray near the warmer, skin slightly darker; food remains dramatically smaller than either paw; realistic miniature cooking, no character-performance framing"
   KF2_CRACK: "same maker-view camera and miniature workbench; same warmer, tray and serving niche remain fixed; the sweet potato skin has one small natural crack with a very thin curl of steam; one feline paw lightly steadies the tray from the side without gripping; no human hand anatomy"
-  KF3_OPEN: "same high-oblique macro maker-view, same workbench and props; the same tray has moved a few millimeters away from the warmer; the existing crack has widened naturally enough to reveal a bright golden center and soft steam; paws remain partial working limbs only, food still under one third paw width"
-  KF4_SERVE: "same maker-view camera and handcrafted miniature workbench; the same already-visible serving niche now holds the same tiny ceramic roasting tray with the finished 12mm yakiimo; the warmer remains in its original location; one feline front paw rests naturally near the edge after completing the slide while warm steam remains; no new plate, cookware, shelf, cat face or body"
+  KF3_OPEN: "same high-oblique macro maker-view, same workbench and props; the same tray has moved a few millimeters away from the warmer; the existing crack has widened naturally enough to reveal a bright golden center and soft steam; paws remain partial working limbs only, food still under one third paw width; this frame must be satisfying enough to end the Short without KF4"
+  KF4_SERVE: "optional resolution target only: same maker-view camera and handcrafted miniature workbench; the same already-visible serving niche now holds the same tiny ceramic roasting tray with the finished 12mm yakiimo; the warmer remains in its original location; one feline front paw rests naturally near the edge after completing the slide while warm steam remains; no new plate, cookware, shelf, cat face or body"
 scenes:
   - id: G1
     generation_type: first_plus_last
@@ -107,24 +108,24 @@ scenes:
     action_guard: "preserve the same stable miniature-making camera, same paw anatomy and tiny scale; no tool grip; paw does not pick up food; same warmer and serving niche remain fixed; one material transformation"
   - id: G3
     generation_type: first_plus_last
-    purpose: golden_center_reveal
+    purpose: complete_core_golden_center_reveal
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G2
     end_frame: KF3_OPEN
     paw_action_family: [slide]
-    action: "one paw slowly slides the same tiny roasting tray a few millimeters away from the heat, then stops; during the quiet hold the existing crack widens naturally from residual warmth and the golden center becomes visible"
-    action_guard: "one slide plus one passive material micro-beat; no cat character performance; paw never pinches the sweet potato; no fingers or thumbs; preserve same tray, maker-view camera, tiny scale, fixed warmer and serving niche"
+    action: "one paw slowly slides the same tiny roasting tray a few millimeters away from the heat, then stops; during the quiet hold the existing crack widens naturally from residual warmth and the golden center becomes visible; this scene must resolve the core Short without requiring G4"
+    action_guard: "one slide plus one passive material micro-beat; no cat character performance; paw never pinches the sweet potato; no fingers or thumbs; preserve same tray, maker-view camera, tiny scale, fixed warmer and serving niche; ending must be independently satisfying"
   - id: G4
     generation_type: first_plus_last
-    purpose: quiet_world_resolution
+    purpose: optional_quiet_world_resolution_after_g3_review
     generation_seconds: 8
     start_frame: ACTUAL_LAST_USABLE_FRAME_G3
     end_frame: KF4_SERVE
     paw_action_family: [slide]
-    action: "one feline front paw slowly slides the same ceramic roasting tray holding the finished yakiimo into the already-visible miniature serving niche, then stops; warm steam continues as a passive payoff"
-    action_guard: "exactly one active paw action: the tray slide; after the paw stops, only steam may continue; same tray, warmer and serving niche; introduce no new plate, bowl, cookware, shelf or stall structure; keep the Mini Forest-style miniature-making observer camera; this is a quiet world-resolution beat, not runtime padding; no paw withdrawal gesture, eating, customer, camera cut, face or full cat"
+    action: "OPTIONAL AFTER REAL G3 REVIEW ONLY: if G3 is strong and still benefits from closure, one feline front paw slowly slides the same ceramic roasting tray holding the finished yakiimo into the already-visible miniature serving niche, then stops; warm steam continues as a passive payoff"
+    action_guard: "do not generate merely because G4 exists in the manifest; first decide after real G3 that this adds independent satisfaction; exactly one active paw action: the tray slide; after the paw stops, only steam may continue; same tray, warmer and serving niche; introduce no new plate, bowl, cookware, shelf or stall structure; keep the Mini Forest-style miniature-making observer camera; no paw withdrawal gesture, eating, customer, camera cut, face or full cat"
 post_production:
-  preferred_final_runtime_seconds: [32, 35]
+  preferred_final_runtime_seconds: [24, 35]
   target_motion_density_pct_min: 82
   max_total_static_hold_seconds: 3
   preferred_playback_speed_range: [0.92, 1.00]
@@ -140,11 +141,11 @@ success_metrics:
 originality_guard:
   unique_goal: make_a_12mm_yakiimo_with_cat_paws_in_realistic_miniature_cooking_style
   unique_conflict: heat_reveals_a_single_skin_crack_without_human_tool_use
-  unique_ending: one_paw_slides_the_same_tiny_roasting_tray_into_a_diorama_serving_niche_then_stops_while_steam_remains
+  unique_ending: core_ends_on_golden_center_reveal_optional_g4_slides_same_tray_into_existing_serving_niche
   do_not_copy_branded_food_or_other_creator_plot: true
 episode_fingerprint:
   hook_mechanic: paw_to_object_impossible_scale_contrast
   dominant_visual: purple_12mm_sweet_potato_macro
   conflict_mechanic: slow_skin_crack
   emotional_turn: tiny_scale_awe_to_warm_reveal
-  ending_mechanic: quiet_world_resolution
+  ending_mechanic: golden_center_core_resolution_optional_same_world_serving_resolution
