@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected for this iteration: `main@b9e8382df1fb906ae3cf43781ac64e3b331602e9`
+Baseline inspected for this iteration: `main@9120f69fcac0874e2b5f4aa03ddc6f3a0b3ae73f`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material change updates this file in the same branch/PR; true NO-OP does not churn it.
 
@@ -15,24 +15,16 @@ Document roles:
 - `CURRENT_STANDARD.md`: executable production/QC/operator rules
 - manifests + ledgers: episode plan + observed evidence
 
-## Latest user priority clarification — 2026-08-29
+## Durable priority order
 
-The user explicitly clarified:
-- Nano Banana is available free in their Google usage context.
-- Stop centering development on Nano Banana cost protection.
-- Focus primarily on **video quality and content quality**.
-- Also optimize **how the user should make the videos, convenience, fast production, and practical efficiency**.
-
-Durable priority order is now:
+Latest explicit user direction:
 1. video/content quality
 2. viewer outcome / recognizable channel identity
 3. production convenience and speed
 4. paid-video reroll/credit efficiency
 5. free-image cost policing
 
-Existing image-cost fail-closed guards remain as harmless safety rails, but further cost-gate hardening/research/documentation is deprioritized unless the user reports a real change/problem. Paid Veo generation and publishing still require explicit user action.
-
-`PRODUCT_CHARTER.md` and `CURRENT_STANDARD.md` were synchronized in this iteration to prevent future AIs from returning to repeated free-image cost-gate work.
+Nano Banana is available free in the user's Google usage context. Existing safety wording can remain, but do not spend iterations polishing image-cost gates unless a real problem returns. Paid Veo generation and publishing still require explicit user action.
 
 ## Durable product intent
 
@@ -48,41 +40,6 @@ Non-negotiable:
 - literal first-person POV not mandatory
 - calm tactile long takes / close ASMR
 - no AI-cat job/character-performance regression
-
-## New quality-first content gate
-
-Before paid video, every episode should make these explicit:
-- **HOOK**: first 1–2s immediately communicate tiny + paws + making
-- **TRANSFORMATION**: visible state change per scene, not motion for motion's sake
-- **SCALE PROOF**: shot where paw/object contrast is strongest
-- **PAYOFF**: finished/steam/crack/gloss/serving reason to stay
-- **NOVELTY/JAPAN FIT**: why this subject now and what makes it distinct
-
-If one is weak, improve premise/shot/action rather than adding runtime.
-
-## Fast-production operator target
-
-Normal interface remains:
-```text
-다음 영상 준비해줘
-```
-
-The prepared output should minimize user assembly work:
-- complete topic/rationale/runtime choice
-- exact-order KF prompts
-- exact-order G prompts
-- invariant settings/negative constraints already included
-- one obvious `지금 할 것` at a time
-- clear PASS/FAIL criteria
-- manifest/NEXT_EPISODE/handoff already synchronized
-
-Tooling improvements should target:
-- lower time-to-first-valid-G1
-- fewer manual interventions per episode
-- fewer prompt corrections before G1
-- fewer rerolls per finished episode
-
-Do not add warning/documentation layers unless they materially improve quality, speed, paid-video efficiency, or safety.
 
 ## Current production state
 
@@ -106,6 +63,86 @@ Continuity:
 - G3 actual saved G2 PASS frame→KF3
 - G4 only if still justified: actual saved G3 PASS frame→KF4
 
+## Material improvement in this iteration — TK-005 is now quality-first and operator-ready
+
+Problem found after cross-checking the current manifest against the newly merged quality/speed standard:
+- TK-005 had technically valid keyframes/actions, but the manifest did not explicitly encode the new five-part quality gate: HOOK / TRANSFORMATION / SCALE PROOF / PAYOFF / JAPAN FIT.
+- A user still had to reconstruct the exact production order and copy/paste prompts from multiple files/generated artifacts.
+- The most important first-pass quality decision — whether KF0 instantly communicates `cat paws + absurdly tiny 12mm food + real miniature making` — was not isolated as the current action.
+
+Changed:
+- `episodes/TK-005.yaml` now includes a `content_quality` block with:
+  - explicit visual hook
+  - scale proof
+  - Japan-fit rationale
+  - final payoff
+  - G1→G4 visible state transformations
+  - first-pass quality priorities
+- added `production/TK-005_OPERATOR_CARD.md`, a single fast-production surface containing:
+  - one clear current action: create/approve KF0 first
+  - copy/paste-ready KF0 prompt
+  - sequential KF1→KF4 change prompts
+  - exact G1→G4 video prompts
+  - scene-specific PASS criteria
+  - G3→G4 adaptive runtime decision
+  - final-edit priorities
+
+Why this is material:
+- it directly improves the Short rather than adding another process/cost warning
+- it makes scale/readability/payout goals explicit before paid generation
+- it reduces prompt reconstruction/manual decision load
+- it makes G1 the primary paid quality checkpoint and preserves Progressive Spend
+
+Production impact:
+- no change to TK-005 ranking, H40 ceiling, safe paw actions or paid-video authorization
+- no Flow/Veo credits spent
+- no publishing
+
+## TK-005 quality gate now encoded
+
+HOOK:
+- KF0 must instantly read as two real feline paws + one impossibly tiny 12mm purple sweet potato on a thumbnail-sized tray.
+
+TRANSFORMATION:
+- G1: tray moves toward heat / skin subtly warms
+- G2: small natural crack + thin steam
+- G3: existing crack widens / golden center appears
+- G4: same finished tray slides into the already-visible serving niche
+
+SCALE PROOF:
+- hero remains roughly 18–32% of one visible paw width; KF0/G1 is the strongest proof shot.
+
+PAYOFF:
+- bright golden center + soft steam; optional final world-resolution in the same serving niche.
+
+JAPAN FIT:
+- current late-August/early-autumn sweet-potato recognition remains strong; use generic yakiimo cues only.
+
+## Fast-production operator target
+
+Normal interface remains:
+```text
+다음 영상 준비해줘
+```
+
+For TK-005, the immediate execution surface is now:
+`production/TK-005_OPERATOR_CARD.md`
+
+The card is intentionally organized so the operator does not need to reconstruct the flow:
+```text
+KF0 strongest scale frame
+→ derive KF1→KF4 in same world
+→ G1 only
+→ PASS / native Save frame
+→ G2
+→ PASS / native Save frame
+→ G3
+→ decide if story is already complete
+→ G4 only if it adds a real final payoff
+```
+
+Future tooling should make this kind of card generated automatically from manifest `content_quality` + scene data rather than hand-maintained, once that can be done without adding fragility.
+
 ## Canonical validation state
 
 - candidate selector fail-closed for <=0.50 paw-width scale and feline-safe actions
@@ -114,11 +151,11 @@ Continuity:
 - `maker_view_failure` / `character_failure` are current learning fields; `pov_failure` is compatibility-only
 - non-first-person maker view is not a failure by itself
 
-These safety gates stay; current priority is no longer spending iterations polishing them unless a real failure appears.
+These gates stay; current priority is content/operator quality unless a real structural regression appears.
 
 ## Flow / production baseline
 
-Current paid-video strategy remains Progressive Spend:
+Progressive Spend remains:
 ```text
 strong visual/keyframe continuity PASS
 → G1 only
@@ -131,8 +168,6 @@ strong visual/keyframe continuity PASS
 
 Actual Flow UI at paid generation time remains final truth for model/mode/output count/displayed cost. No automatic paid generation/publishing.
 
-Nano Banana/reference frames should now be treated primarily as a **free quality/continuity tool available to the user**, not as a cost-risk research target. Build the strongest KF0 and sequential destinations efficiently.
-
 ## Current learning
 
 One real preflight failure remains:
@@ -144,7 +179,7 @@ Interpretation: observer maker-view is fine; character framing, weak scale and h
 
 No trustworthy public 24h/72h Tiny Cat Kitchen sample yet. Do not learn from placeholders.
 
-Future real production should additionally record when practical:
+When real production begins, also record when practical:
 - preparation minutes
 - manual interventions
 - prompt corrections before G1
@@ -152,18 +187,23 @@ Future real production should additionally record when practical:
 
 ## Research / candidate state
 
-Evidence saturation remains active. TK-005 / IDEA-009 remains current production choice. 月見 and 新米塩むすび remain strong future seasonal classes. No new research/backlog churn was needed for this user-priority correction.
+Fresh 2026-08-29 cross-check:
+- current Japanese sweet-potato launches continue into early September and reinforce existing yakiimo timing.
+- adjacent Japanese food Shorts continue to show strong engagement for clear close-up process/ASMR, but this adds no distinct mechanic beyond the already saturated process-first ASMR evidence.
+- therefore `research/benchmark_log.csv` and candidate ranking were intentionally not churned.
+
+TK-005 / IDEA-009 remains current production choice. 月見 and 新米塩むすび remain strong future seasonal classes.
 
 ## Current roadmap / next priorities
 
-1. **Stop spending iterations on Nano Banana free-cost guard polishing unless a real problem is reported.**
-2. Audit TK-005 specifically for hook strength, tactile transformation, scale proof and final payoff before paid generation.
-3. Improve KF0→KF4 prompts/visual anchors for miniature realism and continuity, using the user's free Nano Banana access efficiently.
-4. Improve G1 prompt/first-last-frame plan to maximize first-pass quality.
-5. Make generated operator pack more copy/paste-ready and reduce the number of decisions/clicks the user must make.
-6. When real production begins, measure preparation time/manual interventions/prompt corrections in addition to video credits/rerolls.
-7. Generate G1 only after visual preflight passes; inspect actual output before G2.
-8. Record real 24h/72h audience results and use them to improve content/runtimes/actions.
+1. Use `production/TK-005_OPERATOR_CARD.md` to make and approve the strongest possible KF0 anchor.
+2. Derive KF1→KF4 from the approved prior frame; reject scale/camera/prop drift before video spend.
+3. Generate G1 only after the visual chain passes; judge first-1–2s scale readability and feline-safe nudge quality.
+4. If G1 passes, use the native saved frame and continue progressively.
+5. After real G3, decide whether G4 still adds independent satisfaction; drop it if it has become padding.
+6. Record actual preparation time, prompt corrections, manual interventions, rerolls and video metrics.
+7. After at least one real production run, consider generating the fast operator card automatically from manifest `content_quality` and scene data to remove hand-maintenance.
+8. Use 24h/72h actual audience results to adjust hook/action/runtime priors.
 
 ## Safety / invariants
 
@@ -182,22 +222,24 @@ Evidence saturation remains active. TK-005 / IDEA-009 remains current production
 
 ## Change log
 
-### 2026-08-29 — quality/speed priority correction
-Baseline: `main@b9e8382df1fb906ae3cf43781ac64e3b331602e9`.
+### 2026-08-29 — TK-005 quality operator card
+Baseline: `main@9120f69fcac0874e2b5f4aa03ddc6f3a0b3ae73f`.
 
 Changed:
-- `PRODUCT_CHARTER.md`: made video/content quality, viewer outcome, production convenience/speed, then paid-video efficiency the explicit priority order; recorded that Nano Banana is free for the user's Google usage and repeated cost-gate development is deprioritized
-- `CURRENT_STANDARD.md`: added HOOK/TRANSFORMATION/SCALE PROOF/PAYOFF/NOVELTY quality gate, fast-preparation operator target, and operational speed metrics
+- `episodes/TK-005.yaml`: explicit content-quality gate and scene transformations
+- `production/TK-005_OPERATOR_CARD.md`: exact-order, copy/paste-ready KF/G production card with PASS criteria
 - synchronized this handoff
 
 Why:
-- recent iterations over-focused on preventing free-image credit leakage; the user explicitly wants development attention redirected to what viewers see and how quickly/easily a high-quality Short can be made
+- quality/speed priorities were merged in #66, but TK-005 itself still required manual reconstruction; this turns the new standard into an immediately usable production artifact
+
+Research:
+- fresh sweet-potato/ASMR signals were checked but are same-class/saturated and did not justify benchmark/backlog churn
 
 Production impact:
-- TK-005 remains H40 / up to 4 paid Lite generations / current 40-credit non-Ultra ceiling
-- no Flow/Veo credits spent; no publishing
-- next improvement work should be content/prompt/operator quality, not more Nano Banana cost-gate polishing
+- TK-005 remains H40 / up to four paid Lite video generations / current 40-credit non-Ultra ceiling
+- no paid generation or publishing
 
-### 2026-08-29 — previous operational hardening
-- normal operator surfaces currently contain Nano Banana/no-charge safety wording
-- learning semantics, scene-action validation, maker-view adapter and continuity rules remain in force
+### 2026-08-29 — quality/speed priority correction
+- product priority order changed to video/content quality → viewer outcome → production speed/convenience → paid-video efficiency → free-image cost policing
+- Nano Banana cost-gate hardening explicitly deprioritized
