@@ -25,7 +25,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host ""
 Write-Host "NEXT:" -ForegroundColor Green
 Write-Host "1. Open generated/${EpisodeId}_bundle.md"
-Write-Host "2. Approve the free keyframes/contact sheet before spending Flow credits."
+Write-Host "2. Before any KF creation/edit, verify Flow is using Nano Banana 2 Lite AND the UI currently shows no charge. Only then approve the planned keyframes/contact sheet; if either is false or unclear, STOP instead of spending image credits."
 Write-Host "3. Follow generated/${EpisodeId}_flow_pack.md scene by scene; do not assume every episode is H30/three generations."
 Write-Host "4. Generate only the next scene allowed by the manifest/runtime gate, and only after the previous scene passes QC."
 Write-Host "5. Save the previous scene's actual last usable frame whenever the Flow pack requires it for the next First frame."
