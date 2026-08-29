@@ -8,6 +8,22 @@ constraint: 12mm_sweet_potato
 length_target_seconds: 34
 hook: "この小ささで、焼きいも作れる？"
 title: "猫の前足で作る、12mmの焼きいも。"
+content_quality:
+  hook_visual: "KF0 must instantly read as two real feline front paws surrounding one absurdly tiny 12mm purple sweet potato on a thumbnail-sized roasting tray; the tiny scale must be understandable before any motion starts"
+  scale_proof: "the sweet potato should occupy roughly 18-32% of one visible paw width and remain visibly smaller than the paw throughout; strongest proof is KF0/G1 with the potato centered between partial paws"
+  japan_fit: "early-autumn yakiimo recognition is already rising in Japan; use generic roasted-sweet-potato warmth/crack/steam cues only, with no branded product styling"
+  payoff: "the single crack opens to a warm golden center and the same tiny tray settles into the already-visible serving niche while steam continues"
+  scene_transformations:
+    G1: "stationary tiny raw-looking purple sweet potato on tray → tray nudged toward heat, skin just beginning to warm/darken"
+    G2: "warming intact skin → one small natural crack plus a thin steam wisp"
+    G3: "small crack → visibly widened crack revealing bright golden center after the tray slides away from heat"
+    G4: "finished yakiimo beside warmer → same tray quietly slid into the existing serving niche, then stillness + steam"
+  first_pass_quality_priority:
+    - "impossible scale readable in first 1-2 seconds"
+    - "real miniature food/workbench realism stronger than AI-cat character presence"
+    - "each scene shows one clear state transformation, not motion for motion's sake"
+    - "same paw fur, tray, warmer, serving niche, lens, light and hero scale across KF0-KF4 and G1-G4"
+    - "G4 stays only if the tray-to-serving-niche resolution feels independently satisfying after real G3 footage"
 brand_identity:
   hero_cat: HERO_CAT_V1
   kitchen_world: KITCHEN_WORLD_V1
