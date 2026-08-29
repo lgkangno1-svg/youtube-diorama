@@ -45,5 +45,5 @@ Write-Host "2. Generate only the next paid scene allowed by the manifest. G1 fir
 Write-Host "3. Save the previous PASS scene's actual last usable native frame whenever the next scene requires it as First frame."
 Write-Host "4. Do not reroll good motion for audio-only defects; replace bad audio in edit when practical."
 Write-Host "5. Do not add/drop a scene merely to hit target length; G4 must earn independent payoff value."
-Write-Host "6. Nano Banana is a free quality/continuity preflight in the user's current Google workflow. Existing UI/model checks are safety rails, not the production focus."
+Write-Host "6. Nano Banana is a free quality/continuity preflight in the user's current Google workflow. Safety rail only: before KF creation/edit, verify Nano Banana 2 Lite and that the UI currently shows no charge; if either is false or unclear, STOP instead of spending image credits."
 Write-Host "7. Paid Veo generation and publishing still require explicit user action."
