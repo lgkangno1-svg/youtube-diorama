@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected for this iteration: `main@a4b24d907c71a2c245e44d089c25d4e893b6eb95`
+Baseline inspected for this iteration: `main@1a52f249b3d5ca1b432d3f16f52976266f84a6a0`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OPs do not churn it.
 
@@ -28,7 +28,7 @@ Document roles:
 4. paid-video reroll/credit efficiency
 5. free-image cost policing
 
-Nano Banana is free in the user's current Google usage context. Existing cost/model checks remain safety rails only. Do not spend improvement cycles polishing those guards unless a real problem returns. Paid Veo generation and publishing remain explicit user actions.
+Nano Banana is free in the user's current Google usage context. Existing model/cost checks remain safety rails only. Do not spend improvement cycles polishing them unless a real problem returns. Paid Veo generation and publishing remain explicit user actions.
 
 ## Durable product intent
 
@@ -73,39 +73,39 @@ Continuity:
 - G3 actual saved G2 PASS frame→KF3
 - G4 actual saved G3 PASS frame→KF4 only if still justified
 
-## Material improvement in this iteration — normal one-command path now uses Operator Card first
+## Material improvement in this iteration — source-of-truth docs no longer point back to cost-first workflow
 
-Problem found after inspecting the merged PR #67 state:
-- PR #67 created a strong `production/TK-005_OPERATOR_CARD.md` with exact-order, copy/paste-ready prompts and a clear NOW action.
-- however, the actual normal command `./tools/make_next_short.ps1` still told the user to follow generated bundle/flow-pack files and prominently surfaced the older cost-first checklist.
-- `tools/make_short.ps1` likewise sent the user first to generated artifacts.
-- result: the repo had a faster quality-first runbook, but the user's one-command path did not actually lead to it. This preserved avoidable navigation/decision burden and contradicted the latest quality/speed priority.
+Problem found after inspecting merged PR #68:
+- `CURRENT_STANDARD.md`, `PRODUCT_CHARTER.md`, the operator scripts and this handoff already define quality/content → viewer outcome → production speed → paid-video efficiency as the priority.
+- however, `START_HERE.md` still described the normal path around generic generated packs and a cost-led Gate A, without making the episode Operator Card the primary execution surface.
+- `docs/23_minimum_credit_operator_architecture.md`, despite being a required source-of-truth file on every loop, still framed the architecture primarily as minimum-credit/free-KF optimization.
+- `docs/22_continuous_episode_learning_engine.md` still optimized mainly around failures/credits and did not carry the new operator-speed metrics or Operator-Card-First creation loop.
+- because scheduled/future AIs are explicitly told to cross-check these files every run, this disagreement could regress development back toward cost guards and away from video quality / fast creation even though implementation had already moved on.
 
-Changed:
-- `tools/make_next_short.ps1`
-  - detects `production/${EpisodeId}_OPERATOR_CARD.md`
-  - shows **YOUR NEXT ACTION** and points to the Operator Card first
-  - for TK-005 explicitly tells the operator to make/approve the strongest KF0 scale-hook anchor first
-  - moves generated bundle/flow-pack to technical reference/fallback status
-  - replaces the cost-centric visible checklist with quality-first Progressive Flow: visual preflight → G1 quality gate → PASS/native frame → next scene → optional value-gated G4
-- `tools/make_short.ps1`
-  - surfaces **PRIMARY RUNBOOK** = episode Operator Card when present
-  - keeps generated artifacts as fallbacks
-  - prioritizes hook/scale/transformation/continuity and Progressive Spend
-  - preserves the prior Nano Banana 2 Lite + UI no-charge + STOP wording as a safety rail so existing regression protection is not weakened
-- `tools/test_operator_card_first_path.py`
-  - regression guard requiring both normal scripts to prefer the Operator Card while retaining generated fallbacks
-- `CURRENT_STANDARD.md`
-  - executable standard now explicitly defines Operator-Card-First as the primary production surface
+Corrected:
+- `START_HERE.md`
+  - now states the durable priority order up front
+  - makes `production/<EPISODE>_OPERATOR_CARD.md` the PRIMARY RUNBOOK and generated bundle/flow-pack fallback/reference
+  - adds the content quality gate: HOOK / TRANSFORMATION / SCALE PROOF / PAYOFF / NOVELTY-JAPAN FIT
+  - treats Nano Banana as a quality/continuity tool in the user's current free-access context
+  - adds preparation-time/manual-intervention learning targets
+- `docs/23_minimum_credit_operator_architecture.md`
+  - legacy filename retained for links, but heading/purpose now explicitly Quality-First Fast Operator Architecture
+  - normal workflow is one command → one Operator Card → strong KF chain → progressive paid generation
+  - paid efficiency remains protected without letting cost minimization dominate product decisions
+  - adds `time-to-first-valid-G1`, manual interventions and prompt corrections as operator metrics
+- `docs/22_continuous_episode_learning_engine.md`
+  - creation loop now requires the exact-order Operator Card as a first-class artifact
+  - learning loop includes hook/scale/transformation/payoff hypotheses plus production-speed evidence
+  - official Flow re-check is triggered when production assumptions need changing rather than becoming the focus of every loop
 
 Why material:
-- directly reduces manual navigation and ambiguity in the user's normal one-command path
-- makes the strongest current quality artifact actually discoverable at the moment of production
-- reduces time-to-first-valid-G1 without spending credits or adding fragile automation
-- aligns implementation with the user's explicit priority: video quality + convenience + faster production
+- these are mandatory cross-check documents, so semantic drift here can steer every future automated iteration
+- the update reduces the chance that another AI optimizes the wrong proxy
+- it aligns product intent, operator implementation and learning loop without changing TK-005 or spending credits
 
 Production impact:
-- no change to TK-005 concept, H40 ceiling, scene actions, candidate ranking, or paid authorization
+- no change to TK-005 concept, H40 ceiling, scene actions, candidate ranking or paid authorization
 - no Flow/Veo credits spent
 - no publishing
 
@@ -119,11 +119,14 @@ Production impact:
 - actual previous PASS native saved frame is the next-scene continuity bridge
 - structural FAIL stops the next paid scene
 
-These safety gates stay. Current improvement focus is content/operator quality unless a real regression appears.
+These gates remain. Current improvement focus is content/operator quality unless a real regression appears.
 
 ## Research / evidence state
 
-This run rechecked current miniature/ASMR ecosystem signals. Large miniature-cooking channels remain active at scale, and current public channel snapshots continue to reinforce the already-known combination of tiny-food readability, tactile/satisfying process and ASMR. No new evidence changed TK-005 ranking, timing or mechanics, so `research/benchmark_log.csv` and backlog were intentionally not churned under the saturation gate.
+Fresh 2026-08-29 research rechecked current miniature/ASMR and Japanese sweet-potato signals:
+- a Japanese miniature-cooking channel snapshot still shows an active ~198K-subscriber / ~62M-view category presence and prior ~19-second miniature Shorts, reinforcing the already-known value of immediately legible tiny-food process
+- fresh late-August Japanese sweet-potato retail launches continue to confirm autumn timing
+- these are same-class/saturated signals and did not change TK-005 ranking, runtime or production mechanics, so `research/benchmark_log.csv` and backlog were intentionally not churned
 
 TK-005 / IDEA-009 remains current. 月見 and 新米塩むすび remain strong future seasonal candidates.
 
@@ -150,14 +153,14 @@ When real production begins, record when practical:
 
 ## Current roadmap / next priorities
 
-1. Run `./tools/make_next_short.ps1`; it should now point directly to `production/TK-005_OPERATOR_CARD.md`.
-2. Do only the Operator Card NOW action first: make the strongest KF0 scale-hook anchor.
-3. Derive KF1→KF4 sequentially; reject scale/camera/prop drift before paid video.
-4. Generate G1 only after visual continuity passes; judge first-1–2s readability and feline-safe nudge quality.
-5. PASS → native Save frame → continue progressively.
-6. After real G3, keep G4 only if it adds independent resolution value.
-7. Record production-time/manual-intervention data so future tooling can remove the next largest friction point.
-8. After at least one real run, consider automatic Operator Card generation from manifest data if it reduces maintenance without fragility.
+1. Keep source-of-truth docs aligned with the quality-first Operator-Card-First workflow; do not return to cost-guard polishing without a real problem.
+2. Run `./tools/make_next_short.ps1`; it should point directly to `production/TK-005_OPERATOR_CARD.md`.
+3. Do only the Operator Card NOW action first: make the strongest KF0 scale-hook anchor.
+4. Derive KF1→KF4 sequentially; reject scale/camera/prop drift before paid video.
+5. Generate G1 only after visual continuity passes; judge first-1–2s readability and feline-safe nudge quality.
+6. PASS → native Save frame → continue progressively.
+7. After real G3, keep G4 only if it adds independent resolution value.
+8. Record production-time/manual-intervention data so the next tooling improvement targets actual friction rather than guessed friction.
 9. Use real 24h/72h audience results to adjust hook/action/runtime priors.
 
 ## Safety / invariants
@@ -177,22 +180,24 @@ When real production begins, record when practical:
 
 ## Change log
 
-### 2026-08-29 — Operator-Card-First normal path
-Baseline: `main@a4b24d907c71a2c245e44d089c25d4e893b6eb95`.
+### 2026-08-29 — quality-first operating-system alignment
+Baseline: `main@1a52f249b3d5ca1b432d3f16f52976266f84a6a0`.
 
 Changed:
-- `tools/make_next_short.ps1`: primary next action now points to the episode Operator Card and quality-first G1 path
-- `tools/make_short.ps1`: Operator Card becomes PRIMARY RUNBOOK; generated artifacts become fallbacks; old safety rail retained without dominating UX
-- `tools/test_operator_card_first_path.py`: regression coverage
-- `CURRENT_STANDARD.md`: executable Operator-Card-First rule
+- `START_HERE.md`: Operator Card is now the documented primary runbook; quality gate + speed metrics added
+- `docs/23_minimum_credit_operator_architecture.md`: legacy filename retained but architecture redefined as quality-first/fast-production, with paid efficiency as a constraint rather than the product goal
+- `docs/22_continuous_episode_learning_engine.md`: Operator Card + content-quality hypotheses + operator-speed metrics added to the learning loop
 - synchronized this handoff
 
 Why:
-- PR #67 created the right fast-quality artifact but the real one-command path did not surface it
+- mandatory source-of-truth docs were semantically lagging behind PRs #66–#68 and could steer future scheduled improvements back toward cost-first optimization
 
 Production impact:
 - TK-005 remains H40 / up to four paid Lite scenes / current 40-credit non-Ultra ceiling
 - no paid generation/publishing
+
+### 2026-08-29 — Operator-Card-First normal path
+- normal scripts surface episode Operator Card before bundle/flow-pack
 
 ### 2026-08-29 — TK-005 quality operator card
 - explicit HOOK / TRANSFORMATION / SCALE PROOF / PAYOFF / JAPAN FIT
