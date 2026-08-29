@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected for this iteration: `main@ddcaf7f8bd54c376920fc3f8f3ba0b9b2a638a43`
+Baseline inspected for this iteration: `main@9d9d1bbe1e71a3ef330f3151deb77ee48c184507`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OP research must not churn it.
 
@@ -56,14 +56,13 @@ Current non-Ultra first-pass ceiling: 4 Veo 3.1 Lite generations / 40 credits
 Expected final: ~32–35s if all four beats remain independently useful
 
 Visual intent:
-- stable Mini Forest-style high-oblique maker view
-- front paws only where human hands normally would enter
+- Mini Forest-style high-oblique maker view
+- front paws only where human hands normally enter
 - 12mm yakiimo dramatically smaller than paw
 - same tray / warmer / serving niche through KF0→KF4
 - zero-cut calm long takes
 - one active paw-safe action per generation + optional passive payoff
 - scene action families: G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide`
-- G4 = tray slide, then passive steam only
 
 Paid continuity:
 - G1: KF0 → KF1
@@ -71,32 +70,30 @@ Paid continuity:
 - G3: actual saved G2 PASS frame → KF3
 - G4 only if still justified: actual saved G3 PASS frame → KF4
 
-## Material improvement in this iteration — learning failure semantics
+## Material improvement in this iteration — no-charge image preflight fail-closed operator gate
 
-A post-production learning regression risk was found in `tools/score_credit_efficiency.py` and the ledger schema.
+Official Google Flow model documentation was rechecked on 2026-08-29. It currently states:
+- `Nano Banana 2 Lite` is the default image model available **at no charge** for image generation/editing.
+- Veo 3.1 Lite supports First + Last Frames for 4s/6s/8s videos.
+- Veo 3.1 Lite remains 10 credits/generation for non-Ultra subscribers and 5 for Ultra.
+- Plus/Pro/Ultra 1080p upscale remains 0 credits.
+- actual Flow UI model/mode/output count/displayed cost remains final truth.
 
-Problem:
-- production has already moved from mandatory literal first-person POV to Mini Forest-style observational maker-view semantics.
-- `analytics/learning_ledger.csv` still exposed only `pov_failure` for framing failures.
-- `tools/score_credit_efficiency.py` directly treated `pov_failure=true` as a structural visual-grammar failure and printed that `POV` failure is structural.
-- A future operator could therefore mark a valid non-first-person maker-view as failed and teach the optimization loop to regress toward obsolete cat-eye POV.
+Problem found:
+- `tools/make_next_short.ps1` told the operator to approve “free reference/keyframe images” but did not identify the documented no-charge image model or require a no-charge UI confirmation.
+- A user could accidentally switch to a paid image model and spend credits during what the production architecture treats as free keyframe preflight.
 
 Corrected:
-- ledger now adds `maker_view_failure` and `character_failure` as current-semantic structural fields.
-- `pov_failure` remains only for backward compatibility with older ledgers/history.
-- scorer now prefers `maker_view_failure` / `character_failure` whenever those columns exist.
-- legacy `pov_failure` is consulted only when current-semantic columns are absent entirely.
-- interpretation text now explicitly says a non-first-person camera is not a failure by itself.
-- the existing preflight failure is marked as maker-view + character + scale failure because the real issue was full-cat/body character framing and weak miniature scale, not observer camera angle.
-- regression tests cover current-semantic PASS/failure behavior and legacy fallback.
+- the one-command operator path now explicitly requires `Nano Banana 2 Lite` **and** a UI no-charge indication before KF0→KFn image generation/editing.
+- if the active model or displayed cost is different/unclear, the operator instruction is to stop rather than spend credits on keyframes.
+- no paid video generation or publishing is performed by the repository.
 
 Why this matters:
-- the learning loop now matches the accepted visual identity instead of silently rewarding obsolete literal POV.
-- actual camera experiments can use high-oblique/top-down/side-oblique maker views without being mislabeled as structural failures.
-- historical ledgers remain readable.
+- preserves the intended “free keyframe/reference preflight → paid Veo only after continuity PASS” economics.
+- prevents hidden preflight credit leakage while keeping the actual Flow UI as final truth if Google changes model pricing or eligibility.
 
 Production impact:
-- no change to TK-005 story, ranking, runtime, keyframes, scene count, Flow model, credit budget or Progressive Spend.
+- no change to TK-005 story, ranking, runtime, keyframes, scene count, paw actions, Flow video model, or 40-credit first-pass ceiling.
 - no Flow credits spent.
 - no publishing.
 
@@ -114,26 +111,26 @@ Manifest / bundle validation:
 - all production bundle entry points route through it
 - every paid scene must declare exactly one safe `paw_action_family`
 - `validate_current_standard.py` is internal structural/runtime validation behind the adapter, not a direct current-semantic entry point
-- legacy POV values may remain only as compatibility data and cannot restore mandatory literal first-person framing
 
 Learning semantics:
 - current structural camera/framing fields are `maker_view_failure` and `character_failure`
 - scale/anatomy/continuity remain separate failure classes
-- `pov_failure` is deprecated compatibility data, not a statement that non-first-person is wrong
+- `pov_failure` is deprecated compatibility data only
+- non-first-person maker view is not a failure by itself
 
 ## Flow / spend baseline
 
-Official Google Flow Help rechecked 2026-08-29:
-- Veo 3.1 Lite: non-Ultra 10 credits/generation, Ultra 5 credits/generation
-- non-subscriber: 50 free Flow credits/day
-- Plus/Pro/Ultra: 1080p upscale currently 0 credits
-- non-subscriber: 1080p upscale unavailable
-- actual UI model/mode/output count/displayed cost = generation-time final truth
-
-Progressive Spend:
+Current operator sequence:
 
 ```text
-free/no-charge planned KF chain PASS
+Flow image preflight:
+Nano Banana 2 Lite + UI confirms no charge
+→ KF0 maker-view master anchor
+→ derive KF1→KFn sequentially
+→ all planned KFs PASS
+
+Paid video:
+→ Veo 3.1 Lite / 9:16 / 8s / output 1 / displayed cost verified
 → G1 only
 → QC
 → native Save frame
@@ -156,9 +153,8 @@ One real preflight failure remains recorded:
 Current interpretation:
 - observer/non-first-person maker-view itself is not a failure
 - full-cat/body character framing is `character_failure`
-- workbench/process framing that stops reading like Mini Forest-style miniature making is `maker_view_failure`
+- workbench/process framing collapse is `maker_view_failure`
 - weak tiny scale is `scale_failure`
-- maker-view + paws-only + tiny workpiece is desirable
 
 No trustworthy public 24h/72h Tiny Cat Kitchen performance sample yet. Do not learn from placeholders/theoretical zeros.
 
@@ -169,15 +165,15 @@ Primary benchmark class:
 - handcrafted tiny-food process
 - relaxing tactile ASMR
 
-AI-cat channels remain secondary only for narrow paw/anatomy/reliability evidence. Never copy exact title, plot, branded product/package, distinctive set/dish styling, or ending.
+AI-cat channels remain secondary only for paw/anatomy/reliability evidence. Never copy exact title, plot, branded product/package, distinctive set/dish styling, or ending.
 
 Evidence saturation remains active. Same-class promotional/retail signals do not justify commits unless they change ranking, timing, evidence class, production mechanics, Flow assumptions, freshness, or actual production learning.
 
 2026-08-29 cross-check:
 - sweet-potato/yakiimo evidence remains saturated and still supports TK-005
-- 月見 remains a strong next seasonal class but does not invalidate the already prepared TK-005 production state
-- benchmark/backlog intentionally unchanged in this iteration
-- official Flow pricing remains Lite 10 non-Ultra / 5 Ultra and paid-plan 1080p upscale 0 credits
+- 月見 remains a strong next seasonal class but does not invalidate prepared TK-005
+- latest MOS/yakiimo promotional signals were same-class and intentionally not committed to benchmark/backlog
+- official Flow model/features check produced the material no-charge image-model operator improvement above
 
 Candidate state:
 - TK-005 / IDEA-009 remains current production choice
@@ -187,17 +183,15 @@ Candidate state:
 
 1. Keep all production entry points routed through `validate_maker_view_manifest.py`.
 2. Keep one-safe-action-per-scene manifest validation fail-closed.
-3. Use `maker_view_failure` / `character_failure` for new production learning; do not classify ordinary observer camera as POV failure.
+3. Keep KF preflight no-charge fail-closed: Nano Banana 2 Lite + UI confirms no charge before any keyframe generation/editing.
 4. Run current maker-view manifest/bundle path for TK-005 when the user executes `./tools/make_next_short.ps1`.
-5. Create/approve TK-005 KF0 master anchor in real Flow.
-6. Derive KF1→KF4 sequentially with stable paws/scale/camera/props/lighting.
-7. Generate G1 only after planned KF chain passes.
-8. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
-9. PASS → save actual native usable final frame → continue progressively.
-10. After chain completion, if eligible and UI shows 0 credits, upscale QC-PASS clips to 1080p before final editing/export.
-11. Record actual credits, rerolls, usable motion, G-stage pass/fail, failure class.
-12. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
-13. Use accumulated real evidence to adjust actions, runtimes, scores, and spend strategy.
+5. Create/approve TK-005 KF0 master anchor in real Flow, then derive KF1→KF4 sequentially.
+6. Generate G1 only after planned KF chain passes.
+7. QC maker-view / paws-only / scale / anatomy / fixed props / zero-cut behavior.
+8. PASS → save actual native usable final frame → continue progressively.
+9. Record actual credits, rerolls, usable motion, G-stage pass/fail, failure class.
+10. After upload, record 24h/72h Stayed to watch, APV, engaged views, subscribers, comments.
+11. Use accumulated real evidence to adjust actions, runtimes, scores, and spend strategy.
 
 ## Safety / invariants
 
@@ -208,15 +202,13 @@ Candidate state:
 - no human hands/fingers/thumbs
 - no human-like paw grip
 - no candidate hero-scale ratio >0.50 paw width without documented exception
-- no unsafe candidate paw-action family through selector
 - no paid scene without exactly one safe `paw_action_family`
+- no keyframe spend when no-charge image model/cost is not confirmed
 - no paid G1 before planned KF continuity passes
 - no next paid scene after prior structural failure
 - actual previous PASS native saved frame is the continuity bridge
 - upscaled/re-encoded exports are not continuity bridges
 - non-first-person maker view is not a failure by itself
-- no future learning that equates observer camera with structural POV failure
-- no direct production entry point to legacy structural validator
 - no runtime padding
 - no research churn after saturation
 - no unrelated repository modifications
@@ -224,31 +216,29 @@ Candidate state:
 
 ## Change log
 
-### 2026-08-29 — learning maker-view failure semantics
-Baseline: `main@ddcaf7f8bd54c376920fc3f8f3ba0b9b2a638a43`.
+### 2026-08-29 — no-charge image preflight operator gate
+Baseline: `main@9d9d1bbe1e71a3ef330f3151deb77ee48c184507`.
 
 Changed:
-- added `maker_view_failure` and `character_failure` to `analytics/learning_ledger.csv`
-- retained `pov_failure` only as legacy compatibility data
-- updated `tools/score_credit_efficiency.py` to score current-semantic framing failures and ignore stale POV flags when current fields are available
-- added regression tests for current semantics and legacy fallback
+- updated `tools/make_next_short.ps1` to require `Nano Banana 2 Lite` + a UI no-charge confirmation before KF0→KFn image work
 - synchronized this handoff
 
 Why:
-- prevents valid non-first-person maker views from being mislabeled as structural failures and steering future optimization back toward obsolete mandatory POV
+- official Flow docs identify Nano Banana 2 Lite as the default image model available at no charge; the previous generic “free keyframe” wording could hide accidental paid image-model use
 
 Production impact:
-- TK-005 remains H40 / four Lite generations / 40-credit non-Ultra first-pass ceiling
+- TK-005 remains H40 / four Lite video generations / 40-credit non-Ultra first-pass ceiling
 - no episode/ranking/keyframe/runtime changes
 - no credits spent; no publishing
 
+### 2026-08-29 — learning maker-view failure semantics
+- added `maker_view_failure` and `character_failure`; deprecated `pov_failure` to compatibility-only fallback
+
 ### 2026-08-29 — scene-level paw-action fail-closed validation
-- required exactly one machine-readable safe `paw_action_family` per paid scene
-- annotated TK-005 G1/G2/G3/G4 with `nudge / press / slide / slide`
+- required exactly one safe `paw_action_family` per paid scene
 
 ### 2026-08-29 — zero-credit 1080p PASS finishing
-- documented official Plus/Pro/Ultra 1080p upscale at current 0-credit cost
-- added PASS-only, post-continuity upscale rule
+- added PASS-only post-continuity upscale guidance
 
 ### 2026-08-29 — canonical bundle maker-view validation path
 - routed bundle creation through `validate_maker_view_manifest.py`
@@ -256,13 +246,8 @@ Production impact:
 ### 2026-08-29 — candidate selector maker-view safety gates
 - enforced <=0.50 paw-width scale and feline-safe action allowlist before ranking
 
-### 2026-08-29 — canonical maker-view manifest validator
-- aligned one-command manifest validation with Mini Forest-style maker-view semantics
-
 ### 2026-08-29 — sweet-potato search-demand evidence
-- added a distinct search-behavior evidence class; TK-005 remained top-ranked
+- added distinct search-behavior evidence; TK-005 remained top-ranked
 
 ### 2026-08-28 — product governance
-- added `PRODUCT_CHARTER.md`
-- wired charter into the improvement loop
-- established Mini Forest-style miniature making + feline front paws replacing human hands as canonical visual identity
+- added `PRODUCT_CHARTER.md` and durable document-role rules
