@@ -1,6 +1,6 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-29 Quality-first + Operator-Card-First Fast Loop + Mini Forest Paw-Only Making + Progressive Paid Spend**
+최신 적용 기준: **2026-08-29 Quality-first + Operator-Card-First Fast Loop + Mini Forest Paw-Only Making + Adaptive H40 Progressive Spend**
 
 ## 0. 우선순위 / 문서 거버넌스
 
@@ -39,7 +39,7 @@ Paid video 전에 episode는 다음을 명확히 해야 한다.
 4. **PAYOFF** — 마지막까지 볼 이유가 되는 완성/steam/crack/gloss/serving 결과가 있는가?
 5. **NOVELTY/JAPAN FIT** — 왜 지금 일본 타깃에 맞고 기존/경쟁 episode와 무엇이 다른가?
 
-하나라도 약하면 runtime이나 scene을 늘리지 말고 premise/shot/action을 먼저 개선한다. G4는 독립 payoff/world-resolution 가치가 있을 때만 허용한다.
+하나라도 약하면 runtime이나 scene을 늘리지 말고 premise/shot/action을 먼저 개선한다.
 
 ## 3. Candidate / manifest fail-closed identity gate
 
@@ -52,6 +52,18 @@ Candidate selector와 canonical manifest validator는 계속 다음을 막는다
 Safe action family: `nudge / press / pat / roll / steady / slide / tap / push`.
 
 Canonical production validation entry: `tools/validate_maker_view_manifest.py`.
+
+### Adaptive H40 semantic gate
+
+`immersive_h40`는 **4회 generation을 반드시 쓰는 모드가 아니라 최대 4회의 first-pass ceiling**이다.
+
+Current manifest semantics:
+- `minimum_distinct_motion_beats: 3` = G1→G3가 이미 완결된 core Short여야 함
+- `fourth_beat_optional_after_g3: true` = G4는 real G3를 본 뒤 재판단
+- `fourth_beat_value` = optional G4가 실제로 추가할 독립적 resolution value
+- manifest에는 optional G4 candidate를 미리 기술할 수 있지만, 존재 자체가 spend permission은 아님
+
+Legacy structural validator가 과거 H40 plan shape를 위해 `minimum_distinct_motion_beats >=4`를 기대하는 부분은 maker-view adapter 내부에서만 compatibility translation한다. Current user-facing manifest에 mandatory-G4 semantics를 되살리지 않는다.
 
 ## 4. Operator-Card-First Fast Preparation Loop
 
@@ -77,11 +89,7 @@ ChatGPT/repo가 준비해야 할 결과:
 
 `./tools/make_next_short.ps1`과 `./tools/make_short.ps1`은 Operator Card를 가장 먼저 보여주고 사용자가 그 카드의 `NOW/current action`만 수행하도록 안내해야 한다.
 
-Generated files:
-- `generated/${EPISODE_ID}_bundle.md`
-- `generated/${EPISODE_ID}_flow_pack.md`
-
-은 기술 reference/fallback이다. Operator Card가 있는데도 사용자가 generated 문서 여러 개에서 실행 순서를 다시 조립하게 만들지 않는다.
+Generated bundle/flow-pack은 기술 reference/fallback이다.
 
 Operator UX 원칙:
 - 한 번에 다음 행동 하나를 가장 명확하게 보여준다.
@@ -100,17 +108,33 @@ Tooling KPI:
 
 Nano Banana/reference frame은 비용 절감보다 **좋은 KF0 anchor와 연속된 destination frame을 빠르게 만드는 품질 도구**로 사용한다.
 
+기본 core path:
 ```text
 KF0 strong maker-view anchor
 → paws / scale / camera / props / lighting QC
 → KF1을 승인 KF0에서 파생
 → KF2를 KF1에서 파생
-→ 필요한 KFn까지
-→ visual continuity PASS
+→ core ending KF까지 순차 파생
+→ core visual continuity PASS
 → G1 only
 ```
 
 KF1+를 unrelated fresh lottery frame으로 만들지 않는다.
+
+### Lazy optional-target rule
+
+Adaptive H40에서 G4가 optional이면 **G4 target KF를 G1 전에 미리 만들지 않아도 된다.**
+
+예: TK-005
+```text
+KF0→KF3 core PASS
+→ G1→G3 progressive generation
+→ real G3를 보고 core가 complete면 STOP
+→ G4가 실제로 더 좋아질 때만 actual G3 PASS saved frame에서 KF4 파생
+→ optional G4
+```
+
+이 규칙은 불필요한 pre-production 작업을 줄이고, 아직 존재하지 않는 real G3를 상상해서 fourth scene을 과설계하는 것을 막는다.
 
 ## 6. Flow / Veo paid baseline
 
@@ -126,19 +150,23 @@ output count = 1
 
 Progressive Spend:
 ```text
-visual/keyframe chain PASS
+core visual/keyframe chain PASS
 → G1 only
 → quality QC
 → actual last usable native Save frame
 → G2 only after G1 PASS
 → G3 only after G2 PASS
-→ G4 only if real G3 still benefits from independent payoff
+→ G1-G3 together review
+→ complete면 STOP
+→ optional G4 only if real G3 still benefits from independent payoff
 ```
 
-구조적 FAIL 후 다음 paid scene 금지. Actual previous PASS native saved frame이 continuity bridge다. H30/H40는 first-pass paid-video tier이지 final runtime 약속이 아니다.
+구조적 FAIL 후 다음 paid scene 금지. Actual previous PASS native saved frame이 continuity bridge다.
 
 - compact_h30: 3×8s raw, current non-Ultra ceiling 30 credits
-- immersive_h40: up to 4×8s raw, current non-Ultra ceiling 40 credits; G4 optional/value-gated
+- immersive_h40: **3 core scenes + optional fourth candidate**, current non-Ultra ceiling up to 40 credits
+
+H30/H40는 first-pass paid-video ceiling이지 final runtime 약속이 아니다.
 
 ## 7. 8초 scene grammar
 
@@ -148,7 +176,7 @@ visual/keyframe chain PASS
 
 기본 timing 예:
 ```text
-0–1.5s premise/scale readable; paw settles
+0–1.5s premise/scale readable; paw settles or begins gently
 1.5–6s one clear tactile transformation
 6–8s paw still; steam/crack/gloss/crumb/sizzle payoff continues
 ```
@@ -192,16 +220,19 @@ Evidence saturation 유지. 새 근거가 ranking/timing/content mechanic/produc
 `猫の前足で作る、12mmの焼きいも。`
 
 - `immersive_h40`
-- up to 4 Lite scenes / current non-Ultra first-pass ceiling 40 video credits
-- KF0→KF4 planned continuity
+- G1→G3 = complete core story
+- G4 = optional after real G3 review only
+- maximum 4 Lite scenes / current non-Ultra ceiling 40 video credits
+- before G1, only KF0→KF3 core targets need PASS
+- KF4 is deferred; if G4 is justified, derive KF4 from actual saved G3 PASS frame
 - same tray / warmer / serving niche
-- G1 `nudge`, G2 `press`, G3 `slide`, G4 `slide`
+- G1 `nudge`, G2 `press`, G3 `slide`, optional G4 `slide`
 - no direct pinch/grab
 - zero-cut long take
 - primary runbook: `production/TK-005_OPERATOR_CARD.md`
 
 현재 실제 첫 행동:
-> **Operator Card의 NOW 섹션대로 KF0 하나를 만들고, 첫 1–2초 scale hook이 충분히 강한지 승인한다.**
+> **Operator Card의 NOW 섹션대로 KF0 하나를 만들고, scale hook과 miniature realism을 승인한다.**
 
 ## 12. Learning
 

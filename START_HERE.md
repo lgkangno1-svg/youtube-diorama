@@ -1,6 +1,6 @@
 # Tiny Cat Kitchen — START HERE
 
-목표: 사용자가 매번 주제·대본·Flow 프롬프트를 재구성하지 않고 **한 문장 → quality-first episode 준비 → Operator Card 한 장 → KF continuity → 필요한 Veo generation만 순차 실행 → 실제 성과/제작시간 학습**을 반복한다.
+목표: 사용자가 매번 주제·대본·Flow 프롬프트를 재구성하지 않고 **한 문장 → quality-first episode 준비 → Operator Card 한 장 → core KF continuity → 필요한 Veo generation만 순차 실행 → 실제 성과/제작시간 학습**을 반복한다.
 
 ## 작업 시작 전
 
@@ -86,19 +86,21 @@ Paid video 전에 episode가 다음을 명확히 보여야 한다.
 
 약한 항목이 있으면 장면 수를 늘리지 말고 premise/shot/action을 개선한다.
 
-## Gate A — visual/keyframe continuity
+## Gate A — core visual/keyframe continuity
 
 ```text
 strong KF0 maker-view anchor
 → paws / scale / camera / props / lighting QC
 → KF1을 승인 KF0에서 파생
 → KF2를 KF1에서 파생
-→ 필요한 KFn까지 순차 파생
-→ 전체 continuity PASS
+→ core ending KF까지 순차 파생
+→ core continuity PASS
 → G1 only
 ```
 
 KF1+를 independent fresh lottery image로 만들지 않는다.
+
+**Adaptive H40:** G4가 optional/value-gated라면 G4 target KF를 G1 전에 미리 만들 필요가 없다. G1→G3 core가 complete하도록 KF0→KF3만 먼저 PASS시키고, real G3를 본 뒤 G4가 실제로 필요할 때만 actual G3 saved frame에서 optional KF4를 파생한다.
 
 ## Paid Flow baseline
 
@@ -116,20 +118,21 @@ Paid generation/publishing은 사용자 명시 행동 없이는 하지 않는다
 ## Progressive Spend
 
 ```text
-visual chain PASS
+core visual chain PASS
 → G1 only
 → quality QC
 → PASS: native Save frame
 → G2 only after G1 PASS
 → G3 only after G2 PASS
-→ G4 only if real G3 뒤에도 독립적인 resolution value가 있음
+→ G1-G3를 함께 보고 complete면 STOP
+→ G4가 실제로 더 좋아질 때만 optional target KF 생성 + G4
 ```
 
 다음 scene First frame = previous PASS clip actual native saved frame.
 
 H30/H40는 first-pass paid tier이지 final runtime 약속이 아니다.
 - compact_h30: 3×8s raw, 보통 24–27s final
-- immersive_h40: 최대 4×8s raw, G4는 value-gated
+- immersive_h40: **3 core beats + optional fourth candidate**, 최대 4×8s raw
 
 ## 한 8초 scene
 

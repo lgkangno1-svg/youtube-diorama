@@ -6,7 +6,7 @@ The repository still carries compatibility enum values such as
 semantics are Mini Forest-style observational miniature making with feline
 front paws only. This adapter fail-closes on those current semantics first,
 then delegates the remaining structural/runtime/spend checks to the mature
-legacy validator without letting its compatibility-only POV field regress the
+legacy validator without letting compatibility-only legacy fields regress the
 creative standard.
 """
 from __future__ import annotations
@@ -28,6 +28,7 @@ def validate(data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     brand = data.get("brand_identity") or {}
     camera = data.get("camera_grammar") or {}
+    runtime = data.get("runtime_strategy") or {}
     flow = data.get("flow_strategy") or {}
     progressive_gate = flow.get("progressive_spend_gate") or {}
     scenes = data.get("scenes") or []
@@ -61,6 +62,27 @@ def validate(data: dict[str, Any]) -> list[str]:
             f"legacy progressive-spend gate {LEGACY_STOP_GATE} must not be active on a current maker-view manifest"
         )
 
+    # Current adaptive-H40 semantics: H40 is a four-generation ceiling, not a
+    # requirement to spend G4. The first three beats must form a complete Short;
+    # G4 is only a preplanned optional resolution candidate that is re-evaluated
+    # after real G3 footage exists.
+    if str(runtime.get("mode") or "") == "immersive_h40":
+        minimum_beats = runtime.get("minimum_distinct_motion_beats")
+        if isinstance(minimum_beats, bool) or not isinstance(minimum_beats, int) or minimum_beats != 3:
+            errors.append(
+                "immersive_h40 current semantics require minimum_distinct_motion_beats = 3; "
+                "G1-G3 must already form a complete core Short"
+            )
+        if runtime.get("fourth_beat_optional_after_g3") is not True:
+            errors.append(
+                "immersive_h40 requires runtime_strategy.fourth_beat_optional_after_g3 = true; "
+                "G4 is a value-gated candidate, not a mandatory spend"
+            )
+        if not str(runtime.get("fourth_beat_value") or "").strip():
+            errors.append(
+                "immersive_h40 requires a documented fourth_beat_value before planning optional G4"
+            )
+
     # Candidate-level action safety is not enough: a manifest can be edited after
     # selection. Fail closed again at the final paid-generation boundary so every
     # scene explicitly declares exactly one feline-safe active action family.
@@ -87,7 +109,11 @@ def validate(data: dict[str, Any]) -> list[str]:
 
     # Reuse the existing mature structural validator for runtime, credit,
     # keyframe, sequential-frame, narration, and scene invariants. Translate
-    # only the two compatibility fields that validator historically expected.
+    # compatibility fields that validator historically expected. In particular,
+    # legacy immersive_h40 interprets minimum_distinct_motion_beats=4 as a plan
+    # shape requirement; current semantics treat three beats as the required core
+    # and the fourth as optional after-G3. Translate only for legacy validation so
+    # the user-facing manifest remains truthful about actual spend behavior.
     structural_data = copy.deepcopy(data)
     structural_camera = structural_data.setdefault("camera_grammar", {})
     structural_camera["mode"] = "first_person_cat_pov"
@@ -95,6 +121,9 @@ def validate(data: dict[str, Any]) -> list[str]:
         "progressive_spend_gate", {}
     )
     structural_gate[LEGACY_STOP_GATE] = True
+    structural_runtime = structural_data.setdefault("runtime_strategy", {})
+    if str(structural_runtime.get("mode") or "") == "immersive_h40":
+        structural_runtime["minimum_distinct_motion_beats"] = 4
 
     return validate_structural(structural_data)
 
