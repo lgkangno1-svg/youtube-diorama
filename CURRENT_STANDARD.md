@@ -1,6 +1,6 @@
 # CURRENT STANDARD — Tiny Cat Kitchen
 
-최신 적용 기준: **2026-08-29 Quality-first + Operator-Card-First Fast Loop + Mini Forest Paw-Only Making + Adaptive H40 Progressive Spend**
+최신 적용 기준: **2026-08-29 Quality-first + Operator-Card-First Fast Loop + Mini Forest Paw-Only Making + Actual-Frame-Rebased Progressive Spend**
 
 ## 0. 우선순위 / 문서 거버넌스
 
@@ -55,7 +55,7 @@ Canonical production validation entry: `tools/validate_maker_view_manifest.py`.
 
 ### Adaptive H40 semantic gate
 
-`immersive_h40`는 **4회 generation을 반드시 쓰는 모드가 아니라 최대 4회의 first-pass ceiling**이다.
+`immersive_h40`는 4회 generation을 반드시 쓰는 모드가 아니라 최대 4회의 first-pass ceiling이다.
 
 Current manifest semantics:
 - `minimum_distinct_motion_beats: 3` = G1→G3가 이미 완결된 core Short여야 함
@@ -63,7 +63,7 @@ Current manifest semantics:
 - `fourth_beat_value` = optional G4가 실제로 추가할 독립적 resolution value
 - manifest에는 optional G4 candidate를 미리 기술할 수 있지만, 존재 자체가 spend permission은 아님
 
-Legacy structural validator가 과거 H40 plan shape를 위해 `minimum_distinct_motion_beats >=4`를 기대하는 부분은 maker-view adapter 내부에서만 compatibility translation한다. Current user-facing manifest에 mandatory-G4 semantics를 되살리지 않는다.
+Legacy structural validator의 과거 H40 plan shape는 maker-view adapter 내부 compatibility translation으로만 처리한다. Current user-facing manifest에 mandatory-G4 semantics를 되살리지 않는다.
 
 ## 4. Operator-Card-First Fast Preparation Loop
 
@@ -77,22 +77,16 @@ ChatGPT/repo가 준비해야 할 결과:
 - 다음 소재와 선택 이유
 - runtime tier
 - HOOK / TRANSFORMATION / SCALE PROOF / PAYOFF
-- KF0→KFn exact-order prompts
+- exact-order image/target prompts
 - G1→G3/필요시 G4 exact-order Flow prompts
 - invariant negative constraints/settings
 - 각 단계의 `지금 할 것` 1개와 PASS/FAIL 기준
 - manifest + `production/NEXT_EPISODE.txt` + material handoff sync
 
-### Primary production surface
-
-`production/${EPISODE_ID}_OPERATOR_CARD.md`가 존재하면 **그 파일이 사용자의 primary runbook**이다.
-
-`./tools/make_next_short.ps1`과 `./tools/make_short.ps1`은 Operator Card를 가장 먼저 보여주고 사용자가 그 카드의 `NOW/current action`만 수행하도록 안내해야 한다.
-
-Generated bundle/flow-pack은 기술 reference/fallback이다.
+`production/${EPISODE_ID}_OPERATOR_CARD.md`가 존재하면 그 파일이 primary runbook이다. Generated bundle/flow-pack은 technical fallback/reference다.
 
 Operator UX 원칙:
-- 한 번에 다음 행동 하나를 가장 명확하게 보여준다.
+- 한 번에 다음 행동 하나만 명확하게 보여준다.
 - 프롬프트는 copy/paste-ready.
 - 같은 설정/negative prompt를 여러 곳에서 재조립시키지 않는다.
 - 무료 visual preflight에 불필요한 confirmation을 늘리지 않는다.
@@ -104,37 +98,51 @@ Tooling KPI:
 - prompt corrections before G1
 - rerolls / finished episode
 
-## 5. Keyframe / visual continuity
+## 5. Keyframe / visual continuity — actual-frame rebasing
 
-Nano Banana/reference frame은 비용 절감보다 **좋은 KF0 anchor와 연속된 destination frame을 빠르게 만드는 품질 도구**로 사용한다.
+Nano Banana/reference frame은 비용 절감보다 **좋은 anchor와 actual footage에 맞춘 next target을 빠르게 만드는 품질 도구**로 사용한다.
 
-기본 core path:
+### Default core path
+
+기존처럼 모든 core destination KF를 G1 전에 미리 만들지 않는다. 다음 paid scene에 필요한 target만 그때 만든다.
+
 ```text
 KF0 strong maker-view anchor
-→ paws / scale / camera / props / lighting QC
-→ KF1을 승인 KF0에서 파생
-→ KF2를 KF1에서 파생
-→ core ending KF까지 순차 파생
-→ core visual continuity PASS
+→ KF1 derive from approved KF0
+→ KF0/KF1 PASS
 → G1 only
+→ G1 PASS: native Save frame
+→ derive KF2 from ACTUAL G1 saved frame
+→ G2 only
+→ G2 PASS: native Save frame
+→ derive KF3 from ACTUAL G2 saved frame
+→ G3 only
 ```
 
-KF1+를 unrelated fresh lottery frame으로 만들지 않는다.
+핵심 규칙:
+- manifest의 KF2/KF3/KF4 설명은 **desired destination state**다. 생성 시점을 의미하지 않는다.
+- next target은 가능하면 previous PASS clip의 **actual native saved frame**을 source image/reference로 삼는다.
+- actual frame에서 camera/paw/scale/props/light를 보존하고 intended material-state change만 만든다.
+- unrelated fresh text-to-image lottery는 금지.
 
-### Lazy optional-target rule
+이유:
+1. real Veo drift를 다음 scene target에 흡수해 continuity correction 폭을 줄인다.
+2. 아직 필요하지 않은 target 제작을 줄여 time-to-first-valid-G1을 단축한다.
+3. speculative KF chain이 실제 G1/G2와 어긋나서 다음 generation이 두 세계를 억지로 연결하는 문제를 줄인다.
 
-Adaptive H40에서 G4가 optional이면 **G4 target KF를 G1 전에 미리 만들지 않아도 된다.**
+Google Flow 공식 Help는 saved video frame을 future generation의 start/end frame으로 사용할 수 있다고 명시한다. 실제 UI 기능 제공 여부는 생성 시점 truth다.
 
-예: TK-005
+### Optional G4
+
+Adaptive H40에서는 동일 원리를 그대로 적용한다.
+
 ```text
-KF0→KF3 core PASS
-→ G1→G3 progressive generation
-→ real G3를 보고 core가 complete면 STOP
-→ G4가 실제로 더 좋아질 때만 actual G3 PASS saved frame에서 KF4 파생
+G1→G3 progressive actual-frame rebasing
+→ real G3 together review
+→ core complete = STOP
+→ only if G4 adds independent value: derive KF4 from ACTUAL G3 saved frame
 → optional G4
 ```
-
-이 규칙은 불필요한 pre-production 작업을 줄이고, 아직 존재하지 않는 real G3를 상상해서 fourth scene을 과설계하는 것을 막는다.
 
 ## 6. Flow / Veo paid baseline
 
@@ -150,21 +158,22 @@ output count = 1
 
 Progressive Spend:
 ```text
-core visual/keyframe chain PASS
+KF0/KF1 PASS
 → G1 only
 → quality QC
-→ actual last usable native Save frame
+→ native Save frame
+→ derive next target from actual PASS frame
 → G2 only after G1 PASS
-→ G3 only after G2 PASS
+→ repeat for G3
 → G1-G3 together review
 → complete면 STOP
-→ optional G4 only if real G3 still benefits from independent payoff
+→ optional G4 only if real G3 still benefits
 ```
 
-구조적 FAIL 후 다음 paid scene 금지. Actual previous PASS native saved frame이 continuity bridge다.
+구조적 FAIL 후 다음 paid scene 금지. Actual previous PASS native saved frame이 continuity bridge이자 다음 target derivation source다.
 
 - compact_h30: 3×8s raw, current non-Ultra ceiling 30 credits
-- immersive_h40: **3 core scenes + optional fourth candidate**, current non-Ultra ceiling up to 40 credits
+- immersive_h40: 3 core scenes + optional fourth candidate, current non-Ultra ceiling up to 40 credits
 
 H30/H40는 first-pass paid-video ceiling이지 final runtime 약속이 아니다.
 
@@ -223,8 +232,10 @@ Evidence saturation 유지. 새 근거가 ranking/timing/content mechanic/produc
 - G1→G3 = complete core story
 - G4 = optional after real G3 review only
 - maximum 4 Lite scenes / current non-Ultra ceiling 40 video credits
-- before G1, only KF0→KF3 core targets need PASS
-- KF4 is deferred; if G4 is justified, derive KF4 from actual saved G3 PASS frame
+- **before G1, only KF0 + KF1 need PASS**
+- after G1 PASS, derive KF2 from actual G1 saved frame
+- after G2 PASS, derive KF3 from actual G2 saved frame
+- if G4 is justified, derive KF4 from actual G3 saved frame
 - same tray / warmer / serving niche
 - G1 `nudge`, G2 `press`, G3 `slide`, optional G4 `slide`
 - no direct pinch/grab
@@ -232,7 +243,7 @@ Evidence saturation 유지. 새 근거가 ranking/timing/content mechanic/produc
 - primary runbook: `production/TK-005_OPERATOR_CARD.md`
 
 현재 실제 첫 행동:
-> **Operator Card의 NOW 섹션대로 KF0 하나를 만들고, scale hook과 miniature realism을 승인한다.**
+> **Operator Card의 NOW 섹션대로 KF0 하나를 만들고 scale hook과 miniature realism을 승인한 뒤 KF1까지만 준비한다.**
 
 ## 12. Learning
 
@@ -242,6 +253,7 @@ Evidence saturation 유지. 새 근거가 ranking/timing/content mechanic/produc
 - failed action type / usable motion seconds / final runtime / audio replacement
 - 24h/72h Stayed to watch / APV / engaged views / subscribers / comments
 - preparation minutes / manual interventions / prompt corrections before G1 / time-to-first-valid-G1
+- whether actual-frame target rebasing reduced continuity corrections/rerolls
 
 장기 목표:
 ```text
