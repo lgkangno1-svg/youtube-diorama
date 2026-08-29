@@ -2,7 +2,7 @@
 
 > Legacy filename retained for links. Current purpose is **quality + speed first**, not minimum-credit-at-all-costs.
 
-목표: 사용자가 매번 주제/Flow 프롬프트/편집 순서를 고민하지 않고 **한 문장 → Operator Card → strong core KF chain → 필요한 paid generation만 순차 실행 → 성과/제작시간 학습**으로 끝내게 한다.
+목표: 사용자가 매번 주제/Flow 프롬프트/편집 순서를 고민하지 않고 **한 문장 → Operator Card → strong first pair → 실제 PASS frame 기반 next target → 필요한 paid generation만 순차 실행 → 성과/제작시간 학습**으로 끝내게 한다.
 
 ## Priority order
 
@@ -12,7 +12,7 @@
 4. paid-video reroll/credit efficiency
 5. free-image cost policing
 
-Nano Banana는 사용자의 현재 Google 사용 환경에서 무료로 사용할 수 있다. 이미지 단계는 비용 방어보다 **좋은 KF0와 continuity를 빠르게 만드는 quality preflight**로 사용한다.
+Nano Banana는 사용자의 현재 Google 사용 환경에서 무료로 사용할 수 있다. 이미지 단계는 비용 방어보다 **좋은 anchor와 실제 footage에 맞춘 continuity target을 빠르게 만드는 quality tool**로 사용한다.
 
 ## User interface
 
@@ -27,15 +27,7 @@ Nano Banana는 사용자의 현재 Google 사용 환경에서 무료로 사용�
 
 정상 경로의 PRIMARY RUNBOOK은 `production/<EPISODE>_OPERATOR_CARD.md`다. Bundle/flow-pack은 fallback/reference다.
 
-Operator Card에는:
-- NOW action
-- hook/scale/payoff target
-- exact-order KF prompts
-- exact-order G prompts
-- PASS/FAIL criteria
-- paid generation 직전 설정
-
-사용자가 여러 문서에서 프롬프트와 negative constraints를 재조립하게 하지 않는다.
+Operator Card에는 NOW action, hook/scale/payoff target, exact-order image/Flow prompts, PASS/FAIL criteria, paid generation 직전 설정이 포함되어야 한다.
 
 ## Visual production intent
 
@@ -63,42 +55,56 @@ Paid Veo 전에:
 
 약하면 더 많은 generation을 계획하지 말고 premise/action/frame을 고친다.
 
-## Gate A — core planned visual continuity
+## Gate A — first pair, not speculative full chain
+
+기본적으로 G1 전에 필요한 것은 **KF0 + KF1**이다.
 
 ```text
 strong KF0 maker-view master anchor
 → paw anatomy / scale / camera / props / lighting QC
-→ KF1은 승인 KF0에서 derive/edit/reference
-→ KF2는 KF1에서 파생
-→ core ending KF까지
-→ core KFs PASS
+→ KF1을 approved KF0에서 derive
+→ KF0/KF1 PASS
 → G1 only
 ```
 
-KF1+를 fresh independent text-to-image lottery로 만들지 않는다.
+모든 core KF를 G1 전에 미리 만드는 것을 기본값으로 하지 않는다.
 
-보존 우선순위:
-1. paw fur/anatomy/count
-2. hero scale
-3. maker-view camera/lens
-4. workbench geometry
-5. fixed props
-6. lighting/DOF
-7. intended material-state change only
+## Actual-frame target rebasing
 
-### Lazy optional-target rule
-
-Adaptive H40에서 G4가 value-gated이면 **G4 target KF는 G1 전에 필수가 아니다.**
+Google Flow 공식 Help는 saved video frame을 future generation의 start/end frame으로 재사용할 수 있다고 안내한다. 이를 core continuity 전략으로 활용한다.
 
 ```text
-KF0→core ending KF PASS
-→ G1→G3 progressively
-→ real G3 together review
-→ core complete = STOP
-→ only if G4 adds real independent value: derive optional target from actual saved G3 PASS frame → G4
+G1 PASS
+→ native Save frame
+→ actual G1 frame에서 KF2 destination state만 derive
+→ G2
+→ PASS / Save frame
+→ actual G2 frame에서 KF3 destination state만 derive
+→ G3
 ```
 
-이렇게 해야 불필요한 이미지 준비/결정을 줄이고 real footage가 나오기 전에 fourth scene을 과설계하지 않는다.
+원칙:
+- manifest의 KF2/KF3/KF4는 **desired destination state**이지 creation timing이 아니다.
+- next target source는 가능하면 previous PASS clip의 actual saved frame.
+- actual camera/paw/scale/props/light는 그대로 두고 intended material-state change만 적용.
+- independent fresh image lottery 금지.
+
+효과:
+- real drift를 다음 target에 흡수하여 continuity correction 폭 감소
+- time-to-first-valid-G1 단축
+- 아직 필요하지 않은 이미지 작업 감소
+- planned frame과 실제 footage가 다른 세계가 되는 위험 감소
+
+## Adaptive H40 / optional G4
+
+```text
+G1→G3 progressively with actual-frame rebasing
+→ real G3 together review
+→ core complete = STOP
+→ only if G4 adds independent value: derive KF4 from actual saved G3 PASS frame → G4
+```
+
+G4 target을 real G3 전에 만들지 않는다.
 
 ## Paid Flow baseline
 
@@ -116,17 +122,18 @@ Paid generation은 explicit user action only.
 ## Progressive Spend
 
 ```text
-core visual chain PASS
+KF0/KF1 PASS
 → G1 only
 → quality QC
 → PASS: native Save frame
+→ derive next target from actual PASS frame
 → G2 only after G1 PASS
-→ G3 only after G2 PASS
+→ repeat for G3
 → core complete? STOP
 → optional G4 only if real G3 still benefits
 ```
 
-다음 scene First frame은 previous PASS clip의 actual native saved frame이다. 구조 FAIL 뒤 다음 paid generation 금지.
+구조 FAIL 뒤 다음 paid generation 금지.
 
 ## Runtime
 
@@ -138,12 +145,11 @@ H30/H40는 first-pass spend ceiling이지 final runtime target을 억지로 채�
 - 보통 24–27s final
 
 ### immersive_h40
-- **3 core beats + 1 optional G4 candidate**
+- 3 core beats + 1 optional G4 candidate
 - maximum 4 × 8s raw
 - current non-Ultra first-pass ceiling up to 40 credits
 - G3가 이미 완결되면 STOP
-- G4는 independent serving/world-resolution/afterglow value가 real footage에서 남아 있을 때만
-- optional G4 target KF도 G3 decision 이후로 미룰 수 있음
+- G4는 independent resolution value가 real footage에서 남아 있을 때만
 
 Runtime padding 금지.
 
@@ -151,19 +157,13 @@ Runtime padding 금지.
 
 > **1 calm tactile primary action + optional 1 passive material payoff**
 
-Safe action family:
-`nudge / press / pat / roll / steady / slide / tap / push`
+Safe action family: `nudge / press / pat / roll / steady / slide / tap / push`.
 
-피함:
-- human pinch
-- tongs/chopsticks/knife grip
-- precise twist
-- multiple active gestures
-- rapid montage
+피함: human pinch / tongs/chopsticks/knife grip / precise twist / multiple active gestures / rapid montage.
 
 기본은 0-cut long take.
 
-## QC priorities — quality before technical checkboxing
+## QC priorities
 
 1. opening premise/scale readability
 2. miniature-making realism
@@ -177,10 +177,7 @@ Safe action family:
 
 ## Audio / finishing
 
-기본:
-- no narration
-- no generated music
-- quiet close miniature ASMR
+기본: no narration, no generated music, quiet close miniature ASMR.
 
 좋은 motion + 나쁜 audio는 reroll보다 edit replacement.
 
@@ -194,6 +191,7 @@ Eligible Flow UI에서 1080p upscale이 0 credits로 표시되면 continuity cha
 - prompt corrections before G1
 - time-to-first-valid-G1
 - rerolls / finished episode
+- next-target continuity corrections after actual-frame rebasing
 
 ## Production/audience learning
 
@@ -215,7 +213,3 @@ usable motion / paid credit
 time-to-first-valid-G1
 manual interventions / episode
 ```
-
-핵심 원칙:
-
-> **무료 image/reference 단계에서는 core visual premise와 continuity를 빠르게 만든다. Optional fourth target은 실제 third beat를 본 뒤 필요할 때만 만든다. Paid Veo는 한 번에 하나씩 quality-gated로 사용한다.**
