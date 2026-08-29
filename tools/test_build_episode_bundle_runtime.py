@@ -58,7 +58,15 @@ def main() -> int:
     assert source.index(maker_view_gate) < source.index(originality_gate)
     assert source.index(originality_gate) < source.index("generated_dir.mkdir")
 
-    print("PASS: bundle runtime guidance and canonical maker-view preflight ordering are enforced")
+    # A user may reopen only the generated bundle later, without re-reading the
+    # PowerShell console. The bundle itself must therefore preserve the fail-closed
+    # no-charge keyframe preflight instead of calling keyframes generically "free".
+    assert "Nano Banana 2 Lite" in source
+    assert "UI confirms no charge" in source
+    assert "do not treat Gate A as free" in source
+    assert "Approve {keyframe_count} free keyframes/contact sheet" not in source
+
+    print("PASS: bundle runtime, canonical preflight, and no-charge keyframe gates are enforced")
     return 0
 
 
