@@ -30,7 +30,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host ""
 Write-Host "PROGRESSIVE FLOW SPEND" -ForegroundColor Yellow
-Write-Host "A. Approve the free reference/keyframe images first."
+Write-Host "A. KEYFRAME PREFLIGHT: in Flow, verify the active image model is Nano Banana 2 Lite (Google currently documents it as the default no-charge image model) AND verify the UI displays no charge before creating/editing KF0→KFn. If either condition is false or unclear, stop instead of spending credits on keyframes."
 Write-Host "B. Generate G1 only (Veo 3.1 Lite, output count 1, current displayed cost verified). Stop if maker-view composition / paws-only identity / tiny scale / anatomy is structurally wrong. A non-first-person camera is not itself a failure."
 Write-Host "C. After each PASS, save that scene's actual last usable frame when the Flow pack requires it for the next First frame."
 Write-Host "D. Continue one scene at a time. Never spend G2 before G1 PASS or G3 before G2 PASS."
