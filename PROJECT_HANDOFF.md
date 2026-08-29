@@ -1,7 +1,7 @@
 # Tiny Cat Kitchen — PROJECT HANDOFF
 
 Last update: **2026-08-29 KST**
-Baseline inspected for this iteration: `main@adad83d51df36ecec8e3a31f51c75891503709c8`
+Baseline inspected for this iteration: `main@8f91f04e95a8d42ae9597be91a5a639dbe610f89`
 
 Durable current-state handoff for `lgkangno1-svg/youtube-diorama`. Every material repository change must update this file in the same branch/PR. True NO-OPs do not churn it.
 
@@ -54,85 +54,70 @@ Runtime tier: `immersive_h40`
 Current non-Ultra first-pass ceiling: **up to** 4 Veo 3.1 Lite generations / 40 video credits
 Primary operator runbook: `production/TK-005_OPERATOR_CARD.md`
 
-### Current adaptive runtime truth
+Core story:
+- G1 `nudge` — impossible scale + warming start
+- G2 `press` — crack + steam
+- G3 `slide` — complete golden-center payoff
+- G4 `slide` — optional same-world serving resolution only after real G3 review
 
-TK-005 is explicitly designed as:
-- **G1→G3 = complete core Short**
-- **G4 = optional after real G3 review only**
-- normal final runtime if G3 is complete: roughly 24–27s
-- final runtime if G4 genuinely improves closure: roughly 32–35s
-- H40 is a maximum first-pass spend tier, not a requirement to spend four generations
+Normal final runtime if G3 is complete: ~24–27s. Optional G4 may extend to ~32–35s.
 
-Manifest semantics:
-- `minimum_distinct_motion_beats: 3`
-- `fourth_beat_optional_after_g3: true`
-- optional G4 remains pre-described so the idea is ready, but its existence is not spend permission
+## Material improvement in this iteration — next targets now rebase on actual PASS footage
 
-Scene actions:
-- G1 `nudge`
-- G2 `press`
-- G3 `slide`
-- G4 `slide` only if value-gated after real G3
+Problem found after PR #70:
+- PR #70 correctly deferred optional KF4/G4 until after real G3.
+- but the operator path still asked the user to prebuild **KF2 and KF3 before G1**.
+- once G1 is generated, its actual last usable frame may differ slightly from planned KF1 in paw fur, camera, tray position, hero scale, lighting or geometry.
+- G2 would then start from actual G1 but aim at a KF2 derived from planned KF1, forcing Veo to reconcile two slightly different worlds.
+- the same mismatch could repeat for G3.
+- prebuilding KF2/KF3 also delays time-to-first-valid-G1 even though those targets are not needed yet.
 
-Continuity:
-- G1 KF0→KF1
-- G2 actual saved G1 PASS frame→KF2
-- G3 actual saved G2 PASS frame→KF3
-- optional G4 actual saved G3 PASS frame→optional KF4
+Corrected current strategy:
 
-## Material improvement in this iteration — H40 no longer over-prepares or semantically forces G4
+```text
+KF0 → derive KF1 → G1
+G1 PASS → native Save frame → derive KF2 from ACTUAL G1 saved frame → G2
+G2 PASS → native Save frame → derive KF3 from ACTUAL G2 saved frame → G3
+G3 PASS → review core → STOP if complete
+optional only: derive KF4 from ACTUAL G3 saved frame → G4
+```
 
-Problem found after the quality-first docs were aligned:
-- current docs and Operator Card said G4 is optional/value-gated after real G3.
-- `episodes/TK-005.yaml` still declared four minimum beats and a 32–35s-only target.
-- the old keyframe path required KF0→KF4 before G1 even though real G3 might make KF4 unnecessary.
-- the legacy structural validator interpreted `immersive_h40` as a four-beat plan shape.
-- after fixing those layers, a further executable mismatch was found: `tools/build_healing_edit_plan.py` still summed every manifest scene, so an optional G4 candidate would appear in the initial 32s edit timeline anyway.
-
-Corrected:
-- `tools/validate_maker_view_manifest.py`
-  - current H40 semantics require 3 core beats + explicit `fourth_beat_optional_after_g3: true`
-  - legacy structural validator receives compatibility-only four-beat translation internally
-  - current user-facing manifest remains truthful: G4 is not mandatory
-- `tools/test_validate_maker_view_manifest.py`
-  - regression coverage for 3-core + optional-G4 H40
-  - rejects mandatory-four-core current semantics
-  - requires explicit after-G3 value gate
-  - confirms adapter does not mutate current manifest
-- `episodes/TK-005.yaml`
-  - adaptive 24–35s target
-  - G3 explicitly complete core ending
-  - G4 explicitly optional after real G3 review
-- `production/TK-005_OPERATOR_CARD.md`
-  - pre-G1 work stops at KF0→KF3
-  - KF4 intentionally deferred
-  - after G3, watch G1→G3 and stop if complete
-  - only if G4 improves closure, derive KF4 from the **actual G3 PASS saved frame**, then generate G4
-  - G1 starts motion gently without wasting the opening on a long dead hold
-- `tools/build_healing_edit_plan.py`
-  - adaptive H40 initial edit plan now includes only G1→G3 core footage
-  - raw/core runtime math uses 24s of generated core motion instead of assuming G4 exists
-  - outputs an explicit `Optional G4 decision — after real G3 only` section
-  - optional G4 is only folded into a later edit after the real G3 review justifies generation
-  - removed stale true-first-person edit wording in favor of current maker-view/paws-only semantics
-- `tools/test_build_healing_edit_plan_runtime.py`
-  - regression coverage ensures adaptive H40 core plan contains G1/G2/G3 but not a G4 timeline entry
-  - verifies 24s core source, after-G3 decision guidance, and actual-saved-G3 target derivation
-  - verifies non-optional four-scene plans still include G4 normally
-- `START_HERE.md`, `CURRENT_STANDARD.md`, docs/22/23 synchronized with lazy optional-target behavior
+Important semantic clarification:
+- `episodes/TK-005.yaml` may continue to describe KF2/KF3/KF4 destination states.
+- those descriptions define **what the future state should become**, not when the image must be created.
+- the production source for each next target is now the previous real PASS frame whenever Flow permits it.
 
 Why this matters:
-- directly improves video quality by forcing G3 to carry the actual payoff rather than relying on a fourth scene
-- reduces unnecessary pre-production and edit-planning work
-- prevents runtime padding and accidental fourth-generation pressure
-- preserves a 40-credit maximum ceiling without treating 40 credits as a target
-- improves continuity if G4 is used because its target is based on the actual G3 result rather than a speculative prebuilt frame
+- improves real continuity because each target inherits actual paw/camera/scale/props/light
+- reduces how far Veo must correct between real start frame and planned end frame
+- shortens pre-G1 preparation to KF0 + KF1 only
+- reduces speculative image work
+- provides a measurable hypothesis for fewer continuity rerolls and faster production
+
+Google Flow official Help was rechecked on 2026-08-29 and explicitly documents that a saved video frame can be used as a future generation's start or end frame. Veo 3.1 First+Last Frames remains supported in current model documentation. Actual Flow UI remains final truth.
+
+Changed in this branch:
+- `production/TK-005_OPERATOR_CARD.md`
+  - G1 requires only KF0+KF1
+  - after G1 PASS, KF2 is derived from actual saved G1 frame
+  - after G2 PASS, KF3 is derived from actual saved G2 frame
+  - optional KF4 remains derived from actual saved G3 frame
+- `CURRENT_STANDARD.md`
+  - actual-frame target rebasing is now default core continuity rule
+- `START_HERE.md`
+  - user-facing normal path reflects first-pair-only pre-G1 preparation
+- `docs/23_minimum_credit_operator_architecture.md`
+  - operator architecture now prioritizes actual-frame rebasing over speculative full-chain prebuild
+- `docs/22_continuous_episode_learning_engine.md`
+  - adds actual-frame rebasing as a production hypothesis to measure
+- this handoff synchronized in the same branch
 
 Production impact:
 - no paid generation performed
 - no publishing
-- TK-005 remains current; same safe paw-action families
-- maximum paid ceiling remains 40 credits, while a strong three-generation episode may intentionally finish at 30 credits
+- TK-005 story/ranking/actions/runtime ceiling unchanged
+- maximum paid ceiling remains up to 40 credits
+- user reaches first paid checkpoint sooner and each later target is based on real footage
 
 ## Canonical validation / safety state
 
@@ -141,14 +126,14 @@ Production impact:
 - every paid scene declares exactly one safe `paw_action_family`
 - `maker_view_failure` / `character_failure` are current learning fields; `pov_failure` compatibility-only
 - non-first-person maker view is not a failure by itself
-- actual previous PASS native saved frame is the next-scene continuity bridge
 - structural FAIL stops the next paid scene
+- actual previous PASS native saved frame is the next-scene continuity bridge
+- **actual previous PASS frame should also be the source/reference for deriving the next target KF whenever supported**
 - adaptive H40 current semantic: three complete core beats, optional fourth only after real G3 review
-- adaptive edit-plan generation must likewise exclude optional G4 until that review
 
 ## Research / evidence state
 
-Fresh 2026-08-29 cross-check found current miniature/ASMR category scale and late-August Japanese sweet-potato signals still support the existing tiny-food/process/seasonality thesis. These were same-class, already-saturated signals and did not change TK-005 ranking, timing, or production mechanics, so `research/benchmark_log.csv` and backlog were intentionally not churned.
+Fresh 2026-08-29 cross-check did not reveal a new benchmark/seasonal evidence class that changes TK-005 ranking, timing or content mechanics. Existing yakiimo/oimo evidence remains saturated and supportive. `research/benchmark_log.csv` and backlog were intentionally not churned.
 
 TK-005 / IDEA-009 remains current. 月見 and 新米塩むすび remain strong future seasonal candidates.
 
@@ -171,24 +156,26 @@ When real production begins, record when practical:
 - prompt corrections before G1
 - time-to-first-valid-G1
 - credits/rerolls/G-stage pass-fail
+- whether actual-frame target rebasing reduced continuity corrections/rerolls
 - whether optional G4 was correctly skipped or used after real G3 review
 - 24h/72h Stayed to watch/APV/engaged views/subscribers/comments
 
 ## Current roadmap / next priorities
 
-1. Run `./tools/make_next_short.ps1`; it should point directly to `production/TK-005_OPERATOR_CARD.md`.
-2. Make/approve KF0, then derive only KF1→KF3 before paid video.
-3. Generate G1 only after core KF continuity passes; judge scale hook and feline-safe nudge quality.
-4. PASS → native Save frame → G2 → PASS → G3.
-5. Watch G1→G3 together. If golden-center payoff is complete, stop and edit the roughly 24–27s Short.
-6. Only if real G3 clearly benefits from same-world serving closure: derive KF4 from actual saved G3 PASS frame, then generate optional G4.
-7. Initial generated healing edit plan must remain core-only while G4 is unresolved.
-8. Record production time/manual interventions and whether lazy optional-target planning saved work.
-9. Use real 24h/72h audience results to adjust hook/action/runtime priors.
+1. Run `./tools/make_next_short.ps1`; it should surface `production/TK-005_OPERATOR_CARD.md`.
+2. Create/approve KF0.
+3. Derive/approve KF1 only. **Do not prebuild KF2/KF3.**
+4. Generate G1 only after KF0/KF1 pass.
+5. If G1 PASS: Save native last usable frame and derive KF2 from that actual frame.
+6. Generate G2; PASS → Save frame → derive KF3 from actual G2.
+7. Generate G3 and watch G1→G3 together.
+8. If golden-center payoff is complete, stop and edit the ~24–27s Short.
+9. Only if real G3 benefits from closure: derive KF4 from actual G3 saved frame and generate optional G4.
+10. Record actual preparation time, manual interventions, target corrections, rerolls and audience performance.
 
 ## Validation note
 
-Local git clone/test execution was attempted in this environment but DNS could not resolve `github.com`, so local `python tools/validate_handoff_update.py --base origin/main` and unit-test execution were not available. Regression tests were added as source-level guards; branch-level GitHub diff/PR validation is required before merge.
+This run used connected GitHub state and official Google Flow Help. No local repository clone was available, so `python tools/validate_handoff_update.py --base origin/main` was not run locally. Before merge, inspect branch comparison/PR changed files and ensure this handoff is included.
 
 ## Safety / invariants
 
@@ -200,6 +187,7 @@ Local git clone/test execution was attempted in this environment but DNS could n
 - no weak-scale regression
 - no next paid scene after structural failure
 - actual previous PASS native frame is continuity bridge
+- next target should derive from actual PASS frame when supported
 - no runtime padding
 - no research churn after saturation
 - no unrelated repository changes
@@ -207,26 +195,26 @@ Local git clone/test execution was attempted in this environment but DNS could n
 
 ## Change log
 
-### 2026-08-29 — adaptive H40 core-first / lazy optional G4 target + edit-plan alignment
-Baseline: `main@adad83d51df36ecec8e3a31f51c75891503709c8`.
+### 2026-08-29 — actual-frame-rebased core target chaining
+Baseline: `main@8f91f04e95a8d42ae9597be91a5a639dbe610f89`.
 
 Changed:
-- maker-view validator: current H40 = 3 required core beats + explicit optional-after-G3 fourth beat; compatibility translation remains internal
-- maker-view validator regression tests added
-- TK-005 manifest: adaptive 24–35s, G3 complete core ending, optional G4
-- TK-005 Operator Card: KF0→KF3 before G1; optional KF4 deferred until real G3 proves G4 worthwhile
-- healing edit-plan builder: initial adaptive-H40 timeline is G1→G3 only; optional G4 gets an after-G3 decision section instead of automatic inclusion
-- healing edit-plan regression tests added
-- START_HERE / CURRENT_STANDARD / docs/22/23 synchronized
-- this handoff synchronized in same branch
+- before G1, prepare only KF0/KF1
+- after each PASS generation, save actual frame and derive the next destination KF from that real frame
+- TK-005 Operator Card / CURRENT_STANDARD / START_HERE / docs22 / docs23 synchronized
+- this handoff synchronized in the same branch
 
 Why:
-- old manifest/validator/keyframe/edit-plan semantics could steer the workflow toward unnecessary G4 spend and unnecessary KF4 pre-production despite the accepted adaptive-runtime policy
+- planned KF2/KF3 derived before any video existed could drift away from actual G1/G2 output and make subsequent generations solve unnecessary continuity corrections
+- actual-frame rebasing improves continuity and reduces pre-G1 work
 
 Production impact:
+- TK-005 remains adaptive H40, G1→G3 core + optional G4
 - maximum ceiling unchanged: up to 4 Lite generations / 40 non-Ultra credits
-- a strong G1→G3 can intentionally finish at the three-generation level and the generated edit plan now agrees
 - no credits spent; no publishing
+
+### 2026-08-29 — adaptive H40 core-first / lazy optional G4
+- G1→G3 complete core Short; optional KF4/G4 only after real G3 review
 
 ### 2026-08-29 — quality-first operating-system alignment
 - START_HERE/docs22/docs23 aligned with quality-first Operator-Card-First workflow
@@ -236,6 +224,3 @@ Production impact:
 
 ### 2026-08-29 — TK-005 quality operator card
 - explicit HOOK / TRANSFORMATION / SCALE PROOF / PAYOFF / JAPAN FIT
-
-### 2026-08-29 — quality/speed priority correction
-- video/content quality → viewer outcome → production speed/convenience → paid-video efficiency → free-image cost policing
