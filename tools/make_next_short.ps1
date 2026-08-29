@@ -13,6 +13,8 @@ if ([string]::IsNullOrWhiteSpace($EpisodeId)) {
     exit 2
 }
 
+$OperatorCard = Join-Path $Root "production/${EpisodeId}_OPERATOR_CARD.md"
+
 Write-Host "Tiny Cat Kitchen — next episode: $EpisodeId" -ForegroundColor Cyan
 Write-Host "This command spends 0 Flow credits. It only prepares local production files." -ForegroundColor DarkGray
 Write-Host ""
@@ -29,13 +31,22 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host ""
-Write-Host "PROGRESSIVE FLOW SPEND" -ForegroundColor Yellow
-Write-Host "A. KEYFRAME PREFLIGHT: in Flow, verify the active image model is Nano Banana 2 Lite (Google currently documents it as the default no-charge image model) AND verify the UI displays no charge before creating/editing KF0→KFn. If either condition is false or unclear, stop instead of spending credits on keyframes."
-Write-Host "B. Generate G1 only (Veo 3.1 Lite, output count 1, current displayed cost verified). Stop if maker-view composition / paws-only identity / tiny scale / anatomy is structurally wrong. A non-first-person camera is not itself a failure."
-Write-Host "C. After each PASS, save that scene's actual last usable frame when the Flow pack requires it for the next First frame."
-Write-Host "D. Continue one scene at a time. Never spend G2 before G1 PASS or G3 before G2 PASS."
-Write-Host "E. If the manifest/runtime is compact_h30, normally finish at G3. If it is immersive_h40, G4 is allowed only after G3 PASS and only for its documented independent world-resolution beat."
-Write-Host "F. generated/${EpisodeId}_flow_pack.md and ${EpisodeId}_bundle.md are the episode-specific source of truth for scene count, frame inputs, and runtime intent."
-Write-Host "G. After the continuity chain is complete, Plus/Pro/Ultra users may upscale QC-PASS clips to 1080p only when Flow currently shows 0 credits. Do not upscale rejects, and never use an upscaled/re-encoded export as the next-scene continuity bridge; the native saved PASS frame remains the bridge."
+Write-Host "YOUR NEXT ACTION" -ForegroundColor Green
+if (Test-Path $OperatorCard) {
+    Write-Host "Open production/${EpisodeId}_OPERATOR_CARD.md and do only its NOW/current-action section first."
+    Write-Host "For TK-005 this means: make/approve the strongest KF0 scale-hook anchor before any paid G1."
+} else {
+    Write-Host "Open generated/${EpisodeId}_bundle.md and start at its first planned-keyframe action."
+}
+
 Write-Host ""
-Write-Host "Do not force every episode into H30 or H40. Follow the current manifest and stop rather than pad." -ForegroundColor Green
+Write-Host "QUALITY-FIRST PROGRESSIVE FLOW" -ForegroundColor Yellow
+Write-Host "A. Free visual preflight: use Nano Banana/reference frames to lock the hook, absurd tiny scale, feline paws, maker-view composition, fixed props and lighting."
+Write-Host "B. Generate G1 only after the planned visual chain passes. Judge the first 1–2 seconds for immediate premise/scale readability and the tactile action for believable feline motion."
+Write-Host "C. PASS → native Save frame → next paid scene. Structural FAIL → stop; do not spend the next scene."
+Write-Host "D. Continue one scene at a time. G4 is optional and only earns a generation when real G3 footage still benefits from an independent resolution/payoff beat."
+Write-Host "E. generated/${EpisodeId}_bundle.md and generated/${EpisodeId}_flow_pack.md remain technical reference/fallback artifacts; the episode Operator Card is the primary fast-production surface when present."
+Write-Host "F. Do not reroll good motion for audio-only defects; repair/replace audio in edit when practical."
+Write-Host "G. Paid Veo generation and YouTube publishing remain explicit user actions."
+Write-Host ""
+Write-Host "Do not force runtime. Optimize the actual Short: hook → visible transformation → scale proof → payoff." -ForegroundColor Green
