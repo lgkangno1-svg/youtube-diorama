@@ -75,6 +75,7 @@ Production prior:
 - 5–20mm hero + paw scale contrast가 강할수록 가점
 - visible material transformation과 payoff가 강할수록 가점
 - high-oblique/top-down/tabletop macro에서 잘 읽힐수록 가점
+- **세 번째 beat에서 이미 만족스러운 core ending을 만들 수 있으면 가점; 네 번째 beat가 없어도 story가 완결되어야 함**
 
 감점:
 - full-cat acting
@@ -82,6 +83,7 @@ Production prior:
 - weak scale
 - crowd/multiple characters
 - payoff 없는 motion-only scene
+- G4가 없으면 결말이 성립하지 않는 H40 설계
 
 Legacy `POV_PAWS_MICROWORLD_V1`은 compatibility token이다.
 
@@ -117,30 +119,37 @@ Primary execution surface = Operator Card. Bundle/flow-pack = fallback/reference
 - opening hook hypothesis
 - strongest scale-proof frame
 - scene-by-scene visible transformation
-- final payoff hypothesis
+- core ending hypothesis by G3 when H40 is used
+- optional G4 value hypothesis
 - Japan timing/relevance hypothesis
 
 영상이 실제로 나온 뒤 이 hypothesis가 output에서 살아남았는지 기록한다. 기술적으로 PASS여도 hook/transform/payoff가 약하면 다음 episode prior에 반영한다.
 
 ## 7. Runtime / Progressive Spend
 
-H30/H40는 first-pass paid tier.
+H30/H40는 first-pass paid ceiling.
 
 ```text
 compact_h30 = 3×8s raw
-immersive_h40 = up to 4×8s raw
+immersive_h40 = 3 core beats + optional fourth candidate, up to 4×8s raw
 ```
 
-G4는 독립적인 serving/world-resolution/afterglow 가치가 있을 때만. G3가 이미 완결되면 stop.
+Adaptive H40 rule:
+- G1→G3가 core story를 완결해야 함
+- G4는 독립적인 serving/world-resolution/afterglow 가치가 있을 때만
+- G4 target KF도 real G3 판단 전에는 만들 필요가 없음
+- G3가 이미 완결되면 stop
 
 ```text
-strong visual/KF chain
+strong core visual/KF chain
 → G1 only
 → quality + structural QC
 → PASS: native Save frame
 → G2 only after PASS
 → G3 only after PASS
-→ G4 only when real G3 still benefits
+→ watch G1-G3 together
+→ complete = STOP
+→ only if G4 still adds value: derive optional target from actual G3 saved frame → G4
 ```
 
 다음 scene First frame = previous PASS clip actual native saved frame.
@@ -164,6 +173,7 @@ Operator-efficiency도 가능한 범위로 기록:
 - manual interventions
 - prompt corrections before G1
 - time-to-first-valid-G1
+- whether optional G4 was planned but correctly skipped after G3
 
 `pov_failure`는 deprecated compatibility field다. Non-first-person maker view 자체를 실패로 기록하지 않는다.
 
@@ -189,8 +199,6 @@ Hard identity gate:
 
 ## 10. Optimization targets
 
-장기적으로 함께 본다.
-
 Audience / paid-efficiency:
 ```text
 engaged views / paid credit
@@ -204,6 +212,7 @@ time-to-first-valid-G1
 manual interventions / episode
 prompt corrections before G1
 rerolls / finished episode
+unnecessary prebuilt optional targets / episode
 ```
 
 중요: `credits/video` 또는 `minutes/video`를 단독 최적화하지 않는다. 영상 퀄리티와 audience outcome이 떨어지면 개선이 아니다.
