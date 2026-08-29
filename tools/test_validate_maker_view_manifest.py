@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import copy
 import unittest
 
 from test_validate_current_standard import base_manifest
@@ -22,6 +23,34 @@ def current_manifest() -> dict:
     gate["stop_if_maker_view_scale_anatomy_or_premise_fails"] = True
     for scene in data["scenes"]:
         scene["paw_action_family"] = ["slide"]
+    return data
+
+
+def adaptive_h40_manifest() -> dict:
+    data = current_manifest()
+    data["runtime_strategy"] = {
+        "mode": "immersive_h40",
+        "minimum_distinct_motion_beats": 3,
+        "fourth_beat_optional_after_g3": True,
+        "fourth_beat_value": "quiet world resolution only if real G3 still benefits",
+    }
+    data["keyframes"]["KF4_TARGET"] = "approved optional fourth target"
+    data["scenes"].append(
+        {
+            "id": "G4",
+            "generation_type": "first_plus_last",
+            "generation_seconds": 8,
+            "start_frame": "ACTUAL_LAST_USABLE_FRAME_G3",
+            "end_frame": "KF4_TARGET",
+            "action": "one paw slides the tray into a quiet final niche",
+            "action_guard": "same tray and maker view; no padding or new cookware",
+            "paw_action_family": ["slide"],
+        }
+    )
+    data["flow_strategy"]["max_lite_generations_first_pass"] = 4
+    data["flow_strategy"]["non_ultra_credit_budget_first_pass"] = 40
+    data["flow_strategy"]["progressive_spend_gate"]["g4_requires_g3_pass"] = True
+    data["flow_strategy"]["sequential_chain"]["g4_start_source"] = "save_actual_last_usable_frame_from_G3"
     return data
 
 
@@ -78,6 +107,27 @@ class MakerViewManifestValidationTests(unittest.TestCase):
         data["flow_strategy"]["output_count"] = 2
         errors = validate(data)
         self.assertIn("flow_strategy.output_count must be the integer 1", errors)
+
+    def test_adaptive_h40_allows_three_core_beats_plus_optional_g4_plan(self) -> None:
+        self.assertEqual(validate(adaptive_h40_manifest()), [])
+
+    def test_adaptive_h40_rejects_mandatory_four_core_beat_semantics(self) -> None:
+        data = adaptive_h40_manifest()
+        data["runtime_strategy"]["minimum_distinct_motion_beats"] = 4
+        errors = validate(data)
+        self.assertTrue(any("minimum_distinct_motion_beats = 3" in e for e in errors))
+
+    def test_adaptive_h40_requires_explicit_after_g3_value_gate(self) -> None:
+        data = adaptive_h40_manifest()
+        data["runtime_strategy"]["fourth_beat_optional_after_g3"] = False
+        errors = validate(data)
+        self.assertTrue(any("fourth_beat_optional_after_g3 = true" in e for e in errors))
+
+    def test_h40_adapter_does_not_mutate_current_manifest(self) -> None:
+        data = adaptive_h40_manifest()
+        before = copy.deepcopy(data)
+        self.assertEqual(validate(data), [])
+        self.assertEqual(data, before)
 
 
 if __name__ == "__main__":
