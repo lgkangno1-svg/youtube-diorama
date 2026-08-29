@@ -6,7 +6,7 @@ Source of truth:
 - `PROJECT_HANDOFF.md` — current state / decisions / failures / next priorities
 - `PRODUCT_CHARTER.md` — durable product intent / priority order / improvement standard
 - `CURRENT_STANDARD.md` — executable production rules
-- `docs/23_minimum_credit_operator_architecture.md` — legacy filename, current quality-first fast operator architecture
+- `docs/23_minimum_credit_operator_architecture.md` — quality-first fast operator architecture
 - `docs/27_research_evidence_saturation_gate.md`
 - `ideas/episode_backlog.yaml`
 - `analytics/learning_ledger.csv`
@@ -26,14 +26,13 @@ True NO-OP은 문서 churn 금지.
 
 ## 1. Improvement priority
 
-현재 우선순위:
 1. video/content quality
 2. viewer outcome / recognizable channel identity
 3. production convenience and speed
 4. paid-video reroll/credit efficiency
 5. free-image cost policing
 
-사용자의 Nano Banana image access는 현재 무료다. 실제 비용 문제가 다시 생기지 않는 한 free-image cost gate 자체는 연구/개발 우선순위가 아니다.
+Nano Banana image access는 현재 사용자에게 무료다. 실제 비용 문제가 다시 생기지 않는 한 free-image cost gate 자체는 연구/개발 우선순위가 아니다.
 
 ## 2. Research loop
 
@@ -75,7 +74,7 @@ Production prior:
 - 5–20mm hero + paw scale contrast가 강할수록 가점
 - visible material transformation과 payoff가 강할수록 가점
 - high-oblique/top-down/tabletop macro에서 잘 읽힐수록 가점
-- **세 번째 beat에서 이미 만족스러운 core ending을 만들 수 있으면 가점; 네 번째 beat가 없어도 story가 완결되어야 함**
+- 세 번째 beat에서 만족스러운 core ending을 만들 수 있으면 가점
 
 감점:
 - full-cat acting
@@ -106,11 +105,6 @@ ChatGPT/repo:
 9. NEXT_EPISODE 갱신
 10. material handoff sync
 
-Normal user path:
-```powershell
-./tools/make_next_short.ps1
-```
-
 Primary execution surface = Operator Card. Bundle/flow-pack = fallback/reference.
 
 ## 6. Content-quality learning
@@ -125,7 +119,7 @@ Primary execution surface = Operator Card. Bundle/flow-pack = fallback/reference
 
 영상이 실제로 나온 뒤 이 hypothesis가 output에서 살아남았는지 기록한다. 기술적으로 PASS여도 hook/transform/payoff가 약하면 다음 episode prior에 반영한다.
 
-## 7. Runtime / Progressive Spend
+## 7. Runtime / Progressive Spend / actual-frame rebasing
 
 H30/H40는 first-pass paid ceiling.
 
@@ -134,23 +128,27 @@ compact_h30 = 3×8s raw
 immersive_h40 = 3 core beats + optional fourth candidate, up to 4×8s raw
 ```
 
-Adaptive H40 rule:
+Default continuity rule:
+```text
+KF0 → derive KF1 → G1
+G1 PASS → native Save frame → derive KF2 from ACTUAL G1 frame → G2
+G2 PASS → native Save frame → derive KF3 from ACTUAL G2 frame → G3
+G3 complete = STOP
+optional only: derive KF4 from ACTUAL G3 frame → G4
+```
+
+Manifest KF descriptions are destination states, not a requirement to prebuild every image before G1.
+
+Why this is the new default:
+- next target inherits real paw/camera/scale/props/light rather than a speculative planned world
+- reduces continuity correction distance
+- reduces pre-G1 work
+- provides a measurable hypothesis for fewer rerolls and faster first-valid-G1
+
+Adaptive H40:
 - G1→G3가 core story를 완결해야 함
 - G4는 독립적인 serving/world-resolution/afterglow 가치가 있을 때만
-- G4 target KF도 real G3 판단 전에는 만들 필요가 없음
-- G3가 이미 완결되면 stop
-
-```text
-strong core visual/KF chain
-→ G1 only
-→ quality + structural QC
-→ PASS: native Save frame
-→ G2 only after PASS
-→ G3 only after PASS
-→ watch G1-G3 together
-→ complete = STOP
-→ only if G4 still adds value: derive optional target from actual G3 saved frame → G4
-```
+- G4 target은 real G3 판단 후 actual saved frame에서만 derive
 
 다음 scene First frame = previous PASS clip actual native saved frame.
 
@@ -173,7 +171,8 @@ Operator-efficiency도 가능한 범위로 기록:
 - manual interventions
 - prompt corrections before G1
 - time-to-first-valid-G1
-- whether optional G4 was planned but correctly skipped after G3
+- optional G4 skipped/used after real G3
+- whether actual-frame target rebasing reduced continuity corrections or rerolls
 
 `pov_failure`는 deprecated compatibility field다. Non-first-person maker view 자체를 실패로 기록하지 않는다.
 
@@ -212,27 +211,8 @@ time-to-first-valid-G1
 manual interventions / episode
 prompt corrections before G1
 rerolls / finished episode
-unnecessary prebuilt optional targets / episode
+unnecessary prebuilt targets / episode
+continuity corrections after actual-frame rebasing
 ```
 
 중요: `credits/video` 또는 `minutes/video`를 단독 최적화하지 않는다. 영상 퀄리티와 audience outcome이 떨어지면 개선이 아니다.
-
-성공한 음식/경쟁 episode 자체를 복제하지 않고 성공한 hook / scale / tactile action / maker-view / pacing / ASMR / payoff mechanics만 다음 prior에 반영한다.
-
-## 11. Final goal
-
-> **Mini Forest의 손-중심 미니어처 제작 감성을 사람 손 대신 자연스러운 고양이 앞발로 구현하면서, 더 좋은 hook·transformation·payoff를 가진 Shorts를 사용자가 점점 더 적은 수동 작업과 재생성으로 빠르게 만들 수 있게 한다.**
-
-## 12. Documentation persistence
-
-Material change:
-- always `PROJECT_HANDOFF.md`
-- production/QC/operator rule change → `CURRENT_STANDARD.md`
-- durable purpose/priority change → `PRODUCT_CHARTER.md`
-
-로컬 git 가능 시:
-```powershell
-python tools/validate_handoff_update.py --base origin/main
-```
-
-로컬 git이 불가능하면 latest main 기반 branch/PR diff에서 same-change handoff 포함 여부를 확인한다.
