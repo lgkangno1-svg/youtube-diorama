@@ -1,6 +1,6 @@
 # Tiny Cat Kitchen — START HERE
 
-목표: 사용자가 매번 주제·대본·Flow 프롬프트를 재구성하지 않고 **한 문장 → quality-first episode 준비 → Operator Card 한 장 → core KF continuity → 필요한 Veo generation만 순차 실행 → 실제 성과/제작시간 학습**을 반복한다.
+목표: 사용자가 매번 주제·대본·Flow 프롬프트를 재구성하지 않고 **한 문장 → quality-first episode 준비 → Operator Card 한 장 → KF0/KF1 → 실제 PASS frame 기반 next target → 필요한 Veo generation만 순차 실행 → 실제 성과/제작시간 학습**을 반복한다.
 
 ## 작업 시작 전
 
@@ -24,7 +24,7 @@
 4. paid-video reroll/credit 효율
 5. free-image 비용 가드
 
-Nano Banana는 사용자의 현재 Google 사용 환경에서 무료로 사용할 수 있다. 기존 비용 확인은 안전망으로만 유지하고, 실제 문제가 다시 생기지 않는 한 개선 시간을 비용 가드 자체에 쓰지 않는다.
+Nano Banana는 사용자의 현재 Google 사용 환경에서 무료로 사용할 수 있다. 이미지 단계는 비용 방어보다 quality/continuity 도구로 적극 활용한다.
 
 ## 사용자가 평소 말할 것
 
@@ -36,7 +36,7 @@ ChatGPT/repo가 준비해야 할 것:
 - 소재/선택 이유/Japan fit
 - runtime tier
 - HOOK / TRANSFORMATION / SCALE PROOF / PAYOFF
-- exact-order KF prompts
+- exact-order image/target prompts
 - exact-order G prompts
 - 한 장짜리 `production/<EPISODE>_OPERATOR_CARD.md`
 - manifest + NEXT_EPISODE + material handoff sync
@@ -49,8 +49,6 @@ ChatGPT/repo가 준비해야 할 것:
 ```
 
 **PRIMARY RUNBOOK은 현재 episode의 Operator Card다.** Generated bundle/flow pack은 기술 참고/비상 fallback이다.
-
-사용자는 여러 문서를 오가며 프롬프트를 조립하지 않는다. Operator Card의 `NOW` 한 단계만 먼저 수행한다.
 
 현재 TK-005:
 ```text
@@ -86,21 +84,42 @@ Paid video 전에 episode가 다음을 명확히 보여야 한다.
 
 약한 항목이 있으면 장면 수를 늘리지 말고 premise/shot/action을 개선한다.
 
-## Gate A — core visual/keyframe continuity
+## Gate A — G1 전에 first pair만 준비
 
+기본값:
 ```text
 strong KF0 maker-view anchor
 → paws / scale / camera / props / lighting QC
 → KF1을 승인 KF0에서 파생
-→ KF2를 KF1에서 파생
-→ core ending KF까지 순차 파생
-→ core continuity PASS
+→ KF0/KF1 PASS
 → G1 only
 ```
 
-KF1+를 independent fresh lottery image로 만들지 않는다.
+**KF2/KF3를 G1 전에 미리 만들지 않는다.**
 
-**Adaptive H40:** G4가 optional/value-gated라면 G4 target KF를 G1 전에 미리 만들 필요가 없다. G1→G3 core가 complete하도록 KF0→KF3만 먼저 PASS시키고, real G3를 본 뒤 G4가 실제로 필요할 때만 actual G3 saved frame에서 optional KF4를 파생한다.
+## Actual-frame target rebasing
+
+Google Flow는 저장한 video frame을 future generation의 start/end frame으로 사용할 수 있다. 따라서 next target도 actual PASS footage에서 파생한다.
+
+```text
+G1 PASS
+→ native Save frame
+→ actual G1 frame에서 KF2 생성
+→ G2 PASS
+→ native Save frame
+→ actual G2 frame에서 KF3 생성
+→ G3
+```
+
+Manifest의 KF2/KF3/KF4 설명은 destination state다. 미리 생성해야 한다는 뜻이 아니다.
+
+장점:
+- actual paw/camera/scale/props/light를 그대로 이어감
+- speculative KF와 real footage mismatch 감소
+- time-to-first-valid-G1 단축
+- 불필요한 사전 이미지 작업 감소
+
+Adaptive H40의 optional KF4는 동일하게 actual G3 PASS frame에서만 파생한다.
 
 ## Paid Flow baseline
 
@@ -118,21 +137,20 @@ Paid generation/publishing은 사용자 명시 행동 없이는 하지 않는다
 ## Progressive Spend
 
 ```text
-core visual chain PASS
+KF0/KF1 PASS
 → G1 only
 → quality QC
 → PASS: native Save frame
+→ actual PASS frame에서 next target 생성
 → G2 only after G1 PASS
-→ G3 only after G2 PASS
+→ repeat for G3
 → G1-G3를 함께 보고 complete면 STOP
-→ G4가 실제로 더 좋아질 때만 optional target KF 생성 + G4
+→ G4가 실제로 더 좋아질 때만 actual G3 frame에서 KF4 + optional G4
 ```
-
-다음 scene First frame = previous PASS clip actual native saved frame.
 
 H30/H40는 first-pass paid tier이지 final runtime 약속이 아니다.
 - compact_h30: 3×8s raw, 보통 24–27s final
-- immersive_h40: **3 core beats + optional fourth candidate**, 최대 4×8s raw
+- immersive_h40: 3 core beats + optional fourth candidate, 최대 4×8s raw
 
 ## 한 8초 scene
 
@@ -176,6 +194,7 @@ Quiet room tone + close tiny ASMR
 - manual interventions
 - prompt corrections before G1
 - time-to-first-valid-G1
+- actual-frame rebasing 후 continuity correction/reroll 변화
 
 장기 목표:
 ```text
